@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -14,10 +14,35 @@ import Icon1 from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Onboarding from './components/Onboarding';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useState} from 'react';
+import {currency} from './utils';
+import {Axios} from './utils';
+import moment from 'moment';
+import base64 from 'react-native-base64';
 
 const {width} = Dimensions.get('window');
 
 function HomeScreen({navigation}) {
+  const [dataUser, setDataUser] = useState({});
+  const [room, setRoom] = useState([]);
+  const getRoom = async () => {
+    try {
+      const response = await Axios.get('/room');
+      const data = response.data?.data?.result;
+      setRoom(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getRoom();
+    AsyncStorage.getItem('dataUser').then(res => {
+      setDataUser(JSON.parse(res));
+    });
+  }, []);
+
   return (
     <ScrollView style={{backgroundColor: '#C4F601', flex: 4}}>
       <View
@@ -86,7 +111,7 @@ function HomeScreen({navigation}) {
             fontSize: 14,
             fontWeight: 'bold',
           }}>
-          Hai, Doni Chrisdianto K
+          Hai, {dataUser?.username}
         </Text>
         <Text style={{color: '#000000', fontSize: 13, fontWeight: '400'}}>
           Yuk terus bergerak untuk hidup yang lebih sehat
@@ -123,7 +148,7 @@ function HomeScreen({navigation}) {
               </Text>
               <Text
                 style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>
-                187.000
+                {currency(dataUser?.balance)}
               </Text>
             </View>
 
@@ -142,32 +167,33 @@ function HomeScreen({navigation}) {
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            marginTop: 70,
-            marginLeft: 16,
-            marginRight: 33,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text
+        <TouchableOpacity onPress={() => navigation.navigate('List Meetup')}>
+          <View
             style={{
-              fontSize: 20,
-              fontWeight: '700',
-              color: '#ffffff',
-              fontFamily: 'OpenSans',
+              marginTop: 70,
+              marginLeft: 16,
+              marginRight: 33,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-            Main bareng teman baru
-          </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '700',
+                color: '#ffffff',
+                fontFamily: 'OpenSans',
+              }}>
+              Main bareng teman baru
+            </Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate('List Meetup')}>
             <Icon2
               name="navigate-next"
               style={{color: 'white', fontSize: 25}}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
+
         <View style={{marginLeft: 8}}>
           <ScrollView
             style={{
@@ -184,105 +210,120 @@ function HomeScreen({navigation}) {
               bottom: 0,
               right: 30,
             }}>
-            <TouchableOpacity
-              style={Styles.View}
-              onPress={() => navigation.navigate('DetailMeetupPage')}>
-              <Image
-                source={require('./src/Badminton.png')}
-                style={{
-                  width: '100%',
-                  height: 148,
-                  borderRadius: 10,
-                }}
-              />
-              <View
-                style={{
-                  alignItems: 'center',
-                  position: 'absolute',
-                  top: 110,
-                  left: 240,
-                  right: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                  backgroundColor: '#C4F601',
-                  width: 55,
-                  height: 24,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                }}>
-                <Ionicon
-                  name="people-outline"
-                  size={15}
+            {room.map((item, index) => (
+              <TouchableOpacity
+                style={Styles.View}
+                onPress={() =>
+                  navigation.navigate('DetailMeetupPage', {id: item.id})
+                }>
+                <Image
+                  source={{
+                    uri: item?.facility?.banner_img
+                      ? item?.facility?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                  }}
                   style={{
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    paddingRight: 2,
+                    width: '100%',
+                    height: 148,
+                    borderRadius: 10,
                   }}
                 />
-                <Text
-                  style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
-                  7/10
-                </Text>
-              </View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginLeft: 15,
-                  marginTop: 8,
-                  color: '#C4F601',
-                  fontWeight: '700',
-                  fontFamily: 'OpenSans',
-                  marginBottom: 8,
-                }}>
-                Ayo main badminton bareng
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  marginVertical: 8,
-                  alignItems: 'center',
-                }}>
-                <Ionicon
-                  name="location-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
+                <View
+                  style={{
+                    alignItems: 'center',
+                    position: 'absolute',
+                    top: 110,
+                    left: 240,
+                    right: 0,
+                    bottom: 0,
+                    justifyContent: 'center',
+                    backgroundColor: '#C4F601',
+                    width: 55,
+                    height: 24,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                  }}>
+                  <Ionicon
+                    name="people-outline"
+                    size={15}
+                    style={{
+                      fontWeight: 'bold',
+                      color: '#000000',
+                      paddingRight: 2,
+                    }}
+                  />
+                  <Text
+                    style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
+                    {item.room_detail?.length} / {item.max_capacity}
+                    {/* 7/10 */}
+                  </Text>
+                </View>
                 <Text
                   style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    color: '#ffffff',
+                    fontSize: 16,
+                    marginLeft: 15,
+                    marginTop: 8,
+                    color: '#C4F601',
+                    fontWeight: '700',
                     fontFamily: 'OpenSans',
+                    marginBottom: 8,
                   }}>
-                  Bilal GOR Badminton, Tembung
+                  {item.room_name}
                 </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  alignItems: 'center',
-                }}>
-                <Ionicon
-                  name="time-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
+                <View
                   style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    fontFamily: 'OpenSans',
-                    color: '#ffffff',
+                    flexDirection: 'row',
+                    marginLeft: 20,
+                    marginVertical: 8,
+                    alignItems: 'center',
                   }}>
-                  Sabtu, 25 Nov 08.00-12.00 AM
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <View style={Styles.View}></View>
+                  <Ionicon
+                    name="location-outline"
+                    size={18}
+                    style={{fontWeight: 'bold', color: '#ffffff'}}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      fontSize: 12,
+                      color: '#ffffff',
+                      fontFamily: 'OpenSans',
+                    }}>
+                    {item.facility?.merchant?.address || '-'}
+                    {/* Bilal GOR Badminton, Tembung */}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: 20,
+                    alignItems: 'center',
+                  }}>
+                  <Ionicon
+                    name="time-outline"
+                    size={18}
+                    style={{fontWeight: 'bold', color: '#ffffff'}}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      fontSize: 12,
+                      fontFamily: 'OpenSans',
+                      color: '#ffffff',
+                    }}>
+                    {moment(item.booking.booking_date).format('ddd, D MMM')}{' '}
+                    {item.booking?.time
+                      ? `${JSON.parse(item.booking?.time)[0]} - ${
+                          JSON.parse(item.booking?.time)[1]
+                        }`
+                      : ''}
+                    {/* Sabtu, 25 Nov 08.00-12.00 AM */}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
 

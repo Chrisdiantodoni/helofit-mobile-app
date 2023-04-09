@@ -1,10 +1,35 @@
 import React, {Component, useState} from 'react';
 import {TouchableOpacity, Image, Text, View, TextInput} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Axios} from '../utils';
 
-function ForgetPassword({navigation}) {
+function ForgetPassword(props, {navigation}) {
   const [isSecureEntry, setIsSecureEntry] = useState(true);
   const [password, setPassword] = useState('');
+  const {username, pin} = props.route.params;
+
+  const HandleForget = async () => {
+    try {
+      const body = {
+        newPassword: password,
+        username,
+        pin,
+      };
+      const response = await Axios.post(
+        '/authentication/update-password',
+        body,
+      );
+      if (response.data.data) {
+        props.navigation.replace('Signin');
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+
+    console.log({body});
+  };
+
   return (
     <View
       style={{
@@ -85,7 +110,7 @@ function ForgetPassword({navigation}) {
           alignItems: 'center',
           marginTop: 48,
         }}
-        onPress={() => navigation.navigate('Signin')}>
+        onPress={HandleForget}>
         <Text style={{fontSize: 16, fontWeight: 'bold', color: 'black'}}>
           Selanjutnya
         </Text>

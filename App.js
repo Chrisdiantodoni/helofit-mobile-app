@@ -39,6 +39,7 @@ import PageFasilitas from './Screen/PageFasilitas';
 import Pin from './Screen/Pin';
 import FollowMeetup from './Screen/FollowMeetup';
 import PromoList from './Screen/PromoList';
+import FlashMessage from 'react-native-flash-message';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -268,6 +269,7 @@ function App() {
           options={{headerShown: false}}
         />
       </Stack.Navigator>
+      <FlashMessage position="top" />
     </NavigationContainer>
   );
 }

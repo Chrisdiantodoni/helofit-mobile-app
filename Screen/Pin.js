@@ -9,24 +9,58 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import ReactNativePinView from 'react-native-pin-view';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {Axios} from '../utils';
+import {showMessage, hideMessage} from 'react-native-flash-message';
+import FlashMessage from 'react-native-flash-message';
+import {Button} from 'react-native-paper';
 
 const Pin = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
+
+  const handlePin = async () => {
+    console.log('hallo');
+    try {
+      const body = {username, pin};
+      const response = await Axios.post(
+        '/authentication/find-account-by-pin',
+        body,
+      );
+
+      if (response.data.data !== null) {
+        navigation.navigate('ForgetPassword', {username, pin});
+      } else {
+        // Alert.alert('username salah');
+        showMessage({
+          message: 'User Tidak Ditemukan',
+          type: 'danger',
+        });
+      }
+      console.log(response.data.data);
+    } catch (error) {
+      showMessage({
+        message: error.response.data.message,
+        type: 'danger',
+      });
+      console.log(error.response.data.message);
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
+      resetScrollToCoords={{x: 0, y: 0}}
+      scrollEnabled={false}
       style={{
         backgroundColor: '#161616',
         flex: 1,
-        padding: 16,
       }}>
       <View
         style={{
           alignItems: 'center',
+          padding: 16,
         }}>
         <Image
           source={require('../src/ilustrasi-welcome3-blur.png')}
@@ -34,7 +68,12 @@ const Pin = ({navigation}) => {
         />
         <Image
           source={require('../src/helofitlogo-1.png')}
-          style={{width: 240, height: 60, marginTop: 118, position: 'absolute'}}
+          style={{
+            width: 240,
+            height: 60,
+            marginTop: 118,
+            position: 'absolute',
+          }}
         />
         <View
           style={{
@@ -65,6 +104,7 @@ const Pin = ({navigation}) => {
         </View>
 
         <TextInput
+          autoCapitalize="none"
           placeholder="Masukkan Username"
           placeholderTextColor={'#FFFFFF'}
           style={{
@@ -82,6 +122,7 @@ const Pin = ({navigation}) => {
         />
 
         <TextInput
+          autoCapitalize="none"
           placeholder="Masukkan PIN"
           placeholderTextColor={'#FFFFFF'}
           secureTextEntry={true}
@@ -110,7 +151,8 @@ const Pin = ({navigation}) => {
             alignItems: 'center',
             marginTop: 48,
           }}
-          onPress={() => navigation.navigate('ForgetPassword')}>
+          // onPress={handlePin}
+          onPress={handlePin}>
           <Text style={{fontSize: 16, fontWeight: 'bold', color: 'black'}}>
             Selanjutnya
           </Text>

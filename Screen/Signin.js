@@ -1,11 +1,27 @@
 import React, {Component, useState} from 'react';
-import {TouchableOpacity, Image, Text, View, TextInput} from 'react-native';
+import {
+  TouchableOpacity,
+  Image,
+  Text,
+  View,
+  TextInput,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Axios} from '../utils';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {authenticationAPI} from '../API';
-import {REACT_APP_BASE_URL} from '@env';
+import FlashMessage from 'react-native-flash-message';
+
+const StringifyAsyncStorage = ({name = '', value}) => {
+  const result = AsyncStorage.setItem(name, value);
+  if (name && value) {
+    return result;
+  } else {
+    return Alert.alert('Parsing Gagal');
+  }
+};
 
 function Signin({navigation}) {
   const [isSecureEntry, setIsSecureEntry] = useState(true);
@@ -20,12 +36,39 @@ function Signin({navigation}) {
         password,
       };
       const response = await Axios.post('/authentication/login', body);
-      console.log('bisa', response.data);
-      navigation.navigate('Tabs');
-
+      console.log(response);
+      // console.log('bisa', response.data);
+      if (response.data.message === 'OK') {
+        const token = response.data.data.token;
+        const refreshToken = response.data.data.refreshToken;
+        const type = response.data.data.type;
+        const dataUser = response.data.data.data;
+        console.log({token, refreshToken, type, dataUser});
+        StringifyAsyncStorage({
+          name: 'token',
+          value: token,
+        });
+        StringifyAsyncStorage({
+          name: 'refreshToken',
+          value: refreshToken,
+        });
+        StringifyAsyncStorage({
+          name: 'type',
+          value: type,
+        });
+        StringifyAsyncStorage({
+          name: 'dataUser',
+          value: JSON.stringify(dataUser),
+        });
+        navigation.replace('Tabs');
+      }
       // await AsyncStorage.setItem('token', response.data.token);
     } catch (error) {
-      console.log(error);
+      showMessage({
+        message: 'Username Password Salah',
+        type: 'danger',
+      });
+      console.log(error.response.statusText);
     }
   };
 
@@ -36,11 +79,11 @@ function Signin({navigation}) {
       style={{
         backgroundColor: '#161616',
         flex: 1,
-        padding: 16,
       }}>
       <View
         style={{
           alignItems: 'center',
+          padding: 16,
         }}>
         <Image
           source={require('../src/ilustrasi-welcome3-blur.png')}
@@ -75,8 +118,8 @@ function Signin({navigation}) {
             Selamat Datang kembali
           </Text>
         </View>
-
         <TextInput
+          autoCapitalize="none"
           placeholder="Masukkan Username"
           placeholderTextColor={'#FFFFFF'}
           style={{
@@ -106,6 +149,7 @@ function Signin({navigation}) {
           }}>
           <View style={{width: '85%'}}>
             <TextInput
+              autoCapitalize="none"
               placeholder="Masukkan Password"
               secureTextEntry={isSecureEntry}
               placeholderTextColor={'#FFFFFF'}
@@ -121,7 +165,6 @@ function Signin({navigation}) {
             />
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
           style={{
             alignSelf: 'flex-end',
@@ -137,7 +180,6 @@ function Signin({navigation}) {
             Lupa Password?
           </Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={{
             backgroundColor: '#C4F601',

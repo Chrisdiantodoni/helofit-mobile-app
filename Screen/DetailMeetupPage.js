@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,16 @@ import {
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import {TextInput} from 'react-native-paper';
+import {Axios, currency} from '../utils';
+import {showMessage} from 'react-native-flash-message';
+import moment from 'moment';
+import BuatRoom from './Meetup/BuatRoom';
 
-const DetailMeetupPage = ({navigation}) => {
+const DetailMeetupPage = (props, {navigation}) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
+  const id = props.route.params.id;
+  const [data, setData] = useState({});
 
   const handlePlayer = type => {
     switch (type) {
@@ -29,11 +35,49 @@ const DetailMeetupPage = ({navigation}) => {
     }
   };
 
+  const getDetailRoom = async () => {
+    try {
+      if (!id) {
+        showMessage({
+          message: 'Tidak ada Meetup',
+          type: 'danger',
+        });
+      } else {
+        const {data} = await Axios.get(`/room/${id}`);
+        if (data.message === 'OK') {
+          console.log(data.data);
+          setData(data.data);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const priceperPerson = (total, max_capacity) => {
+    const result = parseInt(total) / parseInt(max_capacity);
+    return result;
+  };
+
+  const callAnotherPerson = (room_detail = [], index) => {
+    const result = room_detail[index]?.user?.username;
+
+    return result;
+  };
+
+  useEffect(() => {
+    getDetailRoom();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <View>
         <Image
-          source={require('../src/Badminton.png')}
+          source={{
+            uri: data?.facility?.banner_img
+              ? data?.facility?.banner_img
+              : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+          }}
           style={{
             width: '100%',
             height: 187.5,
@@ -66,7 +110,7 @@ const DetailMeetupPage = ({navigation}) => {
             }}
           />
           <Text style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
-            7/10
+            {data.room_detail?.length} / {data.max_capacity}
           </Text>
         </View>
         <View style={styles.subContainer}>
@@ -79,10 +123,12 @@ const DetailMeetupPage = ({navigation}) => {
               marginBottom: 8,
               lineHeight: 27.24,
             }}>
-            Ayo main badminton bareng sama ku yuk
+            {data.room_name}
           </Text>
           <View style={{flexDirection: 'row'}}>
-            <Text style={styles.heading14}>Badminton</Text>
+            <Text style={styles.heading14}>
+              {data?.facility?.category?.category_name || '-'}
+            </Text>
             <Text
               style={{
                 fontWeight: '700',
@@ -92,7 +138,7 @@ const DetailMeetupPage = ({navigation}) => {
               |
             </Text>
             <Text style={[styles.heading14, {fontWeight: '400'}]}>
-              Laki-laki
+              {data?.gender === 'male' ? 'Laki - Laki' : 'Perempuan'}
             </Text>
           </View>
         </View>
@@ -110,7 +156,9 @@ const DetailMeetupPage = ({navigation}) => {
               />
             </View>
             <View>
-              <Text style={styles.heading14}>Bilal GOR Badminton, Tembung</Text>
+              <Text style={styles.heading14}>
+                {data?.facility?.merchant?.address || '-'}
+              </Text>
               <View style={{flexDirection: 'row'}}>
                 <TouchableOpacity>
                   <Text style={styles.small12}>lihat detail fasilitas</Text>
@@ -134,7 +182,14 @@ const DetailMeetupPage = ({navigation}) => {
               />
             </View>
             <View>
-              <Text style={styles.heading14}>Sabtu, 25 Nov 08.00-12.00 AM</Text>
+              <Text style={styles.heading14}>
+                {moment(data?.booking?.booking_date).format('ddd, D MMM')}{' '}
+                {data?.booking?.time
+                  ? `${JSON.parse(data?.booking?.time)[0]} - ${
+                      JSON.parse(data?.booking?.time)[1]
+                    }`
+                  : ''}
+              </Text>
             </View>
           </View>
           <View style={{flexDirection: 'row', paddingBottom: 4}}>
@@ -150,7 +205,13 @@ const DetailMeetupPage = ({navigation}) => {
               />
             </View>
             <View>
-              <Text style={styles.heading14}>Rp.400.000 (40.000/pemain)</Text>
+              <Text style={styles.heading14}>
+                Rp {currency(data?.booking?.total)} (
+                {`Rp ${currency(
+                  priceperPerson(data?.booking?.total, data?.max_capacity),
+                )}`}{' '}
+                / Pemain ){/* Rp.400.000 (40.000/pemain) */}
+              </Text>
             </View>
           </View>
         </View>
@@ -170,8 +231,13 @@ const DetailMeetupPage = ({navigation}) => {
           })}
           <View style={{marginHorizontal: 20, width: '65%'}}>
             <Text style={[styles.heading14, {fontSize: 12}]}>
-              Rudiantara, Yono, dan 5 Orang lainnya telah bergabung dalam room
-              ini
+              {callAnotherPerson(data?.room_detail, 0)}
+              {', '}
+              {callAnotherPerson(data?.room_detail, 1)} dan{' '}
+              {data.room_detail?.length} Orang lainnya telah bergabung dalam
+              room ini
+              {/* Rudiantara, Yono, dan 5 Orang lainnya telah bergabung dalam room
+              ini */}
             </Text>
             <TouchableOpacity onPress={() => setIsVisible(true)}>
               <Text style={styles.small12}>Lihat semua pemain</Text>
@@ -182,11 +248,7 @@ const DetailMeetupPage = ({navigation}) => {
         <View style={styles.subContainer3}>
           <Text style={[styles.heading14, {fontSize: 14}]}>Deskripsi</Text>
           <Text style={[styles.heading14, {fontWeight: '400'}]}>
-            Cari temen main badminton nih, gak perlu jago cukup bisa main aja,
-            gak main kasar cuma main buat senang-senang aja Jangan lupa bawa
-            sepatu masing-masing dan air mineral dari rumah karena host gak ada
-            nyediain air minum nya join kuy, ditunggu ya, di waktu dan lokasi
-            yang tertera..
+            {data?.room_desc}
           </Text>
         </View>
         <View style={[styles.subContainer3, {paddingVertical: 10}]}>
@@ -233,7 +295,11 @@ const DetailMeetupPage = ({navigation}) => {
                 styles.small12,
                 {fontSize: 20, fontWeight: '700', height: 50},
               ]}>
-              Rp. 120.000
+              Rp{' '}
+              {currency(
+                priceperPerson(data?.booking?.total, data?.max_capacity) *
+                  parseInt(totalPlayer),
+              )}
             </Text>
           </View>
         </View>
@@ -344,50 +410,55 @@ const DetailMeetupPage = ({navigation}) => {
             </Text>
             <ScrollView>
               <Pressable>
-                {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map(() => {
-                  return (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        marginTop: 20,
-                        alignSelf: 'flex-start',
-                        display: 'flex',
-                        width: '92%',
-                      }}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                        }}>
-                        <Image
-                          source={require('../src/Avatar.png')}
-                          style={{width: 32, height: 32, marginRight: 16}}
-                        />
-                        <Text style={styles.heading14}>Rudiantara Santoso</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: '#C4f601',
-                          borderRadius: 16,
-                          width: 98,
-                          height: 32,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <Text
+                {data?.room_detail
+                  ? data?.room_detail?.map((item, idx) => {
+                      return (
+                        <View
+                          key={idx}
                           style={{
-                            fontSize: 12,
-                            fontWeight: '700',
-                            color: '#161616',
+                            marginTop: 20,
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: '100%',
                           }}>
-                          Keluarkan
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  );
-                })}
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              maxWidth: '55%',
+                              width: '100%',
+                              alignItems: 'center',
+                            }}>
+                            <Image
+                              source={require('../src/Avatar.png')}
+                              style={{width: 32, height: 32, marginRight: 16}}
+                            />
+                            <Text style={styles.heading14}>
+                              {item?.user?.username}
+                            </Text>
+                          </View>
+
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: '#C4f601',
+                              borderRadius: 16,
+                              width: 98,
+                              height: 32,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                fontWeight: '700',
+                                color: '#161616',
+                              }}>
+                              Keluarkan
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })
+                  : ''}
               </Pressable>
             </ScrollView>
           </View>

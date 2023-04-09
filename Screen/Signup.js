@@ -12,7 +12,17 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Dropdown} from 'react-native-element-dropdown';
 import Axios from '../utils/Axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import FlashMessage from 'react-native-flash-message';
+import {showMessage, hideMessage} from 'react-native-flash-message';
+
+const StringifyAsyncStorage = ({name = '', value}) => {
+  const result = AsyncStorage.setItem(name, value);
+  if (name && value) {
+    return result;
+  } else {
+    return Alert.alert('Parsing Gagal');
+  }
+};
 
 function Signin({navigation}) {
   const [jenisKelamin, setJenisKelamin] = useState(null);
@@ -42,41 +52,48 @@ function Signin({navigation}) {
       password: password,
       email: Email,
       pin: pin,
-      gender: 'male',
-      phone_number: '0822',
     };
 
     try {
       console.log('masuk try');
 
       await Axios.post('/authentication/register', body).then(res => {
+        if (res.data.message === 'OK') {
+          const token = res.data.data.token;
+          const refreshToken = res.data.data.refreshToken;
+          const type = res.data.data.type;
+          const dataUser = res.data.data.data;
+          console.log({token, refreshToken, type, dataUser});
+          StringifyAsyncStorage({
+            name: 'token',
+            value: token,
+          });
+          StringifyAsyncStorage({
+            name: 'refreshToken',
+            value: refreshToken,
+          });
+          StringifyAsyncStorage({
+            name: 'type',
+            value: type,
+          });
+          StringifyAsyncStorage({
+            name: 'dataUser',
+            value: JSON.stringify(dataUser),
+          });
+          navigation.replace('Tabs');
+        }
         console.log({res: res.data});
-        navigation.navigate('Signin');
       });
     } catch (error) {
-      console.log('error', error);
+      showMessage({
+        message: error.response.data.data[0],
+        type: 'danger',
+      });
+      console.log('error', error.response.data.data[0]);
       // setMessage(error.response.data.message);
     }
   };
 
-  const getData = async () => {
-    try {
-      // const response = await Axios.get('/authentication/data');
-
-      const response = await axios.get(
-        `http://192.168.67.118:3002/api/v1/client/authentication/data`,
-      );
-
-      console.log('response', response);
-    } catch (error) {
-      console.log('error dia', error);
-    }
-  };
-
-  useEffect(() => {
-    console.log('jalaannnn');
-    getData();
-  }, []);
   return (
     <ScrollView
       style={{
@@ -118,6 +135,7 @@ function Signin({navigation}) {
             </View>
 
             <TextInput
+              autoCapitalize="none"
               placeholder="Masukkan Username"
               placeholderTextColor={'#FFFFFF'}
               value={username}
@@ -136,6 +154,7 @@ function Signin({navigation}) {
               onChangeText={text => setusername(text)}
             />
             <TextInput
+              autoCapitalize="none"
               placeholder="Masukkan Email"
               placeholderTextColor={'#FFFFFF'}
               value={Email}
@@ -173,6 +192,7 @@ function Signin({navigation}) {
                     color: '#FFFFFF',
                     fontSize: 14,
                   }}
+                  autoCapitalize="none"
                   placeholder="Masukkan Password"
                   secureTextEntry={secureText}
                   placeholderTextColor={'#FFFFFF'}
@@ -188,77 +208,7 @@ function Signin({navigation}) {
                 />
               </TouchableOpacity>
             </View>
-            {/* <Dropdown
-              style={{
-                backgroundColor: '#7c7c7c',
-                borderRadius: 16,
-                width: 355,
-                height: 60,
-                color: '#FFFFFF',
-                paddingLeft: 22,
-                fontSize: 14,
-                marginBottom: 16,
-                paddingRight: 24,
-                fontFamily: 'openSans',
-              }}
-              dropdownPosition={'auto'}
-              selectedTextStyle={{
-                fontSize: 14,
-                fontFamily: 'OpenSans',
-                color: '#Ffffff',
-                backgroundColor: '#7c7c7c',
-              }}
-              placeholderStyle={{
-                fontSize: 14,
-                fontFamily: 'OpenSans',
-                color: '#ffffff',
-              }}
-              containerStyle={{
-                borderRadius: 16,
-                backgroundColor: '#ffffff',
-                borderWidth: 1,
-                borderColor: '#7c7c7c',
-              }}
-              activeColor={{
-                backgroundColor: '#7c7c7c',
-              }}
-              itemTextStyle={{
-                color: '#FFFFFF',
-                fontSize: 14,
-                fontFamily: 'OpenSans',
-              }}
-              iconStyle={{
-                tintColor: '#FFFFFF',
-              }}
-              data={data}
-              labelField="label"
-              valueField="value"
-              placeholder="Jenis kelamin"
-              searchPlaceholder="Search..."
-              value={jenisKelamin}
-              onChange={item => {
-                setJenisKelamin(item.value), console.log(item.value);
-              }}
-            /> */}
-            {/* 
-            <TextInput
-              placeholder="Masukkan No Handphone"
-              keyboardType="number-pad"
-              value={nohp}
-              placeholderTextColor={'#FFFFFF'}
-              style={{
-                backgroundColor: '#7c7c7c',
-                borderRadius: 16,
-                width: 355,
-                height: 60,
-                color: '#FFFFFF',
-                paddingLeft: 22,
-                fontSize: 14,
-                marginBottom: 16,
-                fontFamily: 'openSans',
-              }}
-              onChangeText={text => setNohp(text)}
-            /> */}
+
             <TextInput
               placeholder="Masukkan Pin"
               keyboardType="number-pad"
@@ -268,12 +218,11 @@ function Signin({navigation}) {
               placeholderTextColor={'#FFFFFF'}
               style={{
                 backgroundColor: '#7c7c7c',
-                borderRadius: 8,
+                borderRadius: 16,
                 width: 355,
                 height: 60,
                 color: '#FFFFFF',
                 fontSize: 14,
-                alignItems: 'center',
                 textAlign: 'center',
                 fontFamily: 'openSans',
               }}
@@ -318,6 +267,7 @@ function Signin({navigation}) {
           </View>
         </View>
       </KeyboardAwareScrollView>
+      <FlashMessage position="top" />
     </ScrollView>
   );
 }

@@ -1,7 +1,14 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component} from 'react';
 import {TouchableOpacity, Image, Text, View} from 'react-native';
 
 function Welcome({navigation}) {
+  AsyncStorage.getItem('token').then(res => {
+    if (res) {
+      navigation.replace('Tabs');
+    }
+    console.log(res);
+  });
   return (
     <View style={{backgroundColor: '#161616', flex: 1, alignItems: 'center'}}>
       <Image

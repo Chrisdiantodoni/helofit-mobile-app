@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,31 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  ScrollView,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import moment from 'moment';
+import {Axios} from '../utils';
 
 function Meetup({navigation: {navigate, goBack}}) {
+  const [room, setRoom] = useState([]);
+
+  const getRoom = async () => {
+    try {
+      const response = await Axios.get('/room');
+      const data = response.data?.data?.result;
+      setRoom(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getRoom();
+  }, []);
   return (
-    <View style={{backgroundColor: '#161616', flex: 1}}>
+    <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
       <View
         style={{
           backgroundColor: '#C4F601',
@@ -37,7 +56,7 @@ function Meetup({navigation: {navigate, goBack}}) {
           List Meetup
         </Text>
       </View>
-      <View style={{backgroundColor: '#161616'}}>
+      <View style={{backgroundColor: '#161616', paddingBottom: 10}}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <Text style={styles.header}>Belum ketemu yang pas?</Text>
@@ -62,330 +81,130 @@ function Meetup({navigation: {navigate, goBack}}) {
           </TouchableOpacity>
         </View>
       </View>
-      <FlatList
-        data={Array}
-        renderItem={({item}) => (
-          <View style={styles.listContainer}>
-            <Text style={[styles.header, {marginTop: 24}]}>
-              Main dengan teman baru
+      <View style={styles.listContainer}>
+        <Text style={[styles.header, {marginTop: 24}]}>
+          Main dengan teman baru
+        </Text>
+        <Text style={styles.subheader}>
+          Temukan orang yang sehobi dengan kamu dan buat jaringan komunitas
+          lebih luas
+        </Text>
+        {room.map((item, index) => (
+          <TouchableOpacity
+            style={styles.View}
+            onPress={() => navigate('DetailMeetupPage', {id: item.id})}>
+            <Image
+              source={{
+                uri: item?.facility?.banner_img
+                  ? item?.facility?.banner_img
+                  : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+              }}
+              style={{
+                width: '100%',
+                height: 148,
+                borderRadius: 10,
+              }}
+            />
+            <View
+              style={{
+                alignItems: 'center',
+                position: 'absolute',
+                top: 110,
+                left: 290,
+                right: 0,
+                bottom: 0,
+                justifyContent: 'center',
+                backgroundColor: '#C4F601',
+                width: 55,
+                height: 24,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+              }}>
+              <Ionicon
+                name="people-outline"
+                size={15}
+                style={{
+                  fontWeight: 'bold',
+                  color: '#000000',
+                  paddingRight: 2,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#000000',
+                  fontWeight: '400',
+                }}>
+                {item.room_detail?.length} / {item.max_capacity}
+              </Text>
+            </View>
+            <Text
+              style={{
+                fontSize: 16,
+                marginLeft: 15,
+                marginTop: 8,
+                color: '#C4F601',
+                fontWeight: '700',
+                fontFamily: 'OpenSans',
+                marginBottom: 8,
+              }}>
+              {item.room_name}
             </Text>
-            <Text style={styles.subheader}>
-              Temukan orang yang sehobi dengan kamu dan buat jaringan komunitas
-              lebih luas
-            </Text>
-            <TouchableOpacity
-              style={styles.View}
-              onPress={() => navigate('DetailMeetupPage')}>
-              <Image
-                source={require('../src/Badminton.png')}
-                style={{
-                  width: '100%',
-                  height: 148,
-                  borderRadius: 10,
-                }}
+            <View
+              style={{
+                flexDirection: 'row',
+                marginLeft: 20,
+                marginVertical: 8,
+                alignItems: 'center',
+              }}>
+              <Ionicon
+                name="location-outline"
+                size={18}
+                style={{fontWeight: 'bold', color: '#ffffff'}}
               />
-              <View
-                style={{
-                  alignItems: 'center',
-                  position: 'absolute',
-                  top: 110,
-                  left: 290,
-                  right: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                  backgroundColor: '#C4F601',
-                  width: 55,
-                  height: 24,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                }}>
-                <Ionicon
-                  name="people-outline"
-                  size={15}
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    paddingRight: 2,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: '#000000',
-                    fontWeight: '400',
-                  }}>
-                  7/10
-                </Text>
-              </View>
               <Text
                 style={{
-                  fontSize: 16,
-                  marginLeft: 15,
-                  marginTop: 8,
-                  color: '#C4F601',
-                  fontWeight: '700',
+                  marginLeft: 10,
+                  fontSize: 12,
+                  color: '#ffffff',
                   fontFamily: 'OpenSans',
-                  marginBottom: 8,
                 }}>
-                Ayo main badminton bareng
+                {item.facility?.merchant?.address || '-'}
               </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  marginVertical: 8,
-                  alignItems: 'center',
-                }}>
-                <Ionicon
-                  name="location-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    color: '#ffffff',
-                    fontFamily: 'OpenSans',
-                  }}>
-                  Bilal GOR Badminton, Tembung
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  alignItems: 'center',
-                  marginBottom: 10,
-                }}>
-                <Ionicon
-                  name="time-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    fontFamily: 'OpenSans',
-                    color: '#ffffff',
-                  }}>
-                  Sabtu, 25 Nov 08.00-12.00 AM
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.View}
-              onPress={() => navigate('DetailMeetupPage')}>
-              <Image
-                source={require('../src/Badminton.png')}
-                style={{
-                  width: '100%',
-                  height: 148,
-                  borderRadius: 10,
-                }}
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginLeft: 20,
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <Ionicon
+                name="time-outline"
+                size={18}
+                style={{fontWeight: 'bold', color: '#ffffff'}}
               />
-              <View
-                style={{
-                  alignItems: 'center',
-                  position: 'absolute',
-                  top: 110,
-                  left: 290,
-                  right: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                  backgroundColor: '#C4F601',
-                  width: 55,
-                  height: 24,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                }}>
-                <Ionicon
-                  name="people-outline"
-                  size={15}
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    paddingRight: 2,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: '#000000',
-                    fontWeight: '400',
-                  }}>
-                  7/10
-                </Text>
-              </View>
               <Text
                 style={{
-                  fontSize: 16,
-                  marginLeft: 15,
-                  marginTop: 8,
-                  color: '#C4F601',
-                  fontWeight: '700',
+                  marginLeft: 10,
+                  fontSize: 12,
                   fontFamily: 'OpenSans',
-                  marginBottom: 8,
+                  color: '#ffffff',
                 }}>
-                Ayo main badminton bareng
+                {moment(item.booking.booking_date).format('ddd, D MMM')}{' '}
+                {item.booking?.time
+                  ? `${JSON.parse(item.booking?.time)[0]} - ${
+                      JSON.parse(item.booking?.time)[1]
+                    }`
+                  : ''}
               </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  marginVertical: 8,
-                  alignItems: 'center',
-                  marginBottom: 10,
-                }}>
-                <Ionicon
-                  name="location-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    color: '#ffffff',
-                    fontFamily: 'OpenSans',
-                  }}>
-                  Bilal GOR Badminton, Tembung
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  alignItems: 'center',
-                }}>
-                <Ionicon
-                  name="time-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    fontFamily: 'OpenSans',
-                    color: '#ffffff',
-                  }}>
-                  Sabtu, 25 Nov 08.00-12.00 AM
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.View}
-              onPress={() => navigation.navigate('DetailMeetupPage')}>
-              <Image
-                source={require('../src/Badminton.png')}
-                style={{
-                  width: '100%',
-                  height: 148,
-                  borderRadius: 10,
-                }}
-              />
-              <View
-                style={{
-                  alignItems: 'center',
-                  position: 'absolute',
-                  top: 110,
-                  left: 290,
-                  right: 0,
-                  bottom: 0,
-                  justifyContent: 'center',
-                  backgroundColor: '#C4F601',
-                  width: 55,
-                  height: 24,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 8,
-                }}>
-                <Ionicon
-                  name="people-outline"
-                  size={15}
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    paddingRight: 2,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: '#000000',
-                    fontWeight: '400',
-                  }}>
-                  7/10
-                </Text>
-              </View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginLeft: 15,
-                  marginTop: 8,
-                  color: '#C4F601',
-                  fontWeight: '700',
-                  fontFamily: 'OpenSans',
-                  marginBottom: 8,
-                }}>
-                Ayo main badminton bareng
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  marginVertical: 8,
-                  alignItems: 'center',
-                  marginBottom: 10,
-                }}>
-                <Ionicon
-                  name="location-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    color: '#ffffff',
-                    fontFamily: 'OpenSans',
-                  }}>
-                  Bilal GOR Badminton, Tembung
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  alignItems: 'center',
-                }}>
-                <Ionicon
-                  name="time-outline"
-                  size={18}
-                  style={{fontWeight: 'bold', color: '#ffffff'}}
-                />
-                <Text
-                  style={{
-                    marginLeft: 10,
-                    fontSize: 12,
-                    fontFamily: 'OpenSans',
-                    color: '#ffffff',
-                  }}>
-                  Sabtu, 25 Nov 08.00-12.00 AM
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-    </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
