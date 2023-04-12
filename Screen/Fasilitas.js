@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,11 @@ import {
   FlatList,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {Axios, currency} from '../utils';
 
 function Fasilitas({navigation: {navigate, goBack}}) {
+  const [facility, setFacility] = useState([]);
+
   const [selected, setSelected] = useState({
     image: require('../src/Price.png'),
     title: 'Harga Terendah',
@@ -29,6 +32,21 @@ function Fasilitas({navigation: {navigate, goBack}}) {
   const handleSelectedFilter = item => {
     setSelected(item);
   };
+
+  const getFacility = async () => {
+    try {
+      const response = await Axios.get('/facility');
+      const data = response?.data?.data?.result;
+      setFacility(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getFacility();
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -100,9 +118,10 @@ function Fasilitas({navigation: {navigate, goBack}}) {
       </View>
       <View style={{marginTop: 40, marginHorizontal: 16}}>
         <FlatList
-          data={Array}
-          renderItem={({item}) => (
+          data={facility}
+          renderItem={({item, index}) => (
             <TouchableOpacity
+              key={index}
               onPress={() => navigate('DetailFasilitasPage')}
               style={{
                 backgroundColor: '#161616',
@@ -110,7 +129,9 @@ function Fasilitas({navigation: {navigate, goBack}}) {
                 paddingVertical: 16,
                 borderRadius: 8,
               }}>
-              <Text style={styles.Heading28}>Antoni Futsal</Text>
+              <Text style={styles.Heading28}>
+                {item.merchant?.merchant_name}
+              </Text>
               <View style={{flexDirection: 'row'}}>
                 <Text
                   style={{
@@ -119,15 +140,17 @@ function Fasilitas({navigation: {navigate, goBack}}) {
                     fontSize: 14,
                     marginVertical: 8,
                   }}>
-                  Mulai dari Rp. 60.000
+                  Mulai dari Rp. {currency(item.price)}
                 </Text>
               </View>
               <Text style={[styles.heading14, {marginBottom: 8, fontSize: 14}]}>
-                Jl.Sutomo No.55B , Medan Tembung
+                {item.merchant?.address}
               </Text>
               <Text
                 style={[styles.heading14, {marginBottom: 15, fontSize: 14}]}>
-                Buka - Tutup 11.00 PM
+                {'Buka - Tutup '}
+                {item?.time}
+                {/* Buka - Tutup */}
               </Text>
             </TouchableOpacity>
           )}

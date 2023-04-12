@@ -46,7 +46,7 @@ const PilihKategori = ({navigation: {goBack, navigate}}) => {
               borderRadius: 24,
               backgroundColor: '#C4F601',
             }}
-            onPress={() => navigate('PageFasilitas')}>
+            onPress={() => navigate('Fasilitas')}>
             <Image
               source={require('../../src/Football.png')}
               style={{

@@ -326,31 +326,31 @@ function HomeScreen({navigation}) {
             ))}
           </ScrollView>
         </View>
-
-        <View
-          style={{
-            marginLeft: 16,
-            marginRight: 33,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text
+        <TouchableOpacity onPress={() => navigation.navigate('Task')}>
+          <View
             style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: '#ffffff',
+              marginLeft: 16,
+              marginRight: 33,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-            Buat yang suka tantangan
-          </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: '#ffffff',
+              }}>
+              Buat yang suka tantangan
+            </Text>
 
-          <TouchableOpacity>
             <Icon2
               name="navigate-next"
               style={{color: 'white', fontSize: 25}}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
+
         <View style={{marginLeft: 8}}>
           <ScrollView
             style={{

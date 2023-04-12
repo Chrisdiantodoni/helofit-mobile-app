@@ -29,6 +29,7 @@ function Meetup({navigation: {navigate, goBack}}) {
   useEffect(() => {
     getRoom();
   }, []);
+
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
       <View

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,48 @@ import {
 } from 'react-native';
 import {ProgressBar} from 'react-native-paper';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {Axios} from '../utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
 function Task({navigation: {navigate, goBack}}) {
+  const [taskItem, setTaskItem] = useState([]);
+  const [data, setData] = useState([]);
+  const [dataUser, setDataUser] = useState({});
+
+  const getUserTask = async () => {
+    try {
+      const id = dataUser?.id;
+      const {data} = await Axios.get(`/task/progress/${id}`);
+      if (data.message === 'OK') {
+        setData(data.data);
+        console.log(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getTask = async () => {
+    try {
+      const response = await Axios.get('/task');
+      const data = response.data?.data?.result;
+      setTaskItem(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getTask();
+    getUserTask();
+    AsyncStorage.getItem('dataUser').then(res => {
+      setDataUser(JSON.parse(res));
+    });
+  }, []);
+
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
       <View
@@ -63,99 +101,106 @@ function Task({navigation: {navigate, goBack}}) {
             bottom: 0,
             right: 30,
           }}>
-          <TouchableOpacity
-            style={styles.View}
-            onPress={() => navigate('DetailTask')}>
-            <Image
-              source={require('../src/Fitness.png')}
-              style={{width: '100%', height: 148, borderRadius: 10}}
-            />
-            <Text
-              style={{
-                fontSize: 16,
-                marginLeft: 15,
-                marginTop: 8,
-                color: '#C4F601',
-                fontWeight: '700',
-                fontFamily: 'OpenSans',
-              }}>
-              Bikin otot lengan tambah gede
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                marginLeft: 15,
-                marginTop: 4,
-                fontWeight: '400',
-                fontFamily: 'OpenSans',
-                marginBottom: 24,
-                color: '#FFFFFF',
-              }}>
-              Berakhir dalam 28 hari lagi
-            </Text>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                marginLeft: 20,
-                alignItems: 'center',
-              }}>
-              <Image
-                source={require('../src/Fitness-Icon.png')}
-                style={{width: 21, height: 21, tintColor: 'white'}}
-              />
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <View>
-                  <Text
-                    style={{
-                      marginLeft: 10,
-                      fontSize: 12,
-                      color: '#ffffff',
-                      fontFamily: 'OpenSans',
-                    }}>
-                    Gagah Fitness
-                  </Text>
-                </View>
-                <View
+          {data.map((item, idx) =>
+            item?.expiredInDays > 0 ? (
+              <TouchableOpacity
+                key={idx}
+                style={styles.View}
+                onPress={() => navigate('DetailTask')}>
+                <Image
+                  source={{
+                    uri: item?.banner_img
+                      ? item?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                  }}
+                  style={{width: '100%', height: 148, borderRadius: 10}}
+                />
+                <Text
                   style={{
-                    marginLeft: 117,
-                    justifyContent: 'center',
+                    fontSize: 16,
+                    marginLeft: 15,
+                    marginTop: 8,
+                    color: '#C4F601',
+                    fontWeight: '700',
+                    fontFamily: 'OpenSans',
+                  }}>
+                  {item.task_name}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    marginLeft: 15,
+                    marginTop: 4,
+                    fontWeight: '400',
+                    fontFamily: 'OpenSans',
+                    marginBottom: 24,
+                    color: '#FFFFFF',
+                  }}>
+                  Berakhir dalam {item?.expiredInDays} hari lagi
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: 20,
                     alignItems: 'center',
                   }}>
-                  <View>
-                    <Text
+                  <Image
+                    source={require('../src/Fitness-Icon.png')}
+                    style={{width: 21, height: 21, tintColor: 'white'}}
+                  />
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View>
+                      <Text
+                        style={{
+                          marginLeft: 10,
+                          fontSize: 12,
+                          color: '#ffffff',
+                          fontFamily: 'OpenSans',
+                        }}>
+                        {item.merchant?.merchant_name}
+                      </Text>
+                    </View>
+                    <View
                       style={{
-                        color: '#C4F601',
-                        fontSize: 20,
-                        fontWeight: '700',
-                        fontFamily: 'OpenSans',
+                        marginLeft: 117,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      15
-                    </Text>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#C4F601',
+                            fontSize: 20,
+                            fontWeight: '700',
+                            fontFamily: 'OpenSans',
+                          }}>
+                          {item?.poin}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#C4F601',
+                            fontSize: 12,
+                            fontWeight: '700',
+                            fontFamily: 'OpenSans',
+                          }}>
+                          POIN
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                  <View>
-                    <Text
-                      style={{
-                        color: '#C4F601',
-                        fontSize: 12,
-                        fontWeight: '700',
-                        fontFamily: 'OpenSans',
-                      }}>
-                      POIN
-                    </Text>
-                  </View>
+                </TouchableOpacity>
+                <View style={{marginHorizontal: 16}}>
+                  <ProgressBar
+                    style={{borderRadius: 8, marginTop: 10}}
+                    progress={item.percentage / 100}
+                    color={'#C4f601'}
+                  />
                 </View>
-              </View>
-            </TouchableOpacity>
-            <View style={{marginHorizontal: 16}}>
-              <ProgressBar
-                style={{borderRadius: 8, marginTop: 10}}
-                progress={0.5}
-                color={'#C4f601'}
-              />
-            </View>
-          </TouchableOpacity>
-          <View style={styles.View}></View>
-          <View style={styles.View}></View>
+              </TouchableOpacity>
+            ) : null,
+          )}
         </ScrollView>
       </View>
       <View
@@ -170,12 +215,16 @@ function Task({navigation: {navigate, goBack}}) {
           Dapatkan poin dari task yang kamu kerjakan
         </Text>
         <FlatList
-          data={Array}
-          renderItem={({item}) => (
-            <View style={styles.listContainer}>
+          data={taskItem}
+          renderItem={({item, index}) => (
+            <View key={index} style={styles.listContainer}>
               <View style={styles.View1}>
                 <Image
-                  source={require('../src/Fitness.png')}
+                  source={{
+                    uri: item?.banner_img
+                      ? item?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                  }}
                   style={{width: '100%', height: 171, borderRadius: 10}}
                 />
                 <Text
@@ -188,7 +237,7 @@ function Task({navigation: {navigate, goBack}}) {
                     fontFamily: 'OpenSans',
                     marginBottom: 8,
                   }}>
-                  Bikin otot lengan tambah gede
+                  {item.task_name}
                 </Text>
                 <View
                   style={{
@@ -210,7 +259,7 @@ function Task({navigation: {navigate, goBack}}) {
                           color: '#ffffff',
                           fontFamily: 'OpenSans',
                         }}>
-                        Gagah Fitness
+                        {item.merchant?.merchant_name}
                       </Text>
                     </View>
                     <View
@@ -226,7 +275,7 @@ function Task({navigation: {navigate, goBack}}) {
                             fontSize: 20,
                             fontWeight: '700',
                           }}>
-                          15
+                          {item?.poin}
                         </Text>
                       </View>
                       <View>
@@ -249,36 +298,25 @@ function Task({navigation: {navigate, goBack}}) {
                     justifyContent: 'space-between',
                     marginHorizontal: 10,
                   }}>
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      paddingHorizontal: 10,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 12, fontWeight: '400'}}>
-                      1. Treadmill 20 min
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 12, fontWeight: '400'}}>
-                      2. Barbel 15 kg
-                    </Text>
-                  </View>
+                  {item?.list_task
+                    ? item?.list_task?.slice(0, 2)?.map((itemTask, idxTask) => (
+                        <View
+                          style={{
+                            backgroundColor: '#C4F601',
+                            borderRadius: 8,
+                            paddingHorizontal: 10,
+                            height: 24,
+                            justifyContent: 'center',
+                            marginTop: 8,
+                            marginHorizontal: 8,
+                            alignItems: 'center',
+                          }}>
+                          <Text style={{fontSize: 12, fontWeight: '400'}}>
+                            {idxTask + 1} {'.'} {itemTask.task_name}
+                          </Text>
+                        </View>
+                      ))
+                    : null}
                   <View
                     style={{
                       backgroundColor: '#C4F601',
@@ -294,128 +332,6 @@ function Task({navigation: {navigate, goBack}}) {
                   </View>
                 </View>
               </View>
-              <View style={styles.View1}>
-                <Image
-                  source={require('../src/Fitness.png')}
-                  style={{width: '100%', height: 171, borderRadius: 10}}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginLeft: 15,
-                    marginTop: 8,
-                    color: '#C4F601',
-                    fontWeight: '700',
-                    fontFamily: 'OpenSans',
-                    marginBottom: 8,
-                  }}>
-                  Bikin otot lengan tambah gede
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 20,
-                    marginVertical: 8,
-                    alignItems: 'center',
-                  }}>
-                  <Image
-                    source={require('../src/Fitness-Icon.png')}
-                    style={{width: 21, height: 21, tintColor: 'white'}}
-                  />
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
-                      <Text
-                        style={{
-                          marginLeft: 10,
-                          fontSize: 12,
-                          color: '#ffffff',
-                          fontFamily: 'OpenSans',
-                        }}>
-                        Gagah Fitness
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        marginLeft: 160,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <View>
-                        <Text
-                          style={{
-                            color: '#C4F601',
-                            fontSize: 20,
-                            fontWeight: '700',
-                          }}>
-                          15
-                        </Text>
-                      </View>
-                      <View>
-                        <Text
-                          style={{
-                            color: '#C4F601',
-                            fontSize: 12,
-                            fontWeight: '700',
-                          }}>
-                          POIN
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginBottom: 18,
-                    justifyContent: 'space-between',
-                    marginHorizontal: 10,
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      paddingHorizontal: 10,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 12, fontWeight: '400'}}>
-                      1. Treadmill 20 min
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 12, fontWeight: '400'}}>
-                      2. Barbel 15 kg
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 12, fontWeight: '400'}}>...</Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.View1}></View>
             </View>
           )}
         />

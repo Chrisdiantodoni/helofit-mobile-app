@@ -35,7 +35,6 @@ import Dompet from './Screen/Dompet';
 import CreateRoom from './Screen/Meetup/CreateRoom';
 import DetailTask from './Screen/Task/DetailTask';
 import DetailFasilitasPage from './Screen/DetailFasilitasPage.';
-import PageFasilitas from './Screen/PageFasilitas';
 import Pin from './Screen/Pin';
 import FollowMeetup from './Screen/FollowMeetup';
 import PromoList from './Screen/PromoList';
@@ -254,10 +253,11 @@ function App() {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="PageFasilitas"
-          component={PageFasilitas}
+          name="Fasilitas"
+          component={Fasilitas}
           options={{headerShown: false}}
         />
+
         <Stack.Screen
           name="FollowMeetup"
           component={FollowMeetup}

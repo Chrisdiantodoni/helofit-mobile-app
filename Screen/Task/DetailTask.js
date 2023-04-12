@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,39 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import {Axios} from '../../utils';
+import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
 const DetailTask = ({navigation: {goBack, navigate}}) => {
+  const [data, setData] = useState([]);
+  const [dataUser, setDataUser] = useState({});
+
+  const getDetailTask = async () => {
+    try {
+      const id = dataUser?.id;
+      const {data} = await Axios.get(`/task/progress/${id}`);
+      if (data.message === 'OK') {
+        setData(data.data);
+        console.log(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getDetailTask();
+    AsyncStorage.getItem('dataUser').then(res => {
+      setDataUser(JSON.parse(res));
+    });
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <Image
-        source={require('../../src/FitnessGambar.png')}
+        source={{uri: data?.banner_img}}
         style={{width: '100%', height: 188}}
       />
       <TouchableOpacity onPress={() => goBack()}>
@@ -36,15 +62,13 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
           paddingBottom: 30,
         }}>
         <View style={{marginTop: 24, width: '80%'}}>
-          <Text style={styles.Heading28}>
-            Hanya untuk yang berani aja yang takut minggir
-          </Text>
+          <Text style={styles.Heading28}>{data[0].task_name}</Text>
           <Text
             style={[
               styles.heading14,
               {fontSize: 14, fontWeight: '700', marginTop: 8},
             ]}>
-            Berlaku sampai 30 Februari 2023
+            Berlaku sampai {moment(data[0].expiredIn).format('DD MMMM YYYY')}
           </Text>
           <View
             style={{
@@ -57,7 +81,9 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
                 source={require('../../src/Fitness-Icon.png')}
                 style={{height: 24, width: 24, marginRight: 8}}
               />
-              <Text style={styles.heading14}>Gagah Fitness</Text>
+              <Text style={styles.heading14}>
+                {data?.merchant?.merchant_name}
+              </Text>
             </View>
             <View
               style={{
@@ -71,7 +97,7 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
                     fontSize: 24,
                     fontWeight: '700',
                   }}>
-                  15
+                  {data?.poin}
                 </Text>
               </View>
               <View>
@@ -99,42 +125,19 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
         <Text style={[styles.Heading28, {color: '#FFF', marginBottom: 24}]}>
           Task yang harus dikerjakan
         </Text>
-        <View style={styles.Task}>
-          <View style={{paddingLeft: 32, width: '85%'}}>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>20 Kali</Text>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>
-              Melakukan Pull up
-            </Text>
+        {data.map((item, idx) => (
+          <View style={styles.Task}>
+            <View style={{paddingLeft: 32, width: '85%'}}>
+              <Text style={[styles.heading14, {fontWeight: '700'}]}>
+                {item?.list_task[0].task_name}
+              </Text>
+            </View>
+            <Image
+              source={require('../../src/CheckGreen.png')}
+              style={{width: 32, height: 32}}
+            />
           </View>
-          <Image
-            source={require('../../src/CheckGreen.png')}
-            style={{width: 32, height: 32}}
-          />
-        </View>
-        <View style={styles.Task}>
-          <View style={{paddingLeft: 32, width: '85%'}}>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>20 Kali</Text>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>
-              Melakukan Pull up
-            </Text>
-          </View>
-          <Image
-            source={require('../../src/CheckGreen.png')}
-            style={{width: 32, height: 32}}
-          />
-        </View>
-        <View style={styles.Task}>
-          <View style={{paddingLeft: 32, width: '85%'}}>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>20 Kali</Text>
-            <Text style={[styles.heading14, {fontWeight: '700'}]}>
-              Melakukan Pull up
-            </Text>
-          </View>
-          <Image
-            source={require('../../src/Lock.png')}
-            style={{width: 32, height: 32}}
-          />
-        </View>
+        ))}
       </View>
       <View
         style={{
