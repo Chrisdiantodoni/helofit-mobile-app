@@ -202,7 +202,12 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
           {data?.facility?.filter(filterFacility)?.map(item => (
             <TouchableOpacity
               style={{marginBottom: 15}}
-              onPress={() => navigate('BuatRoom')}>
+              onPress={() =>
+                navigate('BuatRoom', {
+                  id: item?.id,
+                  merchantId: item?.merchantId,
+                })
+              }>
               <Image
                 source={require('../src/fasilitas-badminton-2.png')}
                 style={{width: 346, borderRadius: 8, height: 89.18}}

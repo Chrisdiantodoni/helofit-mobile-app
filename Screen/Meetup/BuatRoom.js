@@ -8,91 +8,39 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import {Axios} from '../../utils';
+import moment from 'moment';
+import currency from './../../utils/currency';
 
 // create a component
-const BuatRoom = ({navigation}) => {
+const BuatRoom = ({route, navigation}) => {
   const [isSelected, setIsSelected] = useState('2023-03-22');
-  // const [dataMitra, setDataMitra] = useState([
-  //   {
-  //     id: 1,
-  //     session: 8,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 2,
-  //     session: 9,
-  //     is_reserved: true,
-  //   },
-  //   {
-  //     id: 3,
-  //     session: 10,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 4,
-  //     session: 11,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 5,
-  //     session: 12,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 6,
-  //     session: 13,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 7,
-  //     session: 14,
-  //     is_reserved: false,
-  //   },
-  //   {
-  //     id: 8,
-  //     session: 15,
-  //     is_reserved: false,
-  //   },
-  // ]);
+  const id = route.params.id;
+  const merchantId = route.params.merchantId;
+  const [data, setData] = useState({});
+  const [dates, setDates] = useState([]);
+
+  const getHour = async () => {
+    console.log(id);
+    const response = await Axios.post(`/facility/time/${id}`, {
+      merchantId,
+    });
+    const data = response.data?.data;
+    setData(data || []);
+    console.log(data);
+  };
+  useEffect(() => {
+    getHour();
+    let today = new Date();
+    let newDates = [];
+    for (let i = 0; i < 7; i++) {
+      let date = new Date(today);
+      date.setDate(today.getDate() + i);
+      newDates.push(date);
+    }
+    setDates(newDates);
+  }, []);
   const [selectedBooking, setSelectedBooking] = useState([]);
-  const [booking, setBooking] = useState([
-    {
-      id: 1,
-      datetime: '08:00',
-      time: '08:00',
-      bookingDetail: {
-        booking_date: '2023-03-22',
-        isBooking: true,
-      },
-    },
-    {
-      id: 2,
-      datetime: '09:00',
-      time: '08:00',
-      bookingDetail: {
-        booking_date: '2023-03-23',
-        isBooking: false,
-      },
-    },
-    {
-      id: 3,
-      datetime: '10:00',
-      time: '08:00',
-      bookingDetail: {
-        booking_date: '2023-03-25',
-        isBooking: true,
-      },
-    },
-    {
-      id: 4,
-      datetime: '11:00',
-      time: '08:00',
-      bookingDetail: {
-        booking_date: '2023-03-22',
-        isBooking: false,
-      },
-    },
-  ]);
 
   const arrDay = [
     '2023-03-22',
@@ -105,22 +53,28 @@ const BuatRoom = ({navigation}) => {
   ];
 
   const handleSelectedBooking = item => {
-    const findDuplicate = selectedBooking.find(find => find.id === item.id);
+    console.log(item);
+    const findDuplicate = selectedBooking.find(find => find.time === item.time);
 
-    if (!findDuplicate?.id) {
+    if (!findDuplicate?.time) {
       setSelectedBooking([...selectedBooking, item]);
     } else {
       setSelectedBooking(
-        selectedBooking.filter(filter => filter.id !== item.id),
+        selectedBooking.filter(filter => filter.time !== item.time),
       );
     }
   };
 
-  const validateSelectedBooking = item => {
-    const findDuplicate = selectedBooking.find(find => find.id === item.id);
+  const subTotal = () => {
+    const total = parseInt(data.price) * parseInt(selectedBooking.length);
+    return total;
+  };
 
-    if (findDuplicate?.id) {
-      return findDuplicate?.id;
+  const validateSelectedBooking = item => {
+    const findDuplicate = selectedBooking.find(find => find.time === item.time);
+
+    if (findDuplicate?.time) {
+      return findDuplicate?.time;
     } else {
       return;
     }
@@ -235,7 +189,7 @@ const BuatRoom = ({navigation}) => {
           Total Biaya :
         </Text>
         <Text style={{fontSize: 20, fontWeight: '700', color: '#C4f601'}}>
-          Rp. 240.000
+          Rp. {currency(subTotal())}
         </Text>
       </View>
       <View style={{backgroundColor: '#000000', paddingLeft: 28}}>
@@ -247,13 +201,13 @@ const BuatRoom = ({navigation}) => {
             marginBottom: 15,
             borderRadius: 16,
           }}>
-          {arrDay.map((item, idx) => (
+          {dates.map((date, idx) => (
             <TouchableOpacity
-              onPress={() => setIsSelected(item)}
+              onPress={() => setIsSelected(date)}
               style={[
                 styles.capsules,
                 {
-                  backgroundColor: isSelected === item ? '#C4F601' : '#000000',
+                  backgroundColor: isSelected === date ? '#C4F601' : '#000000',
                   borderColor: '#C4F601',
                 },
               ]}>
@@ -261,11 +215,11 @@ const BuatRoom = ({navigation}) => {
                 style={[
                   styles.heading14,
                   {
-                    color: isSelected === item ? '#000000' : '#C4F601',
+                    color: isSelected === date ? '#000000' : '#C4F601',
                     fontSize: 12,
                   },
                 ]}>
-                {item}
+                {moment(date).format('DD-MM-YYYY').toUpperCase()}
               </Text>
             </TouchableOpacity>
           ))}
@@ -275,139 +229,62 @@ const BuatRoom = ({navigation}) => {
         <View
           style={{
             marginTop: 8,
-            flexDirection: 'row',
+            display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
             backgroundColor: '#000000',
             paddingHorizontal: 21,
             paddingBottom: 10,
           }}>
-          {booking.map((item, index) => (
-            <View key={index}>
-              <TouchableOpacity
-                onPress={() =>
-                  item.bookingDetail.isBooking
-                    ? null
-                    : handleSelectedBooking(item)
-                }
-                disabled={item.bookingDetail?.isBooking ? true : false}
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: '#161616',
-                  width: 93,
-                  height: 77,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginHorizontal: 17 / 2,
-                  marginVertical: 8,
-                  borderWidth: 2,
-                  borderColor:
-                    validateSelectedBooking(item) === item.id
-                      ? '#c4f601'
-                      : 'black',
-                }}
-                key={item}
-                // onPress={handlePress[i]}
-              >
-                <View>
-                  <Text
-                    style={[
-                      styles.heading14,
-                      {
-                        color: item.bookingDetail?.isBooking
-                          ? '#FFFFFF'
-                          : '#C4f601',
-                      },
-                    ]}>
-                    {item.time}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heading14,
-                      {
-                        color: item.bookingDetail?.isBooking
-                          ? '#FFFFFF'
-                          : '#C4f601',
-                        fontWeight: '400',
-                      },
-                    ]}>
-                    {item.bookingDetail?.isBooking ? 'terisi' : 'tersedia'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ))}
-          {/* {jam.map((number, index) => (
-            <View key={number}>
-              <TouchableOpacity
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: '#161616',
-                  width: 93,
-                  height: 77,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginHorizontal: 17 / 2,
-                  marginVertical: 8,
-                  borderWidth: 2,
-                  borderColor: number == 9 ? '#C4F601' : '#000000',
-                }}
-                key={number}
-                // onPress={handlePress[i]}
-              >
-                <View>
-                  <Text style={[styles.heading14, {color: '#FFFFFF'}]}>
-                    {number}.00
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heading14,
-                      {color: '#FFFFFF', fontWeight: '400'},
-                    ]}>
-                    {number === 9 ? 'terisi' : 'tersedia'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ))} */}
-          {/* {dataMitra.map(item => (
-            <View key={item.id}>
-              <TouchableOpacity
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: '#161616',
-                  width: 93,
-                  height: 77,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginHorizontal: 17 / 2,
-                  marginVertical: 8,
-                  borderWidth: 2,
-                  borderColor: item.is_reserved
-                    ? '#000000'
-                    : isSelected
-                    ? '#C3F601'
+          {data.list_time?.map((item, idx) => (
+            <TouchableOpacity
+              onPress={() => {
+                item?.available ? handleSelectedBooking(item) : null,
+                  subTotal();
+              }}
+              disabled={item?.available ? false : true}
+              style={{
+                borderRadius: 16,
+                backgroundColor: '#161616',
+                width: 93,
+                height: 77,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginHorizontal: 17 / 2,
+                marginVertical: 8,
+                borderWidth: 2,
+                borderColor:
+                  validateSelectedBooking(item) === item.time
+                    ? '#C4F601'
                     : '#000000',
-                }}
-                disabled={item.is_reserved ? true : false}
-                key={item.id}
-                onPress={() => setIsSelected(item.id)}>
-                <View>
-                  <Text style={[styles.heading14, {color: '#FFFFFF'}]}>
-                    {item.session}.00
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heading14,
-                      {color: '#FFFFFF', fontWeight: '400'},
-                    ]}>
-                    {item.is_reserved === true ? 'terisi' : 'tersedia'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ))} */}
+              }}
+              key={item}
+              // onPress={handlePress[i]}
+            >
+              <View>
+                <Text
+                  style={[
+                    styles.heading14,
+                    {
+                      color: item?.available ? '#FFFFFF' : '#C4f601',
+                    },
+                  ]}>
+                  {item.time}
+                </Text>
+                <Text
+                  style={[
+                    styles.heading14,
+                    {
+                      color: item?.available ? '#FFFFFF' : '#C4f601',
+                      fontWeight: '400',
+                    },
+                  ]}>
+                  {item?.available ? 'tersedia' : 'terisi'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
       {/* {renderTime()} */}
