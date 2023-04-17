@@ -1,10 +1,65 @@
 //import liraries
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {Axios} from '../../utils';
 
 // create a component
 const PilihKategori = ({navigation: {goBack, navigate}}) => {
+  const [data, setData] = useState([]);
+
+  const getKategori = async () => {
+    try {
+      const response = await Axios.get('/category');
+      const data = response.data.data.result;
+      setData(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getKategori();
+  }, []);
+
+  const kategori = [
+    'badminton',
+    'futsal',
+    'basket',
+    'yoga',
+    'fitness',
+    'boxing',
+    'bowling',
+    'tennis',
+    'golf',
+  ];
+
+  const displayImages = item => {
+    switch (item?.category_name?.toLowerCase()) {
+      case 'badminton':
+        return require('../../src/Badminton1.png');
+      case 'futsal':
+        return require('../../src/Football.png');
+      case 'basket':
+        return require('../../src/Basketball.png');
+      case 'yoga':
+        return require('../../src/Yoga.png');
+      case 'tennis':
+        return require('../../src/Tennis.png');
+      case 'boxing':
+        return require('../../src/Boxing.png');
+      case 'fitness':
+        return require('../../src/Gymming.png');
+      case 'golf':
+        return require('../../src/Hockey.png');
+      case 'bowling':
+        return require('../../src/Bowling.png');
+      default:
+        return null;
+        break;
+    }
+  };
   return (
     <View style={styles.container}>
       <View
@@ -35,290 +90,53 @@ const PilihKategori = ({navigation: {goBack, navigate}}) => {
         style={{
           marginHorizontal: 16,
           marginTop: 24,
+          display: 'flex',
+          flexWrap: 'wrap',
           justifyContent: 'space-between',
           flexDirection: 'row',
         }}>
-        <View>
-          <TouchableOpacity
+        {data.map((item, idx) => (
+          <View
+            key={idx}
             style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}
-            onPress={() => navigate('Fasilitas')}>
-            <Image
-              source={require('../../src/Football.png')}
-              style={{
-                width: 78,
-                height: 78,
-                position: 'absolute',
-                top: 20,
-                left: 20,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
+              marginHorizontal: 16,
+              marginTop: 24,
+              justifyContent: 'space-between',
+              flexDirection: 'row',
             }}>
-            Futsal
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Badminton1.png')}
-              style={{
-                width: 78,
-                height: 78,
-                position: 'absolute',
-                top: 20,
-                left: 10,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Badminton
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Basketball.png')}
-              style={{
-                width: 82,
-                height: 78,
-                position: 'absolute',
-                top: 20,
-                right: 20,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Basket
-          </Text>
-        </View>
-      </View>
-      <View
-        style={{
-          marginHorizontal: 16,
-          marginTop: 32,
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-        }}>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Yoga.png')}
-              style={{
-                width: 93,
-                height: 63,
-                position: 'absolute',
-                top: 40,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Yoga
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Gymming.png')}
-              style={{
-                width: 84,
-                height: 63,
-                position: 'absolute',
-                top: 40,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Fitness
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Boxing.png')}
-              style={{
-                width: 92,
-                height: 89,
-                position: 'absolute',
-                top: 20,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Boxing
-          </Text>
-        </View>
-      </View>
-      <View
-        style={{
-          marginHorizontal: 16,
-          marginTop: 32,
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-        }}>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Bowling.png')}
-              style={{
-                width: 81,
-                height: 90,
-                position: 'absolute',
-                top: 10,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Bowling
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Tennis.png')}
-              style={{
-                width: 97,
-                height: 89,
-                position: 'absolute',
-                top: 20,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Tennis
-          </Text>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 24,
-              backgroundColor: '#C4F601',
-            }}>
-            <Image
-              source={require('../../src/Hockey.png')}
-              style={{
-                width: 76,
-                height: 99,
-                position: 'absolute',
-                top: 5,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: '#FFFF',
-              marginTop: 15,
-              fontWeight: '700',
-              textAlign: 'center',
-              fontFamily: 'openSans',
-            }}>
-            Golf
-          </Text>
-        </View>
+            <View>
+              <TouchableOpacity
+                style={{
+                  width: 88,
+                  height: 88,
+                  borderRadius: 24,
+                  backgroundColor: '#C4F601',
+                }}
+                onPress={() => navigate('Fasilitas', {id: item?.id})}>
+                <Image
+                  source={displayImages(item)}
+                  style={{
+                    width: 78,
+                    height: 78,
+                    position: 'absolute',
+                    top: 20,
+                    left: 20,
+                  }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  color: '#FFFF',
+                  marginTop: 15,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  fontFamily: 'openSans',
+                }}>
+                {item.category_name}
+              </Text>
+            </View>
+          </View>
+        ))}
       </View>
     </View>
   );

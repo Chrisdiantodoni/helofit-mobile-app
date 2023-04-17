@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,11 @@ import {
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Onboarding from '../components/Onboarding';
+import {Axios, currency} from '../utils';
 
-const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
+const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
+  const id = route.params.id;
+  const [data, setData] = useState([]);
   const [selected, setSelected] = useState({
     id: 1,
     kategori: 'badminton',
@@ -27,8 +30,63 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
     },
   ];
 
+  const getDetailMerchant = async () => {
+    try {
+      const response = await Axios.get(`/merchant/${id}`);
+      const data = response.data?.data;
+      console.log(data);
+      setData(data || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getHarga = () => {
+    return (
+      data?.facility?.map(item => item.price)?.sort((a, b) => a - b)[0] || 0
+    );
+  };
+
+  const getKategori = () => {
+    const newCat = [
+      ...new Set(
+        data?.facility?.map(item => ({
+          id: item.category.id,
+          kategori: item.category.category_name,
+        })),
+      ),
+    ];
+
+    return newCat;
+  };
+
+  useEffect(() => {
+    if (getKategori()[0]) {
+      setSelected(getKategori()[0]);
+    }
+    getDetailMerchant();
+  }, [id]);
+
   const handleSelectedFacility = item => {
     setSelected(item);
+  };
+
+  const filterFacility = filter => {
+    return filter.categoryId === selected?.id;
+  };
+
+  const getFeature = item => {
+    switch (item?.feature?.feature_name.toLowerCase()) {
+      case 'sewa peralatan olahraga':
+        return 'shirt-outline';
+      case 'makanan dan minuman':
+        return 'fast-food-outline';
+      case 'tempat beribadah':
+        return 'business-outline';
+      default:
+        return null;
+        break;
+    }
   };
   return (
     <ScrollView style={styles.container}>
@@ -45,9 +103,7 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
           />
         </TouchableOpacity>
         <View style={{marginTop: 95}}>
-          <Text style={styles.heading28}>
-            Gelanggang Olahraga Ahmad Yani Nasution
-          </Text>
+          <Text style={styles.heading28}>{data.merchant_name}</Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -66,11 +122,11 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
                 fontSize: 16,
                 fontWeight: '700',
               }}>
-              Rp. 100.000
+              Rp. {getHarga()}
             </Text>
           </View>
           <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
-            Badminton, futsal
+            {data.category?.category_name}
           </Text>
           <View style={{flexDirection: 'row', paddingBottom: 4, marginTop: 8}}>
             <View
@@ -85,9 +141,7 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
               />
             </View>
             <View style={{width: '85%'}}>
-              <Text style={styles.heading14}>
-                Jl.M.H Yamin SH No.123, Medan Perjuangan, Sumatera Utara 202332
-              </Text>
+              <Text style={styles.heading14}>{data?.address}</Text>
             </View>
           </View>
         </View>
@@ -105,18 +159,18 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
         ]}>
         <ScrollView horizontal={true}>
           <View style={{flexDirection: 'row'}}>
-            {arrayFacility.map((item, idx) => {
+            {getKategori().map((item, idx) => {
               return (
                 <TouchableOpacity
                   style={{
                     borderWidth: 1,
                     borderRadius: 8,
                     backgroundColor:
-                      selected?.kategori === item.kategori
+                      selected?.kategori === item?.kategori
                         ? '#C4f601'
                         : '#000000',
                     borderColor:
-                      selected?.kategori === item.kategori
+                      selected?.kategori === item?.kategori
                         ? '#000000'
                         : '#C4f601',
                     marginRight: 8,
@@ -130,13 +184,13 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
                     style={{
                       fontSize: 14,
                       color:
-                        selected?.kategori === item.kategori
+                        selected?.kategori === item?.kategori
                           ? '#000000'
                           : '#C4f601',
                       fontWeight: '700',
                       fontFamily: 'OpenSans',
                     }}>
-                    {item.kategori}
+                    {item?.kategori}
                   </Text>
                 </TouchableOpacity>
               );
@@ -145,85 +199,48 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
         </ScrollView>
 
         <View style={{marginTop: 24}}>
-          <TouchableOpacity
-            style={{marginBottom: 15}}
-            onPress={() => navigate('BuatRoom')}>
-            <Image
-              source={require('../src/fasilitas-badminton-2.png')}
-              style={{width: 346, borderRadius: 8, height: 89.18}}
-            />
-            <View
-              style={{
-                position: 'absolute',
-                top: 16,
-                left: 28,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <View style={{width: '80%'}}>
-                <Text style={[styles.heading28, {fontSize: 14}]}>
-                  Lapangan Badminton 2
-                </Text>
-                <Text style={[styles.heading28, {fontSize: 14}]}>
-                  Rp. 100.000
-                  <Text style={[styles.heading14, {fontWeight: '400'}]}>
-                    {' '}
-                    / Jam
+          {data?.facility?.filter(filterFacility)?.map(item => (
+            <TouchableOpacity
+              style={{marginBottom: 15}}
+              onPress={() => navigate('BuatRoom')}>
+              <Image
+                source={require('../src/fasilitas-badminton-2.png')}
+                style={{width: 346, borderRadius: 8, height: 89.18}}
+              />
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  left: 28,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <View style={{width: '80%'}}>
+                  <Text style={[styles.heading28, {fontSize: 14}]}>
+                    {item.facility_name}
                   </Text>
-                </Text>
-              </View>
-              <View>
-                <Ionicon
-                  name="chevron-forward-outline"
-                  size={25}
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#ffffff',
-                    paddingRight: 2,
-                  }}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Image
-              source={require('../src/fasilitas-badminton-2.png')}
-              style={{width: 346, borderRadius: 8, height: 89.18}}
-            />
-            <View
-              style={{
-                position: 'absolute',
-                top: 16,
-                left: 28,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <View style={{width: '80%'}}>
-                <Text style={[styles.heading28, {fontSize: 14}]}>
-                  Lapangan Badminton 1
-                </Text>
-                <Text style={[styles.heading28, {fontSize: 14}]}>
-                  Rp. 100.000
-                  <Text style={[styles.heading14, {fontWeight: '400'}]}>
-                    {' '}
-                    / Jam
+                  <Text style={[styles.heading28, {fontSize: 14}]}>
+                    Rp. {currency(item?.price)}
+                    <Text style={[styles.heading14, {fontWeight: '400'}]}>
+                      {' '}
+                      / {item.uom}
+                    </Text>
                   </Text>
-                </Text>
+                </View>
+                <View>
+                  <Ionicon
+                    name="chevron-forward-outline"
+                    size={25}
+                    style={{
+                      fontWeight: 'bold',
+                      color: '#ffffff',
+                      paddingRight: 2,
+                    }}
+                  />
+                </View>
               </View>
-              <View>
-                <Ionicon
-                  name="chevron-forward-outline"
-                  size={25}
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#ffffff',
-                    paddingRight: 2,
-                  }}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
 
@@ -231,55 +248,26 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
         <Text style={[styles.heading28, {fontSize: 20, marginBottom: 16}]}>
           Prasarana yang tersedia
         </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            display: 'flex',
-            marginBottom: 10,
-          }}>
-          <Ionicon
-            name="shirt-outline"
-            size={20}
-            style={{color: '#ffffff', marginRight: 10}}
-          />
-          <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
-            Sewa Peralatan Olahraga
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            display: 'flex',
-            marginBottom: 10,
-          }}>
-          <Ionicon
-            name="fast-food-outline"
-            size={20}
-            style={{color: '#ffffff', marginRight: 10}}
-          />
-          <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
-            Makanan dan Minuman
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            display: 'flex',
-            marginBottom: 10,
-          }}>
-          <Ionicon
-            name="woman-outline"
-            size={20}
-            style={{color: '#ffffff', marginRight: 10}}
-          />
-          <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
-            Tempat Beribadah
-          </Text>
-        </View>
+        {data?.feature?.map((item, idx) => (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              display: 'flex',
+              marginBottom: 10,
+            }}>
+            <Ionicon
+              name={getFeature(item)}
+              size={20}
+              style={{color: '#ffffff', marginRight: 10}}
+            />
+            <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
+              {item?.feature?.feature_name}
+            </Text>
+          </View>
+        ))}
       </View>
+
       <View style={styles.subContainer3}>
         <Text style={[styles.heading28, {fontSize: 14}]}>Deskripsi</Text>
         <Text
@@ -287,10 +275,7 @@ const DetailFasilitasPage = ({navigation: {navigate, goBack}}) => {
             styles.heading14,
             {fontSize: 14, fontWeight: '400', marginTop: 16},
           ]}>
-          Yuk Main bersama di gor ini Pelanggan Fasilitas Olahraga yang
-          terhormat Sebelum melakukan Reservasi baca ketentuan kami sebagai
-          berikut: Wajib menggunakan sepatu ketika menggunakan fasilitas tidak
-          membawa minuman keras dan obatan terlarang ..see more
+          {data?.desc}
         </Text>
       </View>
     </ScrollView>

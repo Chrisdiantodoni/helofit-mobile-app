@@ -11,8 +11,9 @@ import {
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {Axios, currency} from '../utils';
 
-function Fasilitas({navigation: {navigate, goBack}}) {
+function Fasilitas({route, navigation: {navigate, goBack}}) {
   const [facility, setFacility] = useState([]);
+  const id = route.params.id;
 
   const [selected, setSelected] = useState({
     image: require('../src/Price.png'),
@@ -35,7 +36,9 @@ function Fasilitas({navigation: {navigate, goBack}}) {
 
   const getFacility = async () => {
     try {
-      const response = await Axios.get('/facility');
+      const response = await Axios.get(
+        `/facility?column_name=["category.id"]&query=[${id}]&order_field=price&order=ASC`,
+      );
       const data = response?.data?.data?.result;
       setFacility(data || []);
       console.log(data);
@@ -46,6 +49,7 @@ function Fasilitas({navigation: {navigate, goBack}}) {
 
   useEffect(() => {
     getFacility();
+    console.log(id);
   }, []);
 
   return (
@@ -71,7 +75,7 @@ function Fasilitas({navigation: {navigate, goBack}}) {
           />
         </TouchableOpacity>
         <Text style={[styles.header, {color: '#000000', fontSize: 20}]}>
-          List Fasilitas
+          List Tempat Olahraga
         </Text>
       </View>
       <View style={{paddingHorizontal: 16, paddingTop: 24}}>
@@ -122,7 +126,9 @@ function Fasilitas({navigation: {navigate, goBack}}) {
           renderItem={({item, index}) => (
             <TouchableOpacity
               key={index}
-              onPress={() => navigate('DetailFasilitasPage')}
+              onPress={() =>
+                navigate('DetailFasilitasPage', {id: item.merchantId})
+              }
               style={{
                 backgroundColor: '#161616',
                 paddingLeft: 24,
@@ -149,8 +155,9 @@ function Fasilitas({navigation: {navigate, goBack}}) {
               <Text
                 style={[styles.heading14, {marginBottom: 15, fontSize: 14}]}>
                 {'Buka - Tutup '}
-                {item?.time}
-                {/* Buka - Tutup */}
+
+                {item.time ? `${JSON.parse(item.time)[1]}` : ''}
+                {console.log(item)}
               </Text>
             </TouchableOpacity>
           )}
