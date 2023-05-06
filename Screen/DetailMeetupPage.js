@@ -15,12 +15,22 @@ import {Axios, currency} from '../utils';
 import {showMessage} from 'react-native-flash-message';
 import moment from 'moment';
 import BuatRoom from './Meetup/BuatRoom';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DetailMeetupPage = (props, {navigation}) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
   const id = props.route.params.id;
   const [data, setData] = useState({});
+  const [dataUser, setDataUser] = useState({});
+
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      setDataUser(JSON.parse(res));
+      const userId = JSON.parse(res)?.id;
+      getDetailRoom(userId);
+    });
+  };
 
   const handlePlayer = type => {
     switch (type) {
@@ -35,7 +45,21 @@ const DetailMeetupPage = (props, {navigation}) => {
     }
   };
 
-  const getDetailRoom = async () => {
+  const handleJoin = async () => {
+    try {
+      const body = {
+        userId: dataUser?.id,
+        roomId: id,
+        qty: totalPlayer,
+      };
+      const response = await Axios.post('/room/join', body);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getDetailRoom = async userId => {
     try {
       if (!id) {
         showMessage({
@@ -43,7 +67,7 @@ const DetailMeetupPage = (props, {navigation}) => {
           type: 'danger',
         });
       } else {
-        const {data} = await Axios.get(`/room/${id}`);
+        const {data} = await Axios.get(`/room/${id}?user_id=${userId}`);
         if (data.message === 'OK') {
           console.log(data.data);
           setData(data.data);
@@ -65,10 +89,22 @@ const DetailMeetupPage = (props, {navigation}) => {
     return result;
   };
 
-  useEffect(() => {
-    getDetailRoom();
-  }, []);
+  const isHost = () => {
+    const userId = dataUser?.id;
+    const result = data?.hostId === userId ? true : false;
+    return result;
+  };
 
+  const filterRoomDetail = filter => {
+    const userId = dataUser?.id;
+    return filter.userId !== userId;
+  };
+
+  useEffect(() => {
+    dataUserAsync();
+    // getDetailRoom();?
+  }, []);
+  console.log('hi', isHost());
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -139,6 +175,26 @@ const DetailMeetupPage = (props, {navigation}) => {
             </Text>
             <Text style={[styles.heading14, {fontWeight: '400'}]}>
               {data?.gender === 'male' ? 'Laki - Laki' : 'Perempuan'}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              display: 'flex',
+            }}>
+            <Ionicon
+              name="person"
+              size={15}
+              style={{
+                fontWeight: 'bold',
+                color: '#ffffff',
+                paddingRight: 10,
+              }}
+            />
+            <Text
+              style={[styles.heading14, {fontWeight: '700', marginBottom: 0}]}>
+              {data?.user?.username}
             </Text>
           </View>
         </View>
@@ -351,36 +407,38 @@ const DetailMeetupPage = (props, {navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            bottom: 0,
-            backgroundColor: '#000',
-            height: 70,
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}>
-          <TouchableOpacity
+        {data?.isJoin ? null : (
+          <View
             style={{
-              width: '90%',
-              marginBottom: 10,
-              height: 38,
-              backgroundColor: '#C4F601',
-              borderRadius: 8,
-              alignItems: 'center',
+              bottom: 0,
+              backgroundColor: '#000',
+              height: 70,
+              width: '100%',
               justifyContent: 'center',
-            }}
-            onPress={() => navigation.navigate('HomeScreen')}>
-            <Text
-              style={[
-                styles.heading14,
-                {color: '#000000', fontSize: 14, marginBottom: 0},
-              ]}>
-              Mulai Meetup
-            </Text>
-          </TouchableOpacity>
-        </View>
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              style={{
+                width: '90%',
+                marginBottom: 10,
+                height: 38,
+                backgroundColor: '#C4F601',
+                borderRadius: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={handleJoin}>
+              <Text
+                style={[
+                  styles.heading14,
+                  {color: '#000000', fontSize: 14, marginBottom: 0},
+                ]}>
+                Mulai Meetup
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <Modal
           isVisible={isVisible}
           style={{justifyContent: 'flex-end', margin: 0}}
@@ -437,24 +495,26 @@ const DetailMeetupPage = (props, {navigation}) => {
                             </Text>
                           </View>
 
-                          <TouchableOpacity
-                            style={{
-                              backgroundColor: '#C4f601',
-                              borderRadius: 16,
-                              width: 98,
-                              height: 32,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
+                          {isHost() && item.userId == dataUser?.id ? null : (
+                            <TouchableOpacity
                               style={{
-                                fontSize: 12,
-                                fontWeight: '700',
-                                color: '#161616',
+                                backgroundColor: '#C4f601',
+                                borderRadius: 16,
+                                width: 98,
+                                height: 32,
+                                justifyContent: 'center',
+                                alignItems: 'center',
                               }}>
-                              Keluarkan
-                            </Text>
-                          </TouchableOpacity>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: '700',
+                                  color: '#161616',
+                                }}>
+                                Keluarkan
+                              </Text>
+                            </TouchableOpacity>
+                          )}
                         </View>
                       );
                     })

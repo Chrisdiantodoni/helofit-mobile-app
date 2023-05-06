@@ -10,27 +10,44 @@ import {
 } from 'react-native';
 import {Axios} from '../../utils';
 import moment from 'moment';
-import currency from './../../utils/currency';
+import currency from '../../utils/currency';
 
+const getToday = () => {
+  return moment(new Date());
+};
 // create a component
 const BuatRoom = ({route, navigation}) => {
-  const [isSelected, setIsSelected] = useState('2023-03-22');
-  const id = route.params.id;
-  const merchantId = route.params.merchantId;
+  const [isSelected, setIsSelected] = useState();
+  const [selectedBooking, setSelectedBooking] = useState([]);
   const [data, setData] = useState({});
   const [dates, setDates] = useState([]);
 
+  const idFacility = route.params.idFacility;
+  const merchantId = route.params.merchantId;
+  const img = route.params.img;
+  const price = route.params.price;
+
   const getHour = async () => {
-    console.log(id);
-    const response = await Axios.post(`/facility/time/${id}`, {
+    console.log({date: moment(isSelected).format('YYYY-MM-DD')});
+    await Axios.post(`/facility/time/${idFacility}`, {
       merchantId,
-    });
-    const data = response.data?.data;
-    setData(data || []);
-    console.log(data);
+      selected_date: moment(isSelected).format('YYYY-MM-DD'),
+    })
+      .then(response => {
+        const data = response.data?.data;
+        setData(data || []);
+        console.log({response});
+      })
+      .catch(err => {
+        console.log({err});
+      });
   };
+
   useEffect(() => {
     getHour();
+  }, [isSelected]);
+
+  useEffect(() => {
     let today = new Date();
     let newDates = [];
     for (let i = 0; i < 7; i++) {
@@ -40,17 +57,6 @@ const BuatRoom = ({route, navigation}) => {
     }
     setDates(newDates);
   }, []);
-  const [selectedBooking, setSelectedBooking] = useState([]);
-
-  const arrDay = [
-    '2023-03-22',
-    '2023-03-23',
-    '2023-03-24',
-    '2023-03-25',
-    '2023-03-26',
-    '2023-03-27',
-    '2023-03-28',
-  ];
 
   const handleSelectedBooking = item => {
     console.log(item);
@@ -80,95 +86,9 @@ const BuatRoom = ({route, navigation}) => {
     }
   };
 
-  // const buka = 8;
-  // const tutup = 19;
-  // for (let i = 0; i <= datas.length; i++) {
-  //   const data = [];
-  //   data.push([i]);
-  // }
-  // const bucket = [];
-
-  // datas.forEach(item => {
-  //   const waktu = item.clock_time;
-  // });
-
-  // for (let i = buka; i <= tutup; i++) {
-  //   for (let j = 0; j < data.length; j++) {
-  //     const item = data[j];
-  //     jam.push();
-  //   }
-  // }
-
-  // const renderTime = () => {
-  //   const result = [];
-  //   datas.forEach(data => {
-  //     for (let i = data.start_time; i <= data.end_time; i++) {
-  //       result.push(
-  //         <View>
-  //           <TouchableOpacity
-  //             style={{
-  //               borderRadius: 16,
-  //               backgroundColor: '#161616',
-  //               width: 93,
-  //               height: 77,
-  //               justifyContent: 'center',
-  //               alignItems: 'center',
-  //               marginHorizontal: 17 / 2,
-  //               marginVertical: 8,
-  //               borderWidth: 2,
-  //               borderColor: data.is_reserved
-  //                 ? '#000000'
-  //                 : isSelected
-  //                 ? '#000000'
-  //                 : '#000000',
-  //             }}
-  //             disabled={data.is_reserved ? true : isSelected ? false : false}
-  //             onPress={() => setIsSelected(prev => !prev)}>
-  //             <View>
-  //               <Text
-  //                 style={[
-  //                   styles.heading14,
-
-  //                   {
-  //                     color: data.is_reserved
-  //                       ? '#ffffff'
-  //                       : isSelected
-  //                       ? '#C4F601'
-  //                       : '#ffffff',
-  //                     textAlign: 'center',
-  //                   },
-  //                 ]}>
-  //                 {i}.00
-  //               </Text>
-  //               <Text
-  //                 style={[
-  //                   styles.heading14,
-  //                   {
-  //                     color: data.is_reserved
-  //                       ? '#ffffff'
-  //                       : isSelected
-  //                       ? '#C4F601'
-  //                       : '#ffffff',
-  //                     fontWeight: '400',
-  //                   },
-  //                 ]}>
-  //                 {data.is_reserved ? '*terisi' : 'tersedia'}
-  //               </Text>
-  //             </View>
-  //           </TouchableOpacity>
-  //         </View>,
-  //       );
-  //     }
-  //   });
-  //   return result;
-  // };
-
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../src/BadmintonGambar.png')}
-        style={{width: '100%', height: 188}}
-      />
+      <Image source={{uri: img}} style={{width: '100%', height: 188}} />
       <View
         style={{
           flexDirection: 'row',
@@ -203,11 +123,16 @@ const BuatRoom = ({route, navigation}) => {
           }}>
           {dates.map((date, idx) => (
             <TouchableOpacity
+              key={idx}
               onPress={() => setIsSelected(date)}
               style={[
                 styles.capsules,
                 {
-                  backgroundColor: isSelected === date ? '#C4F601' : '#000000',
+                  backgroundColor:
+                    moment(isSelected).format('DD-MM-YYYY') ===
+                    moment(date).format('DD-MM-YYYY')
+                      ? '#C4F601'
+                      : '#000000',
                   borderColor: '#C4F601',
                 },
               ]}>
@@ -215,7 +140,11 @@ const BuatRoom = ({route, navigation}) => {
                 style={[
                   styles.heading14,
                   {
-                    color: isSelected === date ? '#000000' : '#C4F601',
+                    color:
+                      moment(isSelected).format('DD-MM-YYYY') ===
+                      moment(date).format('DD-MM-YYYY')
+                        ? '#000000'
+                        : '#C4F601',
                     fontSize: 12,
                   },
                 ]}>
@@ -309,8 +238,15 @@ const BuatRoom = ({route, navigation}) => {
             justifyContent: 'center',
           }}
           onPress={() => {
-            console.log(selectedBooking, isSelected),
-              navigation.navigate('CreateRoom');
+            navigation.navigate('CreateRoom', {
+              idFacility,
+              merchantId,
+              img,
+              listTime: selectedBooking,
+              selectedDate: isSelected,
+              subTotal: subTotal(),
+              price,
+            });
           }}>
           <Text style={[styles.heading14, {color: '#000000'}]}>
             Selanjutnya

@@ -42,8 +42,8 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
   };
 
   const getHarga = () => {
-    return (
-      data?.facility?.map(item => item.price)?.sort((a, b) => a - b)[0] || 0
+    return currency(
+      data?.facility?.map(item => item.price)?.sort((a, b) => a - b)[0] || 0,
     );
   };
 
@@ -90,67 +90,15 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
   };
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.subContainer2}>
-        <TouchableOpacity onPress={() => goBack()}>
-          <Image
-            source={require('../src/X.png')}
-            style={{
-              width: 24,
-              height: 24,
-              position: 'absolute',
-              top: 50,
-            }}
-          />
-        </TouchableOpacity>
-        <View style={{marginTop: 95}}>
-          <Text style={styles.heading28}>{data.merchant_name}</Text>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text
-              style={{
-                color: '#C4F601',
-                fontWeight: '700',
-                fontSize: 16,
-                marginVertical: 8,
-              }}>
-              Mulai dari
-            </Text>
-            <Text
-              style={{
-                color: '#C4F601',
-                marginLeft: 5,
-                marginVertical: 2,
-                fontSize: 16,
-                fontWeight: '700',
-              }}>
-              Rp. {getHarga()}
-            </Text>
-          </View>
-          <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
-            {data.category?.category_name}
-          </Text>
-          <View style={{flexDirection: 'row', paddingBottom: 4, marginTop: 8}}>
-            <View
-              style={{
-                width: '10%',
-                alignItems: 'center',
-              }}>
-              <Ionicon
-                name="location-outline"
-                size={20}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
-              />
-            </View>
-            <View style={{width: '85%'}}>
-              <Text style={styles.heading14}>{data?.address}</Text>
-            </View>
-          </View>
-        </View>
-      </View>
+      <HeaderDetailFacility goBack={goBack} data={data} getHarga={getHarga()} />
+      {/* carousel=================== */}
       <View style={{height: 220}}>
         <Onboarding />
       </View>
       {/* <View style={[styles.subContainer3, {marginHorizontal: 0}]}>
       </View> */}
+
+      {/* end carousel ================== */}
 
       <View
         style={[
@@ -199,53 +147,64 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
         </ScrollView>
 
         <View style={{marginTop: 24}}>
-          {data?.facility?.filter(filterFacility)?.map(item => (
-            <TouchableOpacity
-              style={{marginBottom: 15}}
-              onPress={() =>
-                navigate('BuatRoom', {
-                  id: item?.id,
-                  merchantId: item?.merchantId,
-                })
-              }>
-              <Image
-                source={require('../src/fasilitas-badminton-2.png')}
-                style={{width: 346, borderRadius: 8, height: 89.18}}
-              />
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 16,
-                  left: 28,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <View style={{width: '80%'}}>
-                  <Text style={[styles.heading28, {fontSize: 14}]}>
-                    {item.facility_name}
-                  </Text>
-                  <Text style={[styles.heading28, {fontSize: 14}]}>
-                    Rp. {currency(item?.price)}
-                    <Text style={[styles.heading14, {fontWeight: '400'}]}>
-                      {' '}
-                      / {item.uom}
+          {data?.facility?.filter(filterFacility)?.map(item => {
+            console.log({item});
+            return (
+              <TouchableOpacity
+                style={{marginBottom: 15}}
+                onPress={() =>
+                  navigate('BuatRoom', {
+                    price: item?.price,
+                    idFacility: item?.id,
+                    merchantId: item?.merchantId,
+                    img: item?.banner_img
+                      ? item?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                  })
+                }>
+                <Image
+                  source={{
+                    uri: item?.banner_img
+                      ? item?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                  }}
+                  style={{width: 346, borderRadius: 8, height: 89.18}}
+                />
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 16,
+                    left: 28,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{width: '80%'}}>
+                    <Text style={[styles.heading28, {fontSize: 14}]}>
+                      {item.facility_name}
                     </Text>
-                  </Text>
+                    <Text style={[styles.heading28, {fontSize: 14}]}>
+                      Rp. {currency(item?.price)}
+                      <Text style={[styles.heading14, {fontWeight: '400'}]}>
+                        {' '}
+                        / {item.uom}
+                      </Text>
+                    </Text>
+                  </View>
+                  <View>
+                    <Ionicon
+                      name="chevron-forward-outline"
+                      size={25}
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#ffffff',
+                        paddingRight: 2,
+                      }}
+                    />
+                  </View>
                 </View>
-                <View>
-                  <Ionicon
-                    name="chevron-forward-outline"
-                    size={25}
-                    style={{
-                      fontWeight: 'bold',
-                      color: '#ffffff',
-                      paddingRight: 2,
-                    }}
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
@@ -333,3 +292,64 @@ const styles = StyleSheet.create({
 
 //make this component available to the app
 export default DetailFasilitasPage;
+
+const HeaderDetailFacility = ({getHarga, goBack, data}) => {
+  return (
+    <View style={styles.subContainer2}>
+      <TouchableOpacity onPress={() => goBack()}>
+        <Image
+          source={require('../src/X.png')}
+          style={{
+            width: 24,
+            height: 24,
+            position: 'absolute',
+            top: 50,
+          }}
+        />
+      </TouchableOpacity>
+      <View style={{marginTop: 95}}>
+        <Text style={styles.heading28}>{data.merchant_name}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Text
+            style={{
+              color: '#C4F601',
+              fontWeight: '700',
+              fontSize: 16,
+              marginVertical: 8,
+            }}>
+            Mulai dari
+          </Text>
+          <Text
+            style={{
+              color: '#C4F601',
+              marginLeft: 5,
+              marginVertical: 2,
+              fontSize: 16,
+              fontWeight: '700',
+            }}>
+            Rp. {getHarga}
+          </Text>
+        </View>
+        <Text style={[styles.heading14, {fontSize: 14, fontWeight: '400'}]}>
+          {data.category?.category_name}
+        </Text>
+        <View style={{flexDirection: 'row', paddingBottom: 4, marginTop: 8}}>
+          <View
+            style={{
+              width: '10%',
+              alignItems: 'center',
+            }}>
+            <Ionicon
+              name="location-outline"
+              size={20}
+              style={{fontWeight: 'bold', color: '#ffffff'}}
+            />
+          </View>
+          <View style={{width: '85%'}}>
+            <Text style={styles.heading14}>{data?.address}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
