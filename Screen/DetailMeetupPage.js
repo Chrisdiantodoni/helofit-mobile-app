@@ -16,13 +16,15 @@ import {showMessage} from 'react-native-flash-message';
 import moment from 'moment';
 import BuatRoom from './Meetup/BuatRoom';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
 
-const DetailMeetupPage = (props, {navigation}) => {
+const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
-  const id = props.route.params.id;
+  const id = route.params.id;
   const [data, setData] = useState({});
   const [dataUser, setDataUser] = useState({});
+  const navigation = useNavigation();
 
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
@@ -101,9 +103,11 @@ const DetailMeetupPage = (props, {navigation}) => {
   };
 
   useEffect(() => {
-    dataUserAsync();
-    // getDetailRoom();?
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      dataUserAsync();
+    });
+    return unsubscribe;
+  }, [navigation]);
   console.log('hi', isHost());
   return (
     <ScrollView style={styles.container}>

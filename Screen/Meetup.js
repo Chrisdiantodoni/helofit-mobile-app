@@ -11,8 +11,10 @@ import {
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import {Axios} from '../utils';
+import {useNavigation} from '@react-navigation/native';
 
 function Meetup({navigation: {navigate, goBack}}) {
+  const navigation = useNavigation();
   const [room, setRoom] = useState([]);
 
   const getRoom = async () => {
@@ -27,8 +29,11 @@ function Meetup({navigation: {navigate, goBack}}) {
   };
 
   useEffect(() => {
-    getRoom();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      getRoom();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>

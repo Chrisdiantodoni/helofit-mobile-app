@@ -19,6 +19,7 @@ import {useState} from 'react';
 import {currency} from './utils';
 import {Axios} from './utils';
 import moment from 'moment';
+import {useNavigation} from '@react-navigation/native';
 import base64 from 'react-native-base64';
 
 const {width} = Dimensions.get('window');
@@ -37,11 +38,14 @@ function HomeScreen({navigation}) {
     }
   };
   useEffect(() => {
-    getRoom();
+    const unsubscribe = navigation.addListener('focus', () => {
+      getRoom();
+    });
     AsyncStorage.getItem('dataUser').then(res => {
       setDataUser(JSON.parse(res));
     });
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <ScrollView style={{backgroundColor: '#C4F601', flex: 4}}>

@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component, useState} from 'react';
 import {
   View,
@@ -10,7 +11,13 @@ import {
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
-function Profile({navigation: {goBack, navigate}}) {
+function Profile({navigation: {goBack, navigate, popToTop}}) {
+  const handleLogout = () => {
+    const removeToken = AsyncStorage.removeItem('token');
+    popToTop();
+    return removeToken;
+  };
+
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
       <View
@@ -357,7 +364,8 @@ function Profile({navigation: {goBack, navigate}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
-          }}>
+          }}
+          onPress={handleLogout}>
           <Image
             source={require('../src/Exit.png')}
             style={{height: 24, width: 24, marginRight: 20}}

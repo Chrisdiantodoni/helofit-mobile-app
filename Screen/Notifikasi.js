@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,60 @@ import {
   Image,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Axios} from '../utils';
+import {showMessage} from 'react-native-flash-message';
+import moment from 'moment';
 
 const Notifikasi = ({navigation: {goBack}}) => {
+  const [dataUser, setDataUser] = useState('');
+  const [dataNotif, setDataNotif] = useState([]);
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      setDataUser(JSON.parse(res));
+      const userId = JSON.parse(res)?.id;
+      console.log(userId);
+      getNotification(userId);
+    });
+  };
+  const getNotification = async userId => {
+    if (!userId) {
+      showMessage({
+        message: 'Tidak ada Notifikasi',
+        type: 'danger',
+      });
+    } else {
+      const response = await Axios.get(`/notification/${userId}`);
+
+      if (response.data?.message === 'OK') {
+        console.log(response?.data?.data);
+        setDataNotif(response?.data?.data);
+      }
+    }
+  };
+  const handleApproved = async id => {
+    const body = {
+      roomId: id.roomId,
+      userId: id.userId,
+      status_approved: 'approved',
+    };
+    const response = await Axios.put(`/room/request/approved`, {body});
+    console.log(response);
+  };
+  const handleUnapproved = async id => {
+    const body = {
+      roomId: id.roomId,
+      userId: id.userId,
+      status_approved: 'unapproved',
+    };
+    const response = await Axios.put(`/room/request/approved`, {body});
+    console.log(response);
+  };
+  useEffect(() => {
+    dataUserAsync();
+    console.log(moment(new Date()).format('DD MMM YYYY'));
+  }, []);
+
   return (
     <View style={styles.container}>
       <View
@@ -39,8 +91,9 @@ const Notifikasi = ({navigation: {goBack}}) => {
       </View>
       <View>
         <FlatList
-          data={Array}
-          renderItem={({item}) => (
+          data={dataNotif}
+          keyExtractor={item => item.id}
+          renderItem={({item, index}) => (
             <View>
               <View
                 style={{
@@ -59,14 +112,18 @@ const Notifikasi = ({navigation: {goBack}}) => {
                 </View>
                 <View style={{marginBottom: 30}}>
                   <Text style={[styles.heading14, {width: 267}]}>
-                    <Text style={styles.heading28}>Budi Hartono Jaya </Text>
+                    <Text style={styles.heading28}>{item.user?.username} </Text>
                     <Text>ingin bergabung ke room meetup </Text>
                     <Text style={styles.heading28}>
-                      Main Futsal Bareng Yuk..
+                      {item?.room?.room_name}
                     </Text>
                   </Text>
                   <Text style={[styles.small12, {marginTop: 8}]}>
-                    Hari ini, 07:56 AM
+                    {moment(item.createdAt).format('DD MMM YYYY') ===
+                    moment(new Date()).format('DD MMM YYYY')
+                      ? 'Hari ini'
+                      : moment(item.createdAt).format('dddd')}
+                    , {moment(item.createdAt).format('hh:mm A')}
                   </Text>
                   <View style={{flexDirection: 'row', marginTop: 8}}>
                     <TouchableOpacity
@@ -77,7 +134,13 @@ const Notifikasi = ({navigation: {goBack}}) => {
                         height: 32,
                         alignItems: 'center',
                         justifyContent: 'center',
-                      }}>
+                      }}
+                      onPress={() =>
+                        handleApproved({
+                          roomId: item?.roomId,
+                          userId: item?.userId,
+                        })
+                      }>
                       <Text style={[styles.heading28, {color: '#000'}]}>
                         Setuju
                       </Text>
@@ -92,65 +155,13 @@ const Notifikasi = ({navigation: {goBack}}) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginLeft: 24,
-                      }}>
-                      <Text style={[styles.heading28, {color: '#C4f601'}]}>
-                        Tolak
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: '#000000',
-                  paddingHorizontal: 16,
-                  paddingTop: 24,
-                  flexDirection: 'row',
-                  marginBottom: 8,
-                }}>
-                <View style={{width: '20%'}}>
-                  <Image
-                    source={require('../src/Doni.png')}
-                    style={{width: 48, height: 48}}
-                  />
-                </View>
-                <View style={{marginBottom: 30}}>
-                  <Text style={[styles.heading14, {width: 267}]}>
-                    <Text style={styles.heading28}>Budi Hartono Jaya </Text>
-                    <Text>ingin bergabung ke room meetup </Text>
-                    <Text style={styles.heading28}>
-                      Main Futsal Bareng Yuk..
-                    </Text>
-                  </Text>
-                  <Text style={[styles.small12, {marginTop: 8}]}>
-                    Hari ini, 07:56 AM
-                  </Text>
-                  <View style={{flexDirection: 'row', marginTop: 8}}>
-                    <TouchableOpacity
-                      style={{
-                        borderRadius: 16,
-                        backgroundColor: '#C4F601',
-                        width: 120,
-                        height: 32,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <Text style={[styles.heading28, {color: '#000'}]}>
-                        Setuju
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        borderRadius: 16,
-                        borderColor: '#C4F601',
-                        borderWidth: 1,
-                        width: 120,
-                        height: 32,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginLeft: 24,
-                      }}>
+                      }}
+                      onPress={() =>
+                        handleUnapproved({
+                          roomId: item?.roomId,
+                          userId: item?.userId,
+                        })
+                      }>
                       <Text style={[styles.heading28, {color: '#C4f601'}]}>
                         Tolak
                       </Text>
