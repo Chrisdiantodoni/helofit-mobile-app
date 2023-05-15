@@ -12,17 +12,19 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
-const DetailTask = ({navigation: {goBack, navigate}}) => {
+const DetailTask = ({navigation: {goBack, navigate}, route}) => {
   const [data, setData] = useState([]);
   const [dataUser, setDataUser] = useState({});
+  const taskId = route?.params?.taskId;
 
   const getDetailTask = async () => {
     try {
       const id = dataUser?.id;
-      const {data} = await Axios.get(`/task/progress/${id}`);
+      const {data} = await Axios.get(`/task/progress/detail/${id}/${taskId}`);
+      console.log({data});
       if (data.message === 'OK') {
         setData(data.data);
-        console.log(data.data);
+        console.log('detail', data.data);
       }
     } catch (error) {
       console.log(error);
@@ -36,10 +38,12 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
     });
   }, []);
 
+  console.log('muharis', data);
+
   return (
     <ScrollView style={styles.container}>
       <Image
-        source={{uri: data?.banner_img}}
+        source={{uri: data?.task?.banner_img}}
         style={{width: '100%', height: 188}}
       />
       <TouchableOpacity onPress={() => goBack()}>
@@ -62,13 +66,14 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
           paddingBottom: 30,
         }}>
         <View style={{marginTop: 24, width: '80%'}}>
-          <Text style={styles.Heading28}>{data[0].task_name}</Text>
+          <Text style={styles.Heading28}>{data?.task?.task_name}</Text>
           <Text
             style={[
               styles.heading14,
               {fontSize: 14, fontWeight: '700', marginTop: 8},
             ]}>
-            Berlaku sampai {moment(data[0].expiredIn).format('DD MMMM YYYY')}
+            Berlaku sampai{' '}
+            {moment(data?.task?.expiredIn).format('DD MMMM YYYY')}
           </Text>
           <View
             style={{
@@ -82,7 +87,7 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
                 style={{height: 24, width: 24, marginRight: 8}}
               />
               <Text style={styles.heading14}>
-                {data?.merchant?.merchant_name}
+                {data?.task?.merchant?.merchant_name}
               </Text>
             </View>
             <View
@@ -97,7 +102,7 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
                     fontSize: 24,
                     fontWeight: '700',
                   }}>
-                  {data?.poin}
+                  {data?.currentPoin}
                 </Text>
               </View>
               <View>
@@ -125,17 +130,19 @@ const DetailTask = ({navigation: {goBack, navigate}}) => {
         <Text style={[styles.Heading28, {color: '#FFF', marginBottom: 24}]}>
           Task yang harus dikerjakan
         </Text>
-        {data.map((item, idx) => (
+        {data?.task_detail?.map((item, idx) => (
           <View style={styles.Task}>
             <View style={{paddingLeft: 32, width: '85%'}}>
               <Text style={[styles.heading14, {fontWeight: '700'}]}>
-                {item?.list_task[0].task_name}
+                {item?.task_name}
               </Text>
             </View>
-            <Image
-              source={require('../../src/CheckGreen.png')}
-              style={{width: 32, height: 32}}
-            />
+            {item.status ? (
+              <Image
+                source={require('../../src/CheckGreen.png')}
+                style={{width: 32, height: 32}}
+              />
+            ) : null}
           </View>
         ))}
       </View>

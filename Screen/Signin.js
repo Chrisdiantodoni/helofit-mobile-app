@@ -36,7 +36,7 @@ function Signin({navigation}) {
         password,
       };
       const response = await Axios.post('/authentication/login', body);
-      console.log(response);
+      console.log({response});
       // console.log('bisa', response.data);
       if (response.data.message === 'OK') {
         const token = response.data.data.token;

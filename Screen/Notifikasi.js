@@ -35,7 +35,7 @@ const Notifikasi = ({navigation: {goBack}}) => {
       const response = await Axios.get(`/notification/${userId}`);
 
       if (response.data?.message === 'OK') {
-        console.log(response?.data?.data);
+        console.log('data notif', response?.data?.data);
         setDataNotif(response?.data?.data);
       }
     }
@@ -93,85 +93,221 @@ const Notifikasi = ({navigation: {goBack}}) => {
         <FlatList
           data={dataNotif}
           keyExtractor={item => item.id}
-          renderItem={({item, index}) => (
-            <View>
-              <View
-                style={{
-                  borderRadius: 16,
-                  backgroundColor: '#000000',
-                  paddingHorizontal: 16,
-                  paddingTop: 24,
-                  flexDirection: 'row',
-                  marginBottom: 8,
-                }}>
-                <View style={{width: '20%'}}>
-                  <Image
-                    source={require('../src/Doni.png')}
-                    style={{width: 48, height: 48}}
-                  />
-                </View>
-                <View style={{marginBottom: 30}}>
-                  <Text style={[styles.heading14, {width: 267}]}>
-                    <Text style={styles.heading28}>{item.user?.username} </Text>
-                    <Text>ingin bergabung ke room meetup </Text>
-                    <Text style={styles.heading28}>
-                      {item?.room?.room_name}
-                    </Text>
-                  </Text>
-                  <Text style={[styles.small12, {marginTop: 8}]}>
-                    {moment(item.createdAt).format('DD MMM YYYY') ===
-                    moment(new Date()).format('DD MMM YYYY')
-                      ? 'Hari ini'
-                      : moment(item.createdAt).format('dddd')}
-                    , {moment(item.createdAt).format('hh:mm A')}
-                  </Text>
-                  <View style={{flexDirection: 'row', marginTop: 8}}>
-                    <TouchableOpacity
-                      style={{
-                        borderRadius: 16,
-                        backgroundColor: '#C4F601',
-                        width: 120,
-                        height: 32,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                      onPress={() =>
-                        handleApproved({
-                          roomId: item?.roomId,
-                          userId: item?.userId,
-                        })
-                      }>
-                      <Text style={[styles.heading28, {color: '#000'}]}>
-                        Setuju
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        borderRadius: 16,
-                        borderColor: '#C4F601',
-                        borderWidth: 1,
-                        width: 120,
-                        height: 32,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginLeft: 24,
-                      }}
-                      onPress={() =>
-                        handleUnapproved({
-                          roomId: item?.roomId,
-                          userId: item?.userId,
-                        })
-                      }>
-                      <Text style={[styles.heading28, {color: '#C4f601'}]}>
-                        Tolak
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          )}
+          renderItem={({item, index}) =>
+            !item.room?.isHost &&
+            item.list_user?.find(find => find?.userId == dataUser?.id) ? (
+              <SendingRequest item={item} />
+            ) : (
+              item.list_user?.map(itemUser => {
+                if (itemUser?.status == 'request') {
+                  return (
+                    <CardRequest
+                      item={item}
+                      itemUser={itemUser}
+                      key={index}
+                      dataUser={dataUser}
+                    />
+                  );
+                } else if (itemUser?.status == 'completed') {
+                  return <ApproveRequest item={item} />;
+                } else {
+                  return <RejectedRequest item={item} />;
+                }
+              })
+            )
+          }
         />
+      </View>
+    </View>
+  );
+};
+
+const RejectedRequest = ({item}) => {
+  return (
+    <View>
+      <View
+        style={{
+          borderRadius: 16,
+          backgroundColor: '#000000',
+          paddingHorizontal: 16,
+          paddingTop: 24,
+          flexDirection: 'row',
+          marginBottom: 8,
+        }}>
+        <View style={{width: '20%'}}>
+          <Image
+            source={require('../src/Doni.png')}
+            style={{width: 48, height: 48}}
+          />
+        </View>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
+            <Text>Permintaan Anda bergabung ke room meetup di tolak oleh </Text>
+            <Text style={styles.heading28}>{item?.room?.room_name}</Text>
+          </Text>
+          <Text style={[styles.small12, {marginTop: 8}]}>
+            {moment(item.createdAt).format('DD MMM YYYY') ===
+            moment(new Date()).format('DD MMM YYYY')
+              ? 'Hari ini'
+              : moment(item.createdAt).format('dddd')}
+            , {moment(item.createdAt).format('hh:mm A')}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const ApproveRequest = ({item}) => {
+  return (
+    <View>
+      <View
+        style={{
+          borderRadius: 16,
+          backgroundColor: '#000000',
+          paddingHorizontal: 16,
+          paddingTop: 24,
+          flexDirection: 'row',
+          marginBottom: 8,
+        }}>
+        <View style={{width: '20%'}}>
+          <Image
+            source={require('../src/Doni.png')}
+            style={{width: 48, height: 48}}
+          />
+        </View>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
+            <Text>
+              <Text style={styles.heading28}>
+                {' '}
+                {item?.room?.user?.username}{' '}
+              </Text>
+              menyetujui permintaan bergabung di room meetup{' '}
+            </Text>
+            <Text style={styles.heading28}>{item?.room?.room_name}</Text>
+          </Text>
+          <Text style={[styles.small12, {marginTop: 8}]}>
+            {moment(item.createdAt).format('DD MMM YYYY') ===
+            moment(new Date()).format('DD MMM YYYY')
+              ? 'Hari ini'
+              : moment(item.createdAt).format('dddd')}
+            , {moment(item.createdAt).format('hh:mm A')}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+const SendingRequest = ({item}) => {
+  return (
+    <View>
+      <View
+        style={{
+          borderRadius: 16,
+          backgroundColor: '#000000',
+          paddingHorizontal: 16,
+          paddingTop: 24,
+          flexDirection: 'row',
+          marginBottom: 8,
+        }}>
+        <View style={{width: '20%'}}>
+          <Image
+            source={require('../src/Doni.png')}
+            style={{width: 48, height: 48}}
+          />
+        </View>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
+            <Text>
+              Permintaan Anda bergabung ke room meetup Sudah Terkirim ke{' '}
+            </Text>
+            <Text style={styles.heading28}>{item?.room?.room_name}</Text>
+          </Text>
+          <Text style={[styles.small12, {marginTop: 8}]}>
+            {moment(item.createdAt).format('DD MMM YYYY') ===
+            moment(new Date()).format('DD MMM YYYY')
+              ? 'Hari ini'
+              : moment(item.createdAt).format('dddd')}
+            , {moment(item.createdAt).format('hh:mm A')}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const CardRequest = ({item, dataUser, itemUser}) => {
+  console.log({dataUser});
+  return (
+    <View>
+      <View
+        style={{
+          borderRadius: 16,
+          backgroundColor: '#000000',
+          paddingHorizontal: 16,
+          paddingTop: 24,
+          flexDirection: 'row',
+          marginBottom: 8,
+        }}>
+        <View style={{width: '20%'}}>
+          <Image
+            source={require('../src/Doni.png')}
+            style={{width: 48, height: 48}}
+          />
+        </View>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
+            <Text style={styles.heading28}>{itemUser.user?.username} </Text>
+            <Text>ingin bergabung ke room meetup </Text>
+            <Text style={styles.heading28}>{item?.room?.room_name}</Text>
+          </Text>
+          <Text style={[styles.small12, {marginTop: 8}]}>
+            {moment(item.createdAt).format('DD MMM YYYY') ===
+            moment(new Date()).format('DD MMM YYYY')
+              ? 'Hari ini'
+              : moment(item.createdAt).format('dddd')}
+            , {moment(item.createdAt).format('hh:mm A')}
+          </Text>
+          <View style={{flexDirection: 'row', marginTop: 8}}>
+            <TouchableOpacity
+              style={{
+                borderRadius: 16,
+                backgroundColor: '#C4F601',
+                width: 120,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() =>
+                handleApproved({
+                  roomId: item?.roomId,
+                  userId: item?.userId,
+                })
+              }>
+              <Text style={[styles.heading28, {color: '#000'}]}>Setuju</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                borderRadius: 16,
+                borderColor: '#C4F601',
+                borderWidth: 1,
+                width: 120,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: 24,
+              }}
+              onPress={() =>
+                handleUnapproved({
+                  roomId: item?.roomId,
+                  userId: item?.userId,
+                })
+              }>
+              <Text style={[styles.heading28, {color: '#C4f601'}]}>Tolak</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </View>
   );
