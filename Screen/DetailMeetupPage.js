@@ -71,7 +71,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
       } else {
         const {data} = await Axios.get(`/room/${id}?user_id=${userId}`);
         if (data.message === 'OK') {
-          console.log(data.data);
+          console.log('datanya', data.data);
           setData(data.data);
         }
       }
@@ -314,7 +314,9 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             <Text style={[styles.heading14, {fontSize: 20, marginBottom: 0}]}>
               Biaya Pemain
             </Text>
-            {isHost() ? null : (
+            {isHost() ||
+            data?.room_detail?.filter(filter => filter?.userId == dataUser?.id)
+              ?.length > 0 ? null : (
               <View
                 style={{
                   flexDirection: 'row',
@@ -495,9 +497,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                             </Text>
                           </View>
 
-                          {isHost() &&
-                          item.userId == dataUser?.id ? null : item.userId !==
-                            dataUser?.id ? null : (
+                          {isHost() && item?.userId != dataUser?.id ? (
                             <TouchableOpacity
                               style={{
                                 backgroundColor: '#C4f601',
@@ -516,7 +516,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                                 Keluarkan
                               </Text>
                             </TouchableOpacity>
-                          )}
+                          ) : null}
                         </View>
                       );
                     })

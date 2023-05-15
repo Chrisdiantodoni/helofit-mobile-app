@@ -69,7 +69,11 @@ const FollowMeetup = ({navigation: {goBack, navigate}}) => {
               <TouchableOpacity
                 key={idx}
                 style={styles.View}
-                onPress={() => navigate('DetailMeetupPage')}>
+                onPress={() =>
+                  navigate('DetailMeetupPage', {
+                    id: item.id,
+                  })
+                }>
                 <Image
                   source={{
                     uri:

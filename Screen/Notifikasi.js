@@ -40,23 +40,26 @@ const Notifikasi = ({navigation: {goBack}}) => {
       }
     }
   };
-  const handleApproved = async id => {
+  const handleApproved = async (roomId, userDetailId) => {
     const body = {
-      roomId: id.roomId,
-      userId: id.userId,
-      status_approved: 'approved',
+      roomId: roomId,
+      userIdRequestJoin: userDetailId,
     };
-    const response = await Axios.put(`/room/request/approved`, {body});
-    console.log(response);
+    const response = await Axios.post(`/notification/approve`, body);
+    if (response?.data?.message == 'OK') {
+      getNotification(dataUser?.id);
+    }
   };
-  const handleUnapproved = async id => {
+  const handleUnapproved = async (roomId, userDetailId) => {
     const body = {
-      roomId: id.roomId,
-      userId: id.userId,
-      status_approved: 'unapproved',
+      roomId: roomId,
+      userIdRequestJoin: userDetailId,
     };
-    const response = await Axios.put(`/room/request/approved`, {body});
-    console.log(response);
+    const response = await Axios.post(`/notification/reject`, body);
+    if (response?.data?.message == 'OK') {
+      getNotification(dataUser?.id);
+    }
+    console.log({response});
   };
   useEffect(() => {
     dataUserAsync();
@@ -94,24 +97,33 @@ const Notifikasi = ({navigation: {goBack}}) => {
           data={dataNotif}
           keyExtractor={item => item.id}
           renderItem={({item, index}) =>
-            !item.room?.isHost &&
-            item.list_user?.find(find => find?.userId == dataUser?.id) ? (
+            item.room?.isHost == false &&
+            item.list_user?.find(
+              find => find?.userId == dataUser?.id && find?.status == 'request',
+            ) ? (
               <SendingRequest item={item} />
             ) : (
               item.list_user?.map(itemUser => {
-                if (itemUser?.status == 'request') {
+                if (
+                  itemUser?.status == 'request' &&
+                  item.room?.isHost == true
+                ) {
                   return (
                     <CardRequest
                       item={item}
                       itemUser={itemUser}
                       key={index}
                       dataUser={dataUser}
+                      handleApproved={handleApproved}
+                      handleUnapproved={handleUnapproved}
                     />
                   );
-                } else if (itemUser?.status == 'completed') {
-                  return <ApproveRequest item={item} />;
-                } else {
-                  return <RejectedRequest item={item} />;
+                } else if (itemUser?.userId == dataUser?.id) {
+                  if (itemUser?.status == 'complete') {
+                    return <ApproveRequest item={item} />;
+                  } else {
+                    return <RejectedRequest item={item} />;
+                  }
                 }
               })
             )
@@ -237,7 +249,13 @@ const SendingRequest = ({item}) => {
   );
 };
 
-const CardRequest = ({item, dataUser, itemUser}) => {
+const CardRequest = ({
+  item,
+  dataUser,
+  itemUser,
+  handleApproved,
+  handleUnapproved,
+}) => {
   console.log({dataUser});
   return (
     <View>
@@ -279,12 +297,7 @@ const CardRequest = ({item, dataUser, itemUser}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              onPress={() =>
-                handleApproved({
-                  roomId: item?.roomId,
-                  userId: item?.userId,
-                })
-              }>
+              onPress={() => handleApproved(item?.roomId, itemUser?.userId)}>
               <Text style={[styles.heading28, {color: '#000'}]}>Setuju</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -298,12 +311,7 @@ const CardRequest = ({item, dataUser, itemUser}) => {
                 justifyContent: 'center',
                 marginLeft: 24,
               }}
-              onPress={() =>
-                handleUnapproved({
-                  roomId: item?.roomId,
-                  userId: item?.userId,
-                })
-              }>
+              onPress={() => handleUnapproved(item?.roomId, itemUser?.userId)}>
               <Text style={[styles.heading28, {color: '#C4f601'}]}>Tolak</Text>
             </TouchableOpacity>
           </View>
