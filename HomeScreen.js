@@ -19,8 +19,6 @@ import {useState} from 'react';
 import {currency} from './utils';
 import {Axios} from './utils';
 import moment from 'moment';
-import {useNavigation} from '@react-navigation/native';
-import base64 from 'react-native-base64';
 
 const {width} = Dimensions.get('window');
 

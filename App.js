@@ -39,6 +39,7 @@ import Pin from './Screen/Pin';
 import FollowMeetup from './Screen/FollowMeetup';
 import PromoList from './Screen/PromoList';
 import FlashMessage from 'react-native-flash-message';
+import SplashScreen from './Screen/SplashScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -152,6 +153,11 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="SplashScreen"
+          component={SplashScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="Welcome"
           component={Welcome}
