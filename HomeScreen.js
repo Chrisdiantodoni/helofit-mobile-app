@@ -25,6 +25,7 @@ const {width} = Dimensions.get('window');
 function HomeScreen({navigation}) {
   const [dataUser, setDataUser] = useState({});
   const [room, setRoom] = useState([]);
+  const [dataTask, setDataTask] = useState([]);
   const getRoom = async () => {
     try {
       const response = await Axios.get('/room');
@@ -33,6 +34,14 @@ function HomeScreen({navigation}) {
       console.log(data);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const getListTask = async () => {
+    const {data} = await Axios.get(`/task`);
+    console.log({dataTask: data});
+    if (data?.message === 'OK') {
+      setDataTask(data?.data?.result);
     }
   };
   useEffect(() => {
@@ -44,6 +53,10 @@ function HomeScreen({navigation}) {
     });
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    getListTask();
+  }, []);
 
   return (
     <ScrollView style={{backgroundColor: '#C4F601', flex: 4}}>
@@ -369,130 +382,145 @@ function HomeScreen({navigation}) {
               bottom: 0,
               right: 30,
             }}>
-            <TouchableOpacity
-              style={Styles.View}
-              onPress={() => navigation.navigate('DetailTask')}>
-              <Image
-                source={require('./src/Fitness.png')}
-                style={{width: '100%', height: 148, borderRadius: 10}}
-              />
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginLeft: 15,
-                  marginTop: 8,
-                  color: '#C4F601',
-                  fontWeight: '700',
-                  fontFamily: 'OpenSans',
-                  marginBottom: 8,
-                }}>
-                Bikin otot lengan tambah gede
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginLeft: 20,
-                  marginVertical: 8,
-                  alignItems: 'center',
-                }}>
+            {dataTask?.map((item, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={Styles.View}
+                onPress={() => navigation.navigate('DetailTask')}>
                 <Image
-                  source={require('./src/Fitness-Icon.png')}
-                  style={{width: 21, height: 21, tintColor: 'white'}}
+                  source={{
+                    uri: item?.banner_img ? item?.banner_img : '',
+                  }}
+                  style={{width: '100%', height: 148, borderRadius: 10}}
                 />
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <View>
-                    <Text
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginLeft: 15,
+                    marginTop: 8,
+                    color: '#C4F601',
+                    fontWeight: '700',
+                    fontFamily: 'OpenSans',
+                    marginBottom: 8,
+                  }}>
+                  {item.task_name}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: 20,
+                    marginVertical: 8,
+                    alignItems: 'center',
+                  }}>
+                  <Image
+                    source={require('./src/Fitness-Icon.png')}
+                    style={{width: 21, height: 21, tintColor: 'white'}}
+                  />
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View>
+                      <Text
+                        style={{
+                          marginLeft: 10,
+                          fontSize: 12,
+                          color: '#ffffff',
+                          fontFamily: 'OpenSans',
+                        }}>
+                        {item?.merchant?.merchant_name}
+                      </Text>
+                    </View>
+                    <View
                       style={{
-                        marginLeft: 10,
-                        fontSize: 12,
-                        color: '#ffffff',
-                        fontFamily: 'OpenSans',
+                        marginLeft: 117,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      Gagah Fitness
-                    </Text>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#C4F601',
+                            fontSize: 20,
+                            fontWeight: '700',
+                          }}>
+                          {item.poin}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#C4F601',
+                            fontSize: 12,
+                            fontWeight: '700',
+                          }}>
+                          POIN
+                        </Text>
+                      </View>
+                    </View>
                   </View>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  {item?.list_task?.map((itemTask, idxTask) => (
+                    <View
+                      style={{
+                        backgroundColor: '#C4F601',
+                        borderRadius: 8,
+                        paddingHorizontal: 10,
+                        height: 24,
+                        justifyContent: 'center',
+                        marginTop: 8,
+                        marginHorizontal: 8,
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: '400',
+                          color: '#000000',
+                        }}>
+                        {idxTask + 1}. {itemTask?.task_name}
+                      </Text>
+                    </View>
+                  ))}
+                  {/* <View
+                          style={{
+                            backgroundColor: '#C4F601',
+                            borderRadius: 8,
+                            height: 24,
+                            justifyContent: 'center',
+                            marginTop: 8,
+                            paddingHorizontal: 10,
+                            marginHorizontal: 8,
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{fontSize: 12, fontWeight: '400', color: '#000000'}}>
+                            2. Barbel 15 kg
+                          </Text>
+                        </View> */}
                   <View
                     style={{
-                      marginLeft: 117,
+                      backgroundColor: '#C4F601',
+                      borderRadius: 8,
+                      height: 24,
                       justifyContent: 'center',
+                      marginTop: 8,
+                      paddingHorizontal: 10,
+                      marginHorizontal: 8,
                       alignItems: 'center',
                     }}>
-                    <View>
-                      <Text
-                        style={{
-                          color: '#C4F601',
-                          fontSize: 20,
-                          fontWeight: '700',
-                        }}>
-                        15
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          color: '#C4F601',
-                          fontSize: 12,
-                          fontWeight: '700',
-                        }}>
-                        POIN
-                      </Text>
-                    </View>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontWeight: '400',
+                        color: '#000000',
+                      }}>
+                      ...
+                    </Text>
                   </View>
                 </View>
-              </View>
-              <View style={{flexDirection: 'row'}}>
-                <View
-                  style={{
-                    backgroundColor: '#C4F601',
-                    borderRadius: 8,
-                    paddingHorizontal: 10,
-                    height: 24,
-                    justifyContent: 'center',
-                    marginTop: 8,
-                    marginHorizontal: 8,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{fontSize: 12, fontWeight: '400', color: '#000000'}}>
-                    1. Treadmill 20 min
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: '#C4F601',
-                    borderRadius: 8,
-                    height: 24,
-                    justifyContent: 'center',
-                    marginTop: 8,
-                    paddingHorizontal: 10,
-                    marginHorizontal: 8,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{fontSize: 12, fontWeight: '400', color: '#000000'}}>
-                    2. Barbel 15 kg
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: '#C4F601',
-                    borderRadius: 8,
-                    height: 24,
-                    justifyContent: 'center',
-                    marginTop: 8,
-                    paddingHorizontal: 10,
-                    marginHorizontal: 8,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{fontSize: 12, fontWeight: '400', color: '#000000'}}>
-                    ...
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <View style={Styles.View}></View>
-            <View style={Styles.View}></View>
+              </TouchableOpacity>
+            ))}
+            {/* <View style={Styles.View}></View>
+            <View style={Styles.View}></View> */}
           </ScrollView>
         </View>
         <Onboarding />

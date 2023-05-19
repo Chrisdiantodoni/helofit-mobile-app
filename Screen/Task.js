@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
-function Task({navigation: {navigate, goBack}}) {
+function Task({navigation: {navigate, goBack}, route}) {
   const [taskItem, setTaskItem] = useState([]);
   const [data, setData] = useState([]);
   const [dataUser, setDataUser] = useState({});
@@ -24,10 +24,13 @@ function Task({navigation: {navigate, goBack}}) {
   const getUserTask = async () => {
     try {
       const id = dataUser?.id;
-      const {data} = await Axios.get(`/task/progress/${id}`);
-      if (data.message === 'OK') {
-        setData(data.data);
-        console.log(data.data);
+      if (id) {
+        const {data} = await Axios.get(`/task/progress2/${id}`);
+        console.log('inni data', data, id);
+        if (data.message === 'OK') {
+          setData(data.data);
+          console.log({data: data.data});
+        }
       }
     } catch (error) {
       console.log(error);
@@ -46,10 +49,10 @@ function Task({navigation: {navigate, goBack}}) {
   };
 
   useEffect(() => {
-    getTask();
-    getUserTask();
     AsyncStorage.getItem('dataUser').then(res => {
       setDataUser(JSON.parse(res));
+      getTask();
+      getUserTask();
     });
   }, []);
 
@@ -101,16 +104,21 @@ function Task({navigation: {navigate, goBack}}) {
             bottom: 0,
             right: 30,
           }}>
-          {data.map((item, idx) =>
-            item?.expiredInDays > 0 ? (
+          {data
+            ?.filter(filter => filter.expiredInDays >= 0)
+            .map((item, idx) => (
               <TouchableOpacity
                 key={idx}
                 style={styles.View}
-                onPress={() => navigate('DetailTask')}>
+                onPress={() =>
+                  navigate('DetailTask', {
+                    taskId: item?.taskId,
+                  })
+                }>
                 <Image
                   source={{
-                    uri: item?.banner_img
-                      ? item?.banner_img
+                    uri: item?.task?.banner_img
+                      ? item?.task?.banner_img
                       : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
                   }}
                   style={{width: '100%', height: 148, borderRadius: 10}}
@@ -124,7 +132,7 @@ function Task({navigation: {navigate, goBack}}) {
                     fontWeight: '700',
                     fontFamily: 'OpenSans',
                   }}>
-                  {item.task_name}
+                  {item.task?.task_name}
                 </Text>
                 <Text
                   style={{
@@ -136,7 +144,9 @@ function Task({navigation: {navigate, goBack}}) {
                     marginBottom: 24,
                     color: '#FFFFFF',
                   }}>
-                  Berakhir dalam {item?.expiredInDays} hari lagi
+                  {item?.expiredInDays == 0
+                    ? 'Berakhir Hari Ini'
+                    : `Berakhir dalam ${item?.expiredInDays} hari lagi`}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -157,7 +167,7 @@ function Task({navigation: {navigate, goBack}}) {
                           color: '#ffffff',
                           fontFamily: 'OpenSans',
                         }}>
-                        {item.merchant?.merchant_name}
+                        {item.task?.merchant?.merchant_name}
                       </Text>
                     </View>
                     <View
@@ -174,7 +184,7 @@ function Task({navigation: {navigate, goBack}}) {
                             fontWeight: '700',
                             fontFamily: 'OpenSans',
                           }}>
-                          {item?.poin}
+                          {item?.current_poin}
                         </Text>
                       </View>
                       <View>
@@ -199,8 +209,7 @@ function Task({navigation: {navigate, goBack}}) {
                   />
                 </View>
               </TouchableOpacity>
-            ) : null,
-          )}
+            ))}
         </ScrollView>
       </View>
       <View

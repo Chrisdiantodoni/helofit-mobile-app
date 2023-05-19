@@ -21,7 +21,7 @@ import {useNavigation} from '@react-navigation/native';
 const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
-  const id = route.params.id;
+  const id = route.params?.id;
   const [data, setData] = useState({});
   const [dataUser, setDataUser] = useState({});
   const navigation = useNavigation();
@@ -71,7 +71,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
       } else {
         const {data} = await Axios.get(`/room/${id}?user_id=${userId}`);
         if (data.message === 'OK') {
-          console.log(data.data);
+          console.log('datanya', data.data);
           setData(data.data);
         }
       }
@@ -97,18 +97,12 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
     return result;
   };
 
-  const filterRoomDetail = filter => {
-    const userId = dataUser?.id;
-    return filter.userId !== userId;
-  };
-
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       dataUserAsync();
     });
     return unsubscribe;
   }, [navigation]);
-  console.log('hi', isHost());
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -320,34 +314,38 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             <Text style={[styles.heading14, {fontSize: 20, marginBottom: 0}]}>
               Biaya Pemain
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <TouchableOpacity
-                onPress={() => handlePlayer('minus')}
-                disabled={totalPlayer == 1 ? true : false}>
-                <Image
-                  source={require('../src/MinusWhite.png')}
-                  style={{
-                    height: 32,
-                    width: 32,
-                    marginLeft: 28,
-                    marginRight: 30,
-                  }}
-                />
-              </TouchableOpacity>
-              <Text style={[styles.heading14, {marginBottom: 0}]}>
-                {totalPlayer}
-              </Text>
-              <TouchableOpacity onPress={() => handlePlayer('plus')}>
-                <Image
-                  source={require('../src/PlusWhite.png')}
-                  style={{height: 32, width: 32, marginLeft: 30}}
-                />
-              </TouchableOpacity>
-            </View>
+            {isHost() ||
+            data?.room_detail?.filter(filter => filter?.userId == dataUser?.id)
+              ?.length > 0 ? null : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <TouchableOpacity
+                  onPress={() => handlePlayer('minus')}
+                  disabled={totalPlayer == 1 ? true : false}>
+                  <Image
+                    source={require('../src/MinusWhite.png')}
+                    style={{
+                      height: 32,
+                      width: 32,
+                      marginLeft: 28,
+                      marginRight: 30,
+                    }}
+                  />
+                </TouchableOpacity>
+                <Text style={[styles.heading14, {marginBottom: 0}]}>
+                  {totalPlayer}
+                </Text>
+                <TouchableOpacity onPress={() => handlePlayer('plus')}>
+                  <Image
+                    source={require('../src/PlusWhite.png')}
+                    style={{height: 32, width: 32, marginLeft: 30}}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
           <View>
             <Text
@@ -499,7 +497,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                             </Text>
                           </View>
 
-                          {isHost() && item.userId == dataUser?.id ? null : (
+                          {isHost() && item?.userId != dataUser?.id ? (
                             <TouchableOpacity
                               style={{
                                 backgroundColor: '#C4f601',
@@ -518,7 +516,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                                 Keluarkan
                               </Text>
                             </TouchableOpacity>
-                          )}
+                          ) : null}
                         </View>
                       );
                     })
