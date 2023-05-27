@@ -5,9 +5,8 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import {Axios} from '../../utils';
 
 // create a component
-const PilihKategori = ({navigation: {goBack, navigate}}) => {
+const PilihKategori = ({route, navigation: {goBack, navigate}}) => {
   const [data, setData] = useState([]);
-
   const getKategori = async () => {
     try {
       const response = await Axios.get('/category');
@@ -22,18 +21,6 @@ const PilihKategori = ({navigation: {goBack, navigate}}) => {
   useEffect(() => {
     getKategori();
   }, []);
-
-  const kategori = [
-    'badminton',
-    'futsal',
-    'basket',
-    'yoga',
-    'fitness',
-    'boxing',
-    'bowling',
-    'tennis',
-    'golf',
-  ];
 
   const displayImages = item => {
     switch (item?.category_name?.toLowerCase()) {
@@ -116,6 +103,7 @@ const PilihKategori = ({navigation: {goBack, navigate}}) => {
                 <Image
                   source={displayImages(item)}
                   style={{
+                    resizeMode: 'contain',
                     width: 78,
                     height: 78,
                     position: 'absolute',

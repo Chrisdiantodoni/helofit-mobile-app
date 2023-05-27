@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,31 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  BackHandler,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {currency} from '../utils';
 
 function Profile({navigation: {goBack, navigate, popToTop}}) {
+  const [dataUser, setDataUser] = useState({});
+
   const handleLogout = () => {
     const removeToken = AsyncStorage.removeItem('token');
-    popToTop();
+    BackHandler.exitApp();
     return removeToken;
   };
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      if (res) {
+        setDataUser(JSON.parse(res));
+        console.log(dataUser);
+      }
+    });
+  };
+
+  useEffect(() => {
+    dataUserAsync();
+  }, []);
 
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
@@ -98,7 +114,7 @@ function Profile({navigation: {goBack, navigate, popToTop}}) {
               styles.heading14,
               {fontSize: 14, color: '#C4F601', width: '20%'},
             ]}>
-            72000
+            Rp. {dataUser?.balance}
           </Text>
           <TouchableOpacity>
             <Ionicon
@@ -176,7 +192,7 @@ function Profile({navigation: {goBack, navigate, popToTop}}) {
               styles.heading14,
               {fontSize: 14, color: '#C4F601', width: '20%'},
             ]}>
-            170
+            {dataUser?.point}
           </Text>
 
           <TouchableOpacity>

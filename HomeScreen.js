@@ -69,36 +69,23 @@ function HomeScreen({navigation}) {
           flexDirection: 'row',
           marginLeft: 16,
         }}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#161616',
-            flexDirection: 'row',
-            borderRadius: 20,
-            width: 263,
-            height: 40,
-            alignItems: 'center',
-          }}
-          onPress={() => navigation.navigate('Pencarian')}>
-          <View style={{marginLeft: 23, marginRight: 15}}>
-            <Icon style={{color: '#7c7c7c', fontSize: 18}} name="search" />
-          </View>
-          <View>
-            <Text style={{color: '#7c7c7c', fontSize: 16}}>
-              Cari meetup, task, ...
-            </Text>
-          </View>
-        </TouchableOpacity>
+        <View style={{width: '65%'}}>
+          <Image source={require('./src/LogoHomescreen.png')} />
+        </View>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
-            <Icon
-              style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
-              name="bell"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <Icon1 style={{color: 'black', fontSize: 25}} name="user" />
-          </TouchableOpacity>
+          <View style={{width: '25%'}}>
+            <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
+              <Icon
+                style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
+                name="bell"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{width: '25%'}}>
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+              <Icon1 style={{color: 'black', fontSize: 25}} name="user" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <Image

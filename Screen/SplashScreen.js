@@ -1,18 +1,18 @@
 import React, {Component, useEffect, useState} from 'react';
-import {View, Image, Text, ProgressBarAndroid} from 'react-native';
+import {View, Image, Text, ProgressBarAndroid, BackHandler} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ProgressBar} from 'react-native-paper';
 
 const SplashScreen = ({navigation}) => {
   //   const [count, setCount] = useState(0);
-  useEffect(() => {
-    AsyncStorage.getItem('token').then(res => {
-      if (res) {
-        navigation.replace('Tabs');
-      }
-      console.log(res);
-    });
-  }, []);
+  AsyncStorage.getItem('token').then(res => {
+    if (res) {
+      navigation.replace('Tabs');
+    } else {
+      navigation.replace('Welcome');
+    }
+    console.log(res);
+  });
 
   return (
     <View

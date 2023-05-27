@@ -7,6 +7,7 @@ import {ScrollView} from 'react-native';
 import moment from 'moment';
 import {currency, Axios} from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from 'react-native-modal';
 
 const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
@@ -27,9 +28,15 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
   const selectedDate = route.params.selectedDate;
   const subTotal = route.params.subTotal;
   const price = route.params.price;
+  const [isVisible, setIsVisible] = useState(false);
+  const [dataReserve, setDataReserve] = useState({});
 
   const dataUserAsync = async () => {
-    await AsyncStorage.getItem('dataUser').then(res => setDataUser(res));
+    await AsyncStorage.getItem('dataUser').then(res => {
+      if (res) {
+        setDataUser(JSON.parse(res));
+      }
+    });
   };
 
   const handleTotalPlayer = type => {
@@ -71,7 +78,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
         total: subTotal,
         price,
         booking_date: moment(selectedDate).format('YYYY-MM-DD'),
-        userId: JSON.parse(dataUser)?.id,
+        userId: dataUser?.id,
         time: JSON.stringify(listTime.map(item => item.time)),
       };
 
@@ -88,6 +95,16 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
         });
     }
   };
+  const getDetailFacility = async () => {
+    const response = await Axios.get(`/facility/merchant/detail/${idFacility}`);
+    const data = response.data?.data;
+    console.log(data);
+    setDataReserve(data);
+  };
+  const DpSubtotal = () => {
+    const dp = parseInt(subTotal) * 0.2;
+    return dp;
+  };
 
   const handleCreateRoom = idBooking => {
     const body = {
@@ -97,7 +114,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
       range_age: JSON.stringify([fromAge, toAge]),
       max_capacity: totalPlayer,
       room_desc: deskripsi,
-      hostId: JSON.parse(dataUser)?.id,
+      hostId: dataUser?.id,
       bookingId: idBooking,
     };
     Axios.post('/room', body)
@@ -386,13 +403,109 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 borderRadius: 8,
                 height: 38,
               }}
-              onPress={() => btnBuatRoom()}>
+              onPress={() => {
+                setIsVisible(true), getDetailFacility();
+              }}>
               <Text style={[styles.heading28, {color: '#000000'}]}>
                 Buat Room
               </Text>
             </TouchableOpacity>
           </View>
         </View>
+        <Modal
+          isVisible={isVisible}
+          style={{justifyContent: 'flex-end', margin: 0}}
+          animationInTiming={900}
+          animationOutTiming={500}
+          swipeDirection={'down'}
+          backdropOpacity={0.1}
+          onBackdropPress={() => setIsVisible(false)}
+          onSwipeComplete={() => setIsVisible(false)}>
+          <View View style={styles.Modal}>
+            <View
+              style={{
+                backgroundColor: '#7C7C7C',
+                width: 55,
+                height: 3,
+                marginBottom: 24,
+                marginTop: 30,
+              }}
+            />
+            <View
+              style={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+              }}>
+              <View style={{width: '85%', justifyContent: 'flex-start'}}>
+                <Text
+                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  {data?.address}
+                </Text>
+                <Text
+                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  {dataReserve?.facility_info?.facility_name}
+                </Text>
+                <Text
+                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  {moment(selectedDate).format('ddd, DD MMM YYYY')} ,{' '}
+                  {sortTime()[0]?.time} -{' '}
+                  {sortTime()[sortTime()?.length - 1]?.time}
+                </Text>
+                <Text
+                  style={[styles.heading28, {color: '#C4f601', fontSize: 20}]}>
+                  Rp. {currency(DpSubtotal())}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    borderColor: '#7c7c7c',
+                    borderWidth: 1,
+                    padding: 15,
+                    justifyContent: 'center',
+                    marginVertical: 32,
+                  }}>
+                  <View style={{width: '65%'}}>
+                    <Text
+                      style={[
+                        styles.heading28,
+                        {marginBottom: 8, fontSize: 18},
+                      ]}>
+                      Dompet Olahragamu
+                    </Text>
+                  </View>
+                  <View style={{width: '30%'}}>
+                    <Text
+                      style={[
+                        styles.heading28,
+                        {color: '#C4f601', fontSize: 18},
+                      ]}>
+                      Rp. {currency(dataUser?.balance)}
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={{
+                    width: '90%',
+                    height: 38,
+                    backgroundColor: '#C4F601',
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={btnBuatRoom}>
+                  <Text
+                    style={[
+                      styles.heading14,
+                      {fontWeight: '700', fontSize: 14, color: '#000000'},
+                    ]}>
+                    Bayar Sekarang
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -422,6 +535,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: 'OpenSans',
     color: '#FFFFFF',
+  },
+  Modal: {
+    backgroundColor: '#161616',
+    borderRadius: 10,
+    height: '50%',
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 16,
   },
 });
 

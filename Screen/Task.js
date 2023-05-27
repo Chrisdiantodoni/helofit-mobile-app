@@ -201,13 +201,6 @@ function Task({navigation: {navigate, goBack}, route}) {
                     </View>
                   </View>
                 </TouchableOpacity>
-                <View style={{marginHorizontal: 16}}>
-                  <ProgressBar
-                    style={{borderRadius: 8, marginTop: 10}}
-                    progress={item.percentage / 100}
-                    color={'#C4f601'}
-                  />
-                </View>
               </TouchableOpacity>
             ))}
         </ScrollView>

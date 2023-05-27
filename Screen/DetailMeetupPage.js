@@ -172,7 +172,11 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               |
             </Text>
             <Text style={[styles.heading14, {fontWeight: '400'}]}>
-              {data?.gender === 'male' ? 'Laki - Laki' : 'Perempuan'}
+              {data?.gender === 'male'
+                ? 'Laki - Laki'
+                  ? data?.gender === 'female'
+                  : 'Perempuan'
+                : 'Laki - Laki & Perempuan'}
             </Text>
           </View>
           <View
@@ -285,11 +289,14 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
           })}
           <View style={{marginHorizontal: 20, width: '65%'}}>
             <Text style={[styles.heading14, {fontSize: 12}]}>
-              {callAnotherPerson(data?.room_detail, 0)}
+              {/* {callAnotherPerson(data?.room_detail, 0)}
               {', '}
-              {callAnotherPerson(data?.room_detail, 1)} dan{' '}
-              {data.room_detail?.length} Orang lainnya telah bergabung dalam
-              room ini
+              { */}
+              {data.room_detail?.length === 1
+                ? 'belum ada orang yang telah bergabung dalam room ini'
+                : `${callAnotherPerson(data?.room_detail, 1)} dan ${
+                    data.room_detail?.length
+                  } Orang lainnya telah bergabung dalam room ini`}
               {/* Rudiantara, Yono, dan 5 Orang lainnya telah bergabung dalam room
               ini */}
             </Text>
@@ -409,7 +416,39 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             </TouchableOpacity>
           </View>
         </View>
-        {data?.isJoin ? null : (
+        {data?.isJoin ? (
+          <View
+            style={{
+              bottom: 0,
+              backgroundColor: '#000',
+              height: 70,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              style={{
+                width: '90%',
+                marginBottom: 10,
+                height: 38,
+                backgroundColor: '#C4F601',
+                borderRadius: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              // onPress={handleJoin}
+            >
+              <Text
+                style={[
+                  styles.heading14,
+                  {color: '#000000', fontSize: 14, marginBottom: 0},
+                ]}>
+                Mulai Meetup
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
           <View
             style={{
               bottom: 0,
@@ -436,7 +475,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                   styles.heading14,
                   {color: '#000000', fontSize: 14, marginBottom: 0},
                 ]}>
-                Mulai Meetup
+                Join Meetup
               </Text>
             </TouchableOpacity>
           </View>
@@ -497,7 +536,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                             </Text>
                           </View>
 
-                          {isHost() && item?.userId != dataUser?.id ? (
+                          {/* {isHost() && item?.userId != dataUser?.id ? (
                             <TouchableOpacity
                               style={{
                                 backgroundColor: '#C4f601',
@@ -516,7 +555,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                                 Keluarkan
                               </Text>
                             </TouchableOpacity>
-                          ) : null}
+                          ) : null} */}
                         </View>
                       );
                     })

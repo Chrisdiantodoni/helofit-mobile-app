@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,22 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import {ProgressBar} from 'react-native-paper';
 import Svg from 'react-native-svg';
 import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
 function Promo({navigation: {goBack, navigate}}) {
+  const [dataUser, setDataUser] = useState({});
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      if (res) {
+        setDataUser(JSON.parse(res));
+      }
+    });
+  };
+  useEffect(() => {
+    dataUserAsync();
+  }, []);
   const [isVisible, setIsVisible] = useState(false);
   return (
     <ScrollView style={styles.container}>
@@ -65,8 +77,9 @@ function Promo({navigation: {goBack, navigate}}) {
                     fontFamily: 'OpenSans',
                     color: '#FFFFFF',
                     paddingTop: 5,
+                    fontWeight: '700',
                   }}>
-                  Untuk menikmati promo kecil Ini
+                  Sekarang kamu memiliki
                 </Text>
                 <Text
                   style={{
@@ -75,7 +88,7 @@ function Promo({navigation: {goBack, navigate}}) {
                     fontFamily: 'OpenSans',
                     color: '#FFFFFF',
                   }}>
-                  poin kamu masih kurang 15 lagi nih
+                  {dataUser?.point} POIN, yuk selesaikan task lagi...
                 </Text>
               </View>
 
@@ -89,13 +102,6 @@ function Promo({navigation: {goBack, navigate}}) {
                   paddingTop: 8,
                   marginLeft: 20,
                 }}
-              />
-            </View>
-            <View style={{marginHorizontal: 20}}>
-              <ProgressBar
-                style={{borderRadius: 8, marginTop: 21}}
-                progress={0.5}
-                color={'#C4f601'}
               />
             </View>
           </TouchableOpacity>

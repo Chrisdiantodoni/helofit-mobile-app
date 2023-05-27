@@ -1,5 +1,5 @@
 //import liraries
-import React, {Component, useState, useEffect} from 'react';
+import React, {Component, useState, useEffect, useContext} from 'react';
 import {
   View,
   Text,
@@ -11,22 +11,33 @@ import {
 import {Axios} from '../../utils';
 import moment from 'moment';
 import currency from '../../utils/currency';
+import {Context} from '../../context/index';
+import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getToday = () => {
-  return moment(new Date());
-};
 // create a component
 const BuatRoom = ({route, navigation}) => {
   const [isSelected, setIsSelected] = useState();
   const [selectedBooking, setSelectedBooking] = useState([]);
   const [data, setData] = useState({});
   const [dates, setDates] = useState([]);
-
+  const {type_create_room} = useContext(Context);
   const idFacility = route.params.idFacility;
   const merchantId = route.params.merchantId;
   const img = route.params.img;
   const price = route.params.price;
+  const [dataReserve, setDataReserve] = useState({});
+  const [isVisible, setIsVisible] = useState(false);
 
+  const [dataUser, setDataUser] = useState({});
+
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      if (res) {
+        setDataUser(JSON.parse(res));
+      }
+    });
+  };
   const getHour = async () => {
     console.log({date: moment(isSelected).format('YYYY-MM-DD')});
     await Axios.post(`/facility/time/${idFacility}`, {
@@ -56,6 +67,7 @@ const BuatRoom = ({route, navigation}) => {
       newDates.push(date);
     }
     setDates(newDates);
+    dataUserAsync();
   }, []);
 
   const handleSelectedBooking = item => {
@@ -84,6 +96,41 @@ const BuatRoom = ({route, navigation}) => {
     } else {
       return;
     }
+  };
+  const getDetailFacility = async () => {
+    const response = await Axios.get(`/facility/merchant/detail/${idFacility}`);
+    const data = response.data?.data;
+    console.log(data);
+    setDataReserve(data);
+  };
+  const sortTime = () => {
+    const result = selectedBooking?.sort((a, b) => {
+      return b.time > a.time;
+    });
+
+    return result || [];
+  };
+
+  const handleReserve = async () => {
+    const body = {
+      facilityId: idFacility,
+      total: subTotal(),
+      price: data?.price,
+      booking_date: moment(isSelected).format('YYYY-MM-DD'),
+      userId: dataUser?.id,
+      time: JSON.stringify(selectedBooking.map(item => item.time)),
+    };
+    await Axios.post(`/booking`, body)
+      .then(res => {
+        console.log(res);
+        const data = res.data;
+        if (data.message === 'OK') {
+          navigation.navigate('Tabs');
+        }
+      })
+      .catch(err => {
+        console.log(err.response);
+      });
   };
 
   return (
@@ -217,42 +264,153 @@ const BuatRoom = ({route, navigation}) => {
         </View>
       </ScrollView>
       {/* {renderTime()} */}
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          backgroundColor: '#000',
-          height: 70,
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'row',
-        }}>
-        <TouchableOpacity
+      {type_create_room === 'room' ? (
+        <View
           style={{
-            width: '90%',
-            height: 38,
-            backgroundColor: '#C4F601',
-            borderRadius: 8,
-            alignItems: 'center',
+            position: 'absolute',
+            bottom: 0,
+            backgroundColor: '#000',
+            height: 70,
+            width: '100%',
             justifyContent: 'center',
-          }}
-          onPress={() => {
-            navigation.navigate('CreateRoom', {
-              idFacility,
-              merchantId,
-              img,
-              listTime: selectedBooking,
-              selectedDate: isSelected,
-              subTotal: subTotal(),
-              price,
-            });
+            alignItems: 'center',
+            flexDirection: 'row',
           }}>
-          <Text style={[styles.heading14, {color: '#000000'}]}>
-            Selanjutnya
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={{
+              width: '90%',
+              height: 38,
+              backgroundColor: '#C4F601',
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              navigation.navigate('CreateRoom', {
+                idFacility,
+                merchantId,
+                img,
+                listTime: selectedBooking,
+                selectedDate: isSelected,
+                subTotal: subTotal(),
+                price,
+              });
+            }}>
+            <Text style={[styles.heading14, {color: '#000000'}]}>
+              Selanjutnya
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            backgroundColor: '#000',
+            height: 70,
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity
+            style={{
+              width: '90%',
+              height: 38,
+              backgroundColor: '#C4F601',
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              setIsVisible(true);
+              getDetailFacility();
+              sortTime();
+            }}>
+            <Text style={[styles.heading14, {color: '#000000'}]}>
+              Reservasi
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <Modal
+        isVisible={isVisible}
+        style={{justifyContent: 'flex-end', margin: 0}}
+        animationInTiming={900}
+        animationOutTiming={500}
+        swipeDirection={'down'}
+        backdropOpacity={0.1}
+        onBackdropPress={() => setIsVisible(false)}
+        onSwipeComplete={() => setIsVisible(false)}>
+        <View View style={styles.Modal}>
+          <View
+            style={{
+              backgroundColor: '#7C7C7C',
+              width: 55,
+              height: 3,
+              marginBottom: 24,
+              marginTop: 30,
+            }}
+          />
+          <View
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}>
+            <View style={{width: '85%', justifyContent: 'flex-start'}}>
+              <Text style={[styles.heading28, {marginBottom: 8}]}>
+                {dataReserve?.address}
+              </Text>
+              <Text style={[styles.heading28, {marginBottom: 8}]}>
+                {dataReserve?.facility_info?.facility_name}
+              </Text>
+              <Text style={[styles.heading28, {marginBottom: 8}]}>
+                {moment(isSelected).format('ddd, DD MMM YYYY')} ,{' '}
+                {sortTime()[0]?.time} -{' '}
+                {sortTime()[sortTime()?.length - 1]?.time}
+              </Text>
+              <Text style={[styles.heading28, {color: '#C4f601'}]}>
+                Rp {currency(subTotal())}
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  borderColor: '#7c7c7c',
+                  borderWidth: 1,
+                  padding: 15,
+                  justifyContent: 'center',
+                  marginVertical: 32,
+                }}>
+                <View style={{width: '70%'}}>
+                  <Text style={[styles.heading28, {marginBottom: 8}]}>
+                    Dompet Olahragamu
+                  </Text>
+                </View>
+                <View style={{width: '30%'}}>
+                  <Text style={[styles.heading28, {color: '#C4f601'}]}>
+                    Rp. {dataUser?.balance}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: '90%',
+                  height: 38,
+                  backgroundColor: '#C4F601',
+                  borderRadius: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onPress={handleReserve}>
+                <Text style={[styles.heading14, {color: '#000000'}]}>
+                  Bayar Sekarang
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -277,6 +435,22 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenSans',
     fontWeight: '700',
     fontSize: 14,
+  },
+  Modal: {
+    backgroundColor: '#161616',
+    borderRadius: 10,
+    height: '50%',
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  heading28: {
+    fontSize: 20,
+    fontWeight: '700',
+    fontFamily: 'OpenSans',
+    color: '#ffffff',
+    lineHeight: 27,
+    alignSelf: 'flex-start',
   },
 });
 

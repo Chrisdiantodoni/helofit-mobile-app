@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {Component, useContext} from 'react';
 import {
   View,
   Text,
@@ -27,7 +27,6 @@ import Bantuan from './Screen/Profile/Bantuan';
 import SyaratKetentuan from './Screen/Profile/SyaratKetentuan';
 import ProfilSaya from './Screen/Profile/ProfilSaya';
 import Notifikasi from './Screen/Notifikasi';
-import Pencarian from './Screen/Pencarian';
 import PilihKategori from './Screen/Meetup/PilihKategori';
 import {Ionicon} from 'react-native-vector-icons/Ionicons';
 import BuatRoom from './Screen/Meetup/BuatRoom';
@@ -40,11 +39,13 @@ import FollowMeetup from './Screen/FollowMeetup';
 import PromoList from './Screen/PromoList';
 import FlashMessage from 'react-native-flash-message';
 import SplashScreen from './Screen/SplashScreen';
+import ContextProvider, {Context} from './context';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
+  const {dispatch} = useContext(Context);
   return (
     <Tab.Navigator
       initialRouteName="HomeScreen"
@@ -132,6 +133,14 @@ function MyTabs() {
       <Tab.Screen
         name="PilihKategori"
         component={PilihKategori}
+        listeners={{
+          tabPress: e => {
+            dispatch({
+              type: 'type_create_room',
+              payload: '',
+            });
+          },
+        }}
         options={{
           headerShown: false,
           tabBarLabel: 'Fasilitas',
@@ -151,132 +160,130 @@ function MyTabs() {
 
 function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="SplashScreen"
-          component={SplashScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Signin"
-          component={Signin}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Signup"
-          component={Signup}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="ForgetPassword"
-          component={ForgetPassword}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Profile"
-          component={Profile}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Tentang"
-          component={Tentang}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SyaratKetentuan"
-          component={SyaratKetentuan}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Bantuan"
-          component={Bantuan}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="ProfilSaya"
-          component={ProfilSaya}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Notifikasi"
-          component={Notifikasi}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Pencarian"
-          component={Pencarian}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="PilihKategori"
-          component={PilihKategori}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="BuatRoom"
-          component={BuatRoom}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Dompet"
-          component={Dompet}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="CreateRoom"
-          component={CreateRoom}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DetailTask"
-          component={DetailTask}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Tabs"
-          component={MyTabs}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DetailMeetupPage"
-          component={DetailMeetupPage}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="DetailFasilitasPage"
-          component={DetailFasilitasPage}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Pin"
-          component={Pin}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Fasilitas"
-          component={Fasilitas}
-          options={{headerShown: false}}
-        />
+    <ContextProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="SplashScreen"
+            component={SplashScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Signin"
+            component={Signin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Signup"
+            component={Signup}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ForgetPassword"
+            component={ForgetPassword}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Tentang"
+            component={Tentang}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="SyaratKetentuan"
+            component={SyaratKetentuan}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Bantuan"
+            component={Bantuan}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ProfilSaya"
+            component={ProfilSaya}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Notifikasi"
+            component={Notifikasi}
+            options={{headerShown: false}}
+          />
 
-        <Stack.Screen
-          name="FollowMeetup"
-          component={FollowMeetup}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="PromoList"
-          component={PromoList}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-      <FlashMessage position="top" />
-    </NavigationContainer>
+          <Stack.Screen
+            name="PilihKategori"
+            component={PilihKategori}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="BuatRoom"
+            component={BuatRoom}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Dompet"
+            component={Dompet}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="CreateRoom"
+            component={CreateRoom}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="DetailTask"
+            component={DetailTask}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Tabs"
+            component={MyTabs}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="DetailMeetupPage"
+            component={DetailMeetupPage}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="DetailFasilitasPage"
+            component={DetailFasilitasPage}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Pin"
+            component={Pin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Fasilitas"
+            component={Fasilitas}
+            options={{headerShown: false}}
+          />
+
+          <Stack.Screen
+            name="FollowMeetup"
+            component={FollowMeetup}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="PromoList"
+            component={PromoList}
+            options={{headerShown: false}}
+          />
+        </Stack.Navigator>
+        <FlashMessage position="top" />
+      </NavigationContainer>
+    </ContextProvider>
   );
 }
 

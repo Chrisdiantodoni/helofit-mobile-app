@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,12 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import {Axios} from '../utils';
 import {useNavigation} from '@react-navigation/native';
+import {Context} from './../context/index';
 
 function Meetup({navigation: {navigate, goBack}}) {
   const navigation = useNavigation();
   const [room, setRoom] = useState([]);
+  const {dispatch} = useContext(Context);
 
   const getRoom = async () => {
     try {
@@ -34,6 +36,14 @@ function Meetup({navigation: {navigate, goBack}}) {
     });
     return unsubscribe;
   }, [navigation]);
+
+  const handleCreateRoom = () => {
+    dispatch({
+      type: 'type_create_room',
+      payload: 'room',
+    });
+    navigate('PilihKategori');
+  };
 
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
@@ -72,7 +82,7 @@ function Meetup({navigation: {navigate, goBack}}) {
             </Text>
           </View>
           <TouchableOpacity
-            onPress={() => navigate('PilihKategori')}
+            onPress={handleCreateRoom}
             style={[
               styles.button,
               {
