@@ -404,7 +404,7 @@ function HomeScreen({navigation}) {
                     style={{width: 21, height: 21, tintColor: 'white'}}
                   />
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
+                    <View style={{width: '70%'}}>
                       <Text
                         style={{
                           marginLeft: 10,
@@ -417,9 +417,9 @@ function HomeScreen({navigation}) {
                     </View>
                     <View
                       style={{
-                        marginLeft: 117,
                         justifyContent: 'center',
                         alignItems: 'center',
+                        width: '25%',
                       }}>
                       <View>
                         <Text
@@ -483,26 +483,6 @@ function HomeScreen({navigation}) {
                             2. Barbel 15 kg
                           </Text>
                         </View> */}
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: '400',
-                        color: '#000000',
-                      }}>
-                      ...
-                    </Text>
-                  </View>
                 </View>
               </TouchableOpacity>
             ))}
