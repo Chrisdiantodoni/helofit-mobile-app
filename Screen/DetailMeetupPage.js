@@ -182,7 +182,10 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                   : 'Laki - Laki & Perempuan'}
               </Text>
               <Text
-                style={[styles.heading14, {fontWeight: '400', marginLeft: 8}]}>
+                style={[
+                  styles.heading14,
+                  {fontWeight: '400', marginHorizontal: 8},
+                ]}>
                 {data?.range_age
                   ? `(${JSON.parse(data?.range_age)[0]}-${
                       JSON.parse(data?.range_age)[1]
@@ -190,7 +193,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                   : data?.range_age}
               </Text>
               {isHost() || data?.isJoin ? (
-                <View style={{width: '50%', marginLeft: 12}}>
+                <View style={{width: '50%', marginLeft: 8}}>
                   <TouchableOpacity
                     style={{
                       backgroundColor: '#000000',
