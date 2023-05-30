@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,15 +10,15 @@ import {
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
-import {TextInput} from 'react-native-paper';
-import {Axios, currency} from '../utils';
-import {showMessage} from 'react-native-flash-message';
+import { TextInput } from 'react-native-paper';
+import { Axios, currency } from '../utils';
+import { showMessage } from 'react-native-flash-message';
 import moment from 'moment';
 import BuatRoom from './Meetup/BuatRoom';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
+const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
   const id = route.params?.id;
@@ -69,7 +69,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
           type: 'danger',
         });
       } else {
-        const {data} = await Axios.get(`/room/${id}?user_id=${userId}`);
+        const { data } = await Axios.get(`/room/${id}?user_id=${userId}`);
         if (data.message === 'OK') {
           console.log('datanya', data.data);
           setData(data.data);
@@ -143,7 +143,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               paddingRight: 2,
             }}
           />
-          <Text style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
+          <Text style={{ fontSize: 12, color: '#000000', fontWeight: '400' }}>
             {data.room_detail?.length} / {data.max_capacity}
           </Text>
         </View>
@@ -159,7 +159,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             }}>
             {data.room_name}
           </Text>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Text style={styles.heading14}>
               {data?.facility?.category?.category_name || '-'}
             </Text>
@@ -171,7 +171,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               }}>
               |
             </Text>
-            <Text style={[styles.heading14, {fontWeight: '400'}]}>
+            <Text style={[styles.heading14, { fontWeight: '400' }]}>
               {data?.gender === 'male'
                 ? 'Laki - Laki'
                   ? data?.gender === 'female'
@@ -195,13 +195,13 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               }}
             />
             <Text
-              style={[styles.heading14, {fontWeight: '700', marginBottom: 0}]}>
+              style={[styles.heading14, { fontWeight: '700', marginBottom: 0 }]}>
               {data?.user?.username}
             </Text>
           </View>
         </View>
         <View style={styles.subContainer2}>
-          <View style={{flexDirection: 'row', paddingBottom: 4}}>
+          <View style={{ flexDirection: 'row', paddingBottom: 4 }}>
             <View
               style={{
                 width: '10%',
@@ -210,24 +210,24 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               <Ionicon
                 name="location-outline"
                 size={20}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
+                style={{ fontWeight: 'bold', color: '#ffffff' }}
               />
             </View>
             <View>
               <Text style={styles.heading14}>
                 {data?.facility?.merchant?.address || '-'}
               </Text>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity>
                   <Text style={styles.small12}>lihat detail fasilitas</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{marginLeft: 28}}>
+                <TouchableOpacity style={{ marginLeft: 28 }}>
                   <Text style={styles.small12}>lacak dari map</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-          <View style={{flexDirection: 'row', paddingBottom: 4}}>
+          <View style={{ flexDirection: 'row', paddingBottom: 4 }}>
             <View
               style={{
                 width: '10%',
@@ -236,21 +236,20 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               <Ionicon
                 name="time-outline"
                 size={20}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
+                style={{ fontWeight: 'bold', color: '#ffffff' }}
               />
             </View>
             <View>
               <Text style={styles.heading14}>
                 {moment(data?.booking?.booking_date).format('ddd, D MMM')}{' '}
                 {data?.booking?.time
-                  ? `${JSON.parse(data?.booking?.time)[0]} - ${
-                      JSON.parse(data?.booking?.time)[1]
-                    }`
+                  ? `${JSON.parse(data?.booking?.time)[0]} - ${JSON.parse(data?.booking?.time)[1]
+                  }`
                   : ''}
               </Text>
             </View>
           </View>
-          <View style={{flexDirection: 'row', paddingBottom: 4}}>
+          <View style={{ flexDirection: 'row', paddingBottom: 4 }}>
             <View
               style={{
                 width: '10%',
@@ -259,7 +258,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               <Ionicon
                 name="pricetag-outline"
                 size={20}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
+                style={{ fontWeight: 'bold', color: '#ffffff' }}
               />
             </View>
             <View>
@@ -273,7 +272,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             </View>
           </View>
         </View>
-        <View style={[styles.subContainer3, {flexDirection: 'row'}]}>
+        <View style={[styles.subContainer3, { flexDirection: 'row' }]}>
           {[1, 1, 1, 1].map(item => {
             return (
               <Image
@@ -287,16 +286,15 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               />
             );
           })}
-          <View style={{marginHorizontal: 20, width: '65%'}}>
-            <Text style={[styles.heading14, {fontSize: 12}]}>
+          <View style={{ marginHorizontal: 20, width: '65%' }}>
+            <Text style={[styles.heading14, { fontSize: 12 }]}>
               {/* {callAnotherPerson(data?.room_detail, 0)}
               {', '}
               { */}
               {data.room_detail?.length === 1
                 ? 'belum ada orang yang telah bergabung dalam room ini'
-                : `${callAnotherPerson(data?.room_detail, 1)} dan ${
-                    data.room_detail?.length
-                  } Orang lainnya telah bergabung dalam room ini`}
+                : `${callAnotherPerson(data?.room_detail, 1)} dan ${data.room_detail?.length
+                } Orang lainnya telah bergabung dalam room ini`}
               {/* Rudiantara, Yono, dan 5 Orang lainnya telah bergabung dalam room
               ini */}
             </Text>
@@ -307,23 +305,23 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
         </View>
 
         <View style={styles.subContainer3}>
-          <Text style={[styles.heading14, {fontSize: 14}]}>Deskripsi</Text>
-          <Text style={[styles.heading14, {fontWeight: '400'}]}>
+          <Text style={[styles.heading14, { fontSize: 14 }]}>Deskripsi</Text>
+          <Text style={[styles.heading14, { fontWeight: '400' }]}>
             {data?.room_desc}
           </Text>
         </View>
-        <View style={[styles.subContainer3, {paddingVertical: 10}]}>
+        <View style={[styles.subContainer3, { paddingVertical: 10 }]}>
           <View
             style={{
               flexDirection: 'row',
               alignContent: 'center',
             }}>
-            <Text style={[styles.heading14, {fontSize: 20, marginBottom: 0}]}>
+            <Text style={[styles.heading14, { fontSize: 20, marginBottom: 0 }]}>
               Biaya Pemain
             </Text>
             {isHost() ||
-            data?.room_detail?.filter(filter => filter?.userId == dataUser?.id)
-              ?.length > 0 ? null : (
+              data?.room_detail?.filter(filter => filter?.userId == dataUser?.id)
+                ?.length > 0 ? null : (
               <View
                 style={{
                   flexDirection: 'row',
@@ -342,13 +340,13 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                     }}
                   />
                 </TouchableOpacity>
-                <Text style={[styles.heading14, {marginBottom: 0}]}>
+                <Text style={[styles.heading14, { marginBottom: 0 }]}>
                   {totalPlayer}
                 </Text>
                 <TouchableOpacity onPress={() => handlePlayer('plus')}>
                   <Image
                     source={require('../src/PlusWhite.png')}
-                    style={{height: 32, width: 32, marginLeft: 30}}
+                    style={{ height: 32, width: 32, marginLeft: 30 }}
                   />
                 </TouchableOpacity>
               </View>
@@ -358,131 +356,88 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             <Text
               style={[
                 styles.small12,
-                {fontSize: 20, fontWeight: '700', height: 50},
+                { fontSize: 20, fontWeight: '700', height: 50 },
               ]}>
               Rp{' '}
               {currency(
                 priceperPerson(data?.booking?.total, data?.max_capacity) *
-                  parseInt(totalPlayer),
+                parseInt(totalPlayer),
               )}
             </Text>
           </View>
         </View>
-        <View style={styles.subContainer3}>
-          <Text style={[styles.heading14, {fontSize: 14, paddingBottom: 8}]}>
-            Komentar
-          </Text>
-          <View style={{paddingVertical: 8}}>
-            <Text style={[styles.heading14, {fontSize: 14}]}>
-              Doni Chrisdianto
-            </Text>
-            <Text style={[styles.heading14, {fontWeight: '400'}]}>
-              Mantapp !! dapet temen baru
-            </Text>
-          </View>
-          <View style={{paddingVertical: 8}}>
-            <Text style={[styles.heading14, {fontSize: 14}]}>
-              Doni Chrisdianto
-            </Text>
-            <Text style={[styles.heading14, {fontWeight: '400'}]}>
-              Mantapp !! dapet temen baru
-            </Text>
-          </View>
-          <View style={{marginTop: 8, flexDirection: 'row'}}>
-            <TextInput
+
+        {data?.isJoin ?
+          isHost() ?
+            (
+              <View
+                style={{
+                  bottom: 0,
+                  backgroundColor: '#000',
+                  height: 70,
+                  width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                }}>
+                <TouchableOpacity
+                  style={{
+                    width: '90%',
+                    marginBottom: 10,
+                    height: 38,
+                    backgroundColor: '#C4F601',
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                // onPress={handleJoin}
+                >
+                  <Text
+                    style={[
+                      styles.heading14,
+                      { color: '#000000', fontSize: 14, marginBottom: 0 },
+                    ]}>
+                    Mulai Meetup
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )
+            : null
+          : (
+            <View
               style={{
-                width: '75%',
-                height: 40,
-                backgroundColor: '#7c7c7c',
-                borderRadius: 16,
-                borderTopEndRadius: 16,
-                borderTopStartRadius: 16,
-              }}
-              placeholder="Masukkan Komentar Kamu"
-              placeholderTextColor={'#FFFFFF'}
-            />
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#000000',
+                bottom: 0,
+                backgroundColor: '#000',
+                height: 70,
+                width: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: '#C4f601',
-                marginLeft: 12,
-                width: '20%',
+                flexDirection: 'row',
               }}>
-              <Text style={{color: '#C4F601'}}>POST</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        {data?.isJoin ? (
-          <View
-            style={{
-              bottom: 0,
-              backgroundColor: '#000',
-              height: 70,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity
-              style={{
-                width: '90%',
-                marginBottom: 10,
-                height: 38,
-                backgroundColor: '#C4F601',
-                borderRadius: 8,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              // onPress={handleJoin}
-            >
-              <Text
-                style={[
-                  styles.heading14,
-                  {color: '#000000', fontSize: 14, marginBottom: 0},
-                ]}>
-                Mulai Meetup
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View
-            style={{
-              bottom: 0,
-              backgroundColor: '#000',
-              height: 70,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity
-              style={{
-                width: '90%',
-                marginBottom: 10,
-                height: 38,
-                backgroundColor: '#C4F601',
-                borderRadius: 8,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={handleJoin}>
-              <Text
-                style={[
-                  styles.heading14,
-                  {color: '#000000', fontSize: 14, marginBottom: 0},
-                ]}>
-                Join Meetup
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <TouchableOpacity
+                style={{
+                  width: '90%',
+                  marginBottom: 10,
+                  height: 38,
+                  backgroundColor: '#C4F601',
+                  borderRadius: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onPress={handleJoin}>
+                <Text
+                  style={[
+                    styles.heading14,
+                    { color: '#000000', fontSize: 14, marginBottom: 0 },
+                  ]}>
+                  Join Meetup
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         <Modal
           isVisible={isVisible}
-          style={{justifyContent: 'flex-end', margin: 0}}
+          style={{ justifyContent: 'flex-end', margin: 0 }}
           animationInTiming={900}
           animationOutTiming={500}
           swipeDirection={'down'}
@@ -503,7 +458,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             <Text
               style={[
                 styles.heading14,
-                {fontSize: 20, alignSelf: 'flex-start'},
+                { fontSize: 20, alignSelf: 'flex-start' },
               ]}>
               Daftar Pemain yang Bergabung
             </Text>
@@ -511,32 +466,32 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               <Pressable>
                 {data?.room_detail
                   ? data?.room_detail?.map((item, idx) => {
-                      return (
+                    return (
+                      <View
+                        key={idx}
+                        style={{
+                          marginTop: 20,
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: '100%',
+                        }}>
                         <View
-                          key={idx}
                           style={{
-                            marginTop: 20,
-                            display: 'flex',
                             flexDirection: 'row',
+                            maxWidth: '55%',
                             width: '100%',
+                            alignItems: 'center',
                           }}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              maxWidth: '55%',
-                              width: '100%',
-                              alignItems: 'center',
-                            }}>
-                            <Image
-                              source={require('../src/Avatar.png')}
-                              style={{width: 32, height: 32, marginRight: 16}}
-                            />
-                            <Text style={styles.heading14}>
-                              {item?.user?.username}
-                            </Text>
-                          </View>
+                          <Image
+                            source={require('../src/Avatar.png')}
+                            style={{ width: 32, height: 32, marginRight: 16 }}
+                          />
+                          <Text style={styles.heading14}>
+                            {item?.user?.username}
+                          </Text>
+                        </View>
 
-                          {/* {isHost() && item?.userId != dataUser?.id ? (
+                        {/* {isHost() && item?.userId != dataUser?.id ? (
                             <TouchableOpacity
                               style={{
                                 backgroundColor: '#C4f601',
@@ -556,9 +511,9 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                               </Text>
                             </TouchableOpacity>
                           ) : null} */}
-                        </View>
-                      );
-                    })
+                      </View>
+                    );
+                  })
                   : ''}
               </Pressable>
             </ScrollView>
