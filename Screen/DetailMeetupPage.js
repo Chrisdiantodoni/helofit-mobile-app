@@ -21,6 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
   const id = route.params?.id;
   const [data, setData] = useState({});
   const [dataUser, setDataUser] = useState({});
@@ -40,7 +41,7 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
         setTotalPlayer(totalPlayer == 1 ? 1 : totalPlayer - 1);
         break;
       case 'plus':
-        setTotalPlayer(totalPlayer + 1);
+        setTotalPlayer(parseInt(data.room_detail?.length) - parseInt(data?.max_capacity) == (totalPlayer + 1) ? totalPlayer + 1 : totalPlayer);
         break;
       default:
         break;
@@ -53,8 +54,10 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
         userId: dataUser?.id,
         roomId: id,
         qty: totalPlayer,
+        payment: priceperPerson(data?.booking?.total, data?.max_capacity)
       };
       const response = await Axios.post('/room/join', body);
+      navigate("Tabs")
       console.log(response);
     } catch (error) {
       console.log(error);
@@ -103,6 +106,42 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
     });
     return unsubscribe;
   }, [navigation]);
+
+
+  const handleCancelJoin = async () => {
+    const body = {
+      userId: dataUser?.id,
+      roomId: id,
+    }
+
+    await Axios.post("/room/cancel", body)
+      .then(res => {
+        console.log({ res })
+        navigate("Tabs")
+      })
+      .catch(err => {
+        console.log({ err })
+      })
+  }
+
+  const handleStartMeet = async () => {
+    const body = {
+      roomId: id,
+      userId: dataUser?.id,
+    }
+    await Axios.post("/room/start", body)
+      .then(res => {
+        const result = res.data
+
+        if (result.message == "OK") {
+          navigate("Tabs")
+        }
+      })
+      .catch(err => {
+        console.log({ err: err.message })
+      })
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -159,25 +198,68 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
             }}>
             {data.room_name}
           </Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.heading14}>
-              {data?.facility?.category?.category_name || '-'}
-            </Text>
-            <Text
-              style={{
-                fontWeight: '700',
-                color: '#D9D9D9',
-                marginHorizontal: 16,
-              }}>
-              |
-            </Text>
-            <Text style={[styles.heading14, { fontWeight: '400' }]}>
-              {data?.gender === 'male'
-                ? 'Laki - Laki'
-                  ? data?.gender === 'female'
-                  : 'Perempuan'
-                : 'Laki - Laki & Perempuan'}
-            </Text>
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            <View style={{ flexDirection: 'row', width: '40%' }}>
+              <Text style={styles.heading14}>
+                {data?.facility?.category?.category_name || '-'}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: '700',
+                  color: '#D9D9D9',
+                  marginHorizontal: 12,
+                }}>
+                |
+              </Text>
+              <Text style={[styles.heading14, { fontWeight: '400' }]}>
+                {data?.gender === 'male'
+                  ? 'Laki - Laki'
+                    ? data?.gender === 'female'
+                    : 'Perempuan'
+                  : 'Laki - Laki & Perempuan'}
+              </Text>
+              <Text
+                style={[
+                  styles.heading14,
+                  { fontWeight: '400', marginHorizontal: 8 },
+                ]}>
+                {data?.range_age
+                  ? `(${JSON.parse(data?.range_age)[0]}-${JSON.parse(data?.range_age)[1]
+                  }th)`
+                  : data?.range_age}
+              </Text>
+              {isHost() || data?.isJoin ? (
+                <View style={{ width: '50%', marginLeft: 8 }}>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#000000',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: '#C4f601',
+                      height: '50%',
+                      width: '75%',
+                    }}
+                    onPress={() => setShowCancel(true)}>
+                    <Text style={{ color: '#C4F601', fontWeight: '700' }}>
+                      Batal
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
+              <TouchableOpacity>
+                <Ionicon
+                  name="share-social-outline"
+                  size={24}
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#ffffff',
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           <View
             style={{
@@ -273,7 +355,7 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
           </View>
         </View>
         <View style={[styles.subContainer3, { flexDirection: 'row' }]}>
-          {[1, 1, 1, 1].map(item => {
+          {data?.room_detail?.slice(0, 4).map(item => {
             return (
               <Image
                 source={require('../src/Avatar.png')}
@@ -292,8 +374,8 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
               {', '}
               { */}
               {data.room_detail?.length === 1
-                ? 'belum ada orang yang telah bergabung dalam room ini'
-                : `${callAnotherPerson(data?.room_detail, 1)} dan ${data.room_detail?.length
+                ? 'belum ada orang yang bergabung dalam room ini'
+                : `${callAnotherPerson(data?.room_detail, 1)} dan ${data.room_detail?.length - 1
                 } Orang lainnya telah bergabung dalam room ini`}
               {/* Rudiantara, Yono, dan 5 Orang lainnya telah bergabung dalam room
               ini */}
@@ -363,13 +445,48 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
                 priceperPerson(data?.booking?.total, data?.max_capacity) *
                 parseInt(totalPlayer),
               )}
+
             </Text>
           </View>
         </View>
-
+        {/* <View style={styles.subContainer3}>
+          <Text style={[styles.heading14, {fontSize: 14, paddingBottom: 8}]}>
+            Komentar
+          </Text>
+          <View style={{paddingVertical: 8}}>
+            <Text style={[styles.heading14, {fontSize: 14}]}>
+              Doni Chrisdianto
+            </Text>
+            <Text style={[styles.heading14, {fontWeight: '400'}]}>
+              Mantapp !! dapet temen baru
+            </Text>
+          </View>
+          <View style={{paddingVertical: 8}}>
+            <Text style={[styles.heading14, {fontSize: 14}]}>
+              Doni Chrisdianto
+            </Text>
+            <Text style={[styles.heading14, {fontWeight: '400'}]}>
+              Mantapp !! dapet temen baru
+            </Text>
+          </View>
+          <View style={{marginTop: 8, flexDirection: 'row'}}>
+            <TextInput
+              style={{
+                bottom: 0,
+                backgroundColor: '#000',
+                height: 70,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row',
+              }}>
+              <Text style={{color: '#C4F601'}}>POST</Text>
+            </TouchableOpacity>
+          </View>
+        </View> */}
         {data?.isJoin ?
           isHost() ?
-            (
+            parseInt(data.max_capacity) - parseInt(data.room_detail?.length) != 0 ? null : (
               <View
                 style={{
                   bottom: 0,
@@ -390,7 +507,7 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                // onPress={handleJoin}
+                  onPress={handleStartMeet}
                 >
                   <Text
                     style={[
@@ -519,6 +636,56 @@ const DetailMeetupPage = ({ route, navigation: { navigate, goBack } }) => {
             </ScrollView>
           </View>
         </Modal>
+        <Modal
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+          isVisible={showCancel}
+          backdropOpacity={0}
+          animationIn="zoomInDown"
+          animationOut="zoomOutUp"
+          animationInTiming={600}
+          animationOutTiming={600}
+          backdropTransitionInTiming={600}
+          onBackdropPress={() => setShowCancel(false)}
+          backdropTransitionOutTiming={600}>
+          <View style={styles.Modal2}>
+            <Text style={[styles.heading14, { textAlign: 'center' }]}>
+              Kamu Yakin ingin membatalkan meetup?
+            </Text>
+            <Text
+              style={[
+                styles.heading14,
+                { textAlign: 'center', fontWeight: '400' },
+              ]}>
+              *membatalkan meetup akan menghanguskan biaya muka
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#C4F601',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: '#C4f601',
+                height: '25%',
+                width: '100%',
+                marginTop: 6,
+              }}
+              onPress={() => handleCancelJoin()}>
+              <Text
+                style={[
+                  styles.heading14,
+                  {
+                    textAlign: 'center',
+                    fontWeight: '700',
+                    color: '#000000',
+                    marginBottom: 0,
+                  },
+                ]}>
+                Iya, Batalkan Meetup
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -571,6 +738,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     height: '70%',
     width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  Modal2: {
+    backgroundColor: '#7C7C7C',
+    borderRadius: 10,
+    height: '20%',
+    justifyContent: 'center',
+    width: '80%',
     alignItems: 'center',
     paddingHorizontal: 16,
   },

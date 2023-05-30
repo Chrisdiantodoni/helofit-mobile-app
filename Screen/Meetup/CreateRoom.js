@@ -1,20 +1,19 @@
 //import liraries
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import {Checkbox, TextInput} from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Checkbox, TextInput } from 'react-native-paper';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import {ScrollView} from 'react-native';
+import { ScrollView } from 'react-native';
 import moment from 'moment';
-import {currency, Axios} from '../../utils';
+import { currency, Axios } from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from 'react-native-modal';
 
-const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
+const CreateRoom = ({ route, navigation: { goBack, navigate } }) => {
   const [totalPlayer, setTotalPlayer] = useState(1);
   const [isGrow, setIsGrow] = useState(0);
   const [deskripsi, setDeskripsi] = useState('');
   const [data, setData] = useState({});
-  const [quantity, setQuantity] = useState('');
   const [title, setTitle] = useState(null);
   const [male, setMale] = useState('');
   const [female, setFemale] = useState('');
@@ -81,17 +80,25 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
         userId: dataUser?.id,
         time: JSON.stringify(listTime.map(item => item.time)),
       };
+      const max = Math.max(...listTime.map(item => item.time).map(time => {
+        const [hours, minutes] = time.split(":");
+        return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+      }));
+      const maxTime = `${Math.floor(max / 60).toString().padStart(2, '0')}:${(max % 60).toString().padStart(2, '0')}`;
+
+      const newBookingDate = `${moment(selectedDate).format('YYYY-MM-DD')} ${maxTime}`
+
 
       await Axios.post('/booking', body)
         .then(res => {
           const response = res.data?.data;
           const id = response.id;
           if (res.data.message === 'OK') {
-            handleCreateRoom(id);
+            handleCreateRoom(id, new Date(newBookingDate));
           }
         })
         .catch(err => {
-          console.log({err: err.response});
+          console.log({ err: err.response });
         });
     }
   };
@@ -102,11 +109,11 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
     setDataReserve(data);
   };
   const DpSubtotal = () => {
-    const dp = parseInt(subTotal) * 0.2;
+    const dp = (parseInt(subTotal) * 0.2) + (parseInt(subTotal) / parseInt(totalPlayer));
     return dp;
   };
 
-  const handleCreateRoom = idBooking => {
+  const handleCreateRoom = (idBooking, room_expired) => {
     const body = {
       room_name: title,
       facilityId: idFacility,
@@ -116,18 +123,19 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
       room_desc: deskripsi,
       hostId: dataUser?.id,
       bookingId: idBooking,
+      payment: DpSubtotal(),
+      room_expired: room_expired
     };
     Axios.post('/room', body)
-      .then(res => {
+      .then(async res => {
         const data = res.data;
-
-        console.log({res_createRoom: data});
         if (data.message === 'OK') {
           navigate('Tabs');
+
         }
       })
       .catch(err => {
-        console.log('error create room', err.response);
+        console.log('error create room', err);
       });
   };
 
@@ -135,14 +143,12 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
     switch (title && fromAge && toAge) {
       case null:
         alert(
-          `Please Input ${
-            !title ? 'Title' : !fromAge ? 'Umur Mulai' : !toAge ? 'Umur Ke' : ''
+          `Please Input ${!title ? 'Title' : !fromAge ? 'Umur Mulai' : !toAge ? 'Umur Ke' : ''
           }`,
         );
         break;
 
       default:
-        // handleCreateRoom();
         await handleBooking();
         break;
     }
@@ -158,7 +164,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
           alignItems: 'center',
         }}>
         <TouchableOpacity
-          style={{marginLeft: 24, marginRight: 32}}
+          style={{ marginLeft: 24, marginRight: 32 }}
           onPress={() => goBack()}>
           <Ionicon
             name="chevron-back-outline"
@@ -170,12 +176,12 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
             }}
           />
         </TouchableOpacity>
-        <Text style={[styles.header, {color: '#000000', fontSize: 20}]}>
+        <Text style={[styles.header, { color: '#000000', fontSize: 20 }]}>
           Buat Room Meetup
         </Text>
       </View>
       <View>
-        <Image source={{uri: img}} style={{width: '100%', height: 188}} />
+        <Image source={{ uri: img }} style={{ width: '100%', height: 188 }} />
         <View
           style={{
             borderRadius: 16,
@@ -192,7 +198,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
             <Ionicon
               name="location-outline"
               size={18}
-              style={{fontWeight: 'bold', color: '#ffffff', marginRight: 20}}
+              style={{ fontWeight: 'bold', color: '#ffffff', marginRight: 20 }}
             />
             <View>
               <Text style={styles.heading28}>{data?.address}</Text>
@@ -209,7 +215,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
             <Ionicon
               name="time-outline"
               size={18}
-              style={{fontWeight: 'bold', color: '#ffffff', marginRight: 20}}
+              style={{ fontWeight: 'bold', color: '#ffffff', marginRight: 20 }}
             />
             <Text style={styles.heading28}>
               {moment(selectedDate).format('ddd, DD MMM YYYY')} ,{' '}
@@ -226,13 +232,13 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
             <Ionicon
               name="pricetag-outline"
               size={18}
-              style={{fontWeight: 'bold', color: '#ffffff', marginRight: 20}}
+              style={{ fontWeight: 'bold', color: '#ffffff', marginRight: 20 }}
             />
             <Text style={styles.heading28}>Rp. {currency(subTotal)}</Text>
           </View>
         </View>
-        <View style={{paddingHorizontal: 16}}>
-          <Text style={[styles.heading28, {fontSize: 20}]}>
+        <View style={{ paddingHorizontal: 16 }}>
+          <Text style={[styles.heading28, { fontSize: 20 }]}>
             Judul Room Meetup
           </Text>
 
@@ -252,35 +258,35 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
             placeholderTextColor="#FFFFFF"
             onChangeText={text => setTitle(text)}
           />
-          <View style={{marginTop: 32}}>
-            <Text style={[styles.heading28, {fontSize: 20}]}>
+          <View style={{ marginTop: 32 }}>
+            <Text style={[styles.heading28, { fontSize: 20 }]}>
               Jenis Kelamin
             </Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Checkbox
                 status={male ? 'checked' : 'unchecked'}
                 onPress={() => setMale(!male)}
               />
               <Text
-                style={[styles.heading14, {marginLeft: 18}]}
+                style={[styles.heading14, { marginLeft: 18 }]}
                 onPress={() => setMale(!male)}>
                 Laki-laki
               </Text>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Checkbox
                 status={female ? 'checked' : 'unchecked'}
                 onPress={() => setFemale(!female)}
               />
               <Text
-                style={[styles.heading14, {marginLeft: 18}]}
+                style={[styles.heading14, { marginLeft: 18 }]}
                 onPress={() => setFemale(!female)}>
                 Perempuan
               </Text>
             </View>
           </View>
-          <View style={{marginTop: 30}}>
-            <Text style={[styles.heading28, {fontSize: 20}]}>
+          <View style={{ marginTop: 30 }}>
+            <Text style={[styles.heading28, { fontSize: 20 }]}>
               Hanya dengan Umur
             </Text>
             <View
@@ -289,7 +295,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 alignItems: 'center',
                 marginTop: 22,
               }}>
-              <Text style={[styles.heading28, {fontSize: 16, width: '20%'}]}>
+              <Text style={[styles.heading28, { fontSize: 16, width: '20%' }]}>
                 Mulai
               </Text>
               <TextInput
@@ -313,7 +319,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 alignItems: 'center',
                 marginTop: 22,
               }}>
-              <Text style={[styles.heading28, {fontSize: 16, width: '20%'}]}>
+              <Text style={[styles.heading28, { fontSize: 16, width: '20%' }]}>
                 Sampai
               </Text>
               <TextInput
@@ -334,8 +340,8 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
               {/* <Dropdown dropdownPosition={true} data={age} /> */}
             </View>
           </View>
-          <View style={{marginTop: 30}}>
-            <Text style={[styles.heading28, {fontSize: 20}]}>
+          <View style={{ marginTop: 30 }}>
+            <Text style={[styles.heading28, { fontSize: 20 }]}>
               Jumlah Pemain Meetup
             </Text>
             <View
@@ -358,14 +364,14 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
               <TouchableOpacity onPress={() => handleTotalPlayer('plus')}>
                 <Image
                   source={require('../../src/PlusWhite.png')}
-                  style={{height: 32, width: 32, marginLeft: 30}}
+                  style={{ height: 32, width: 32, marginLeft: 30 }}
                 />
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={{marginTop: 38}}>
-            <Text style={[styles.heading28, {fontSize: 20}]}>Deskripsi</Text>
+          <View style={{ marginTop: 38 }}>
+            <Text style={[styles.heading28, { fontSize: 20 }]}>Deskripsi</Text>
             <TextInput
               placeholder="Masukkan deskripsi"
               placeholderTextColor={'#FFFFFF'}
@@ -376,7 +382,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 setDeskripsi(text);
               }}
               onContentSizeChange={() => {
-                setIsGrow({height: isGrow});
+                setIsGrow({ height: isGrow });
               }}
               style={{
                 borderRadius: 16,
@@ -406,7 +412,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
               onPress={() => {
                 setIsVisible(true), getDetailFacility();
               }}>
-              <Text style={[styles.heading28, {color: '#000000'}]}>
+              <Text style={[styles.heading28, { color: '#000000' }]}>
                 Buat Room
               </Text>
             </TouchableOpacity>
@@ -414,7 +420,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
         </View>
         <Modal
           isVisible={isVisible}
-          style={{justifyContent: 'flex-end', margin: 0}}
+          style={{ justifyContent: 'flex-end', margin: 0 }}
           animationInTiming={900}
           animationOutTiming={500}
           swipeDirection={'down'}
@@ -437,23 +443,23 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 flexDirection: 'row',
                 justifyContent: 'space-around',
               }}>
-              <View style={{width: '85%', justifyContent: 'flex-start'}}>
+              <View style={{ width: '85%', justifyContent: 'flex-start' }}>
                 <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  style={[styles.heading28, { marginBottom: 8, fontSize: 20 }]}>
                   {data?.address}
                 </Text>
                 <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  style={[styles.heading28, { marginBottom: 8, fontSize: 20 }]}>
                   {dataReserve?.facility_info?.facility_name}
                 </Text>
                 <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
+                  style={[styles.heading28, { marginBottom: 8, fontSize: 20 }]}>
                   {moment(selectedDate).format('ddd, DD MMM YYYY')} ,{' '}
                   {sortTime()[0]?.time} -{' '}
                   {sortTime()[sortTime()?.length - 1]?.time}
                 </Text>
                 <Text
-                  style={[styles.heading28, {color: '#C4f601', fontSize: 20}]}>
+                  style={[styles.heading28, { color: '#C4f601', fontSize: 20 }]}>
                   Rp. {currency(DpSubtotal())}
                 </Text>
                 <View
@@ -465,20 +471,20 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                     justifyContent: 'center',
                     marginVertical: 32,
                   }}>
-                  <View style={{width: '65%'}}>
+                  <View style={{ width: '65%' }}>
                     <Text
                       style={[
                         styles.heading28,
-                        {marginBottom: 8, fontSize: 18},
+                        { marginBottom: 8, fontSize: 18 },
                       ]}>
                       Dompet Olahragamu
                     </Text>
                   </View>
-                  <View style={{width: '30%'}}>
+                  <View style={{ width: '30%' }}>
                     <Text
                       style={[
                         styles.heading28,
-                        {color: '#C4f601', fontSize: 18},
+                        { color: '#C4f601', fontSize: 18 },
                       ]}>
                       Rp. {currency(dataUser?.balance)}
                     </Text>
@@ -493,12 +499,18 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
+                  disabled={
+                    parseInt(dataUser?.balance) > parseInt(DpSubtotal()) ? false : true
+                  }
                   onPress={btnBuatRoom}>
                   <Text
+
                     style={[
                       styles.heading14,
-                      {fontWeight: '700', fontSize: 14, color: '#000000'},
-                    ]}>
+                      { fontWeight: '700', fontSize: 14, color: '#000000' },
+                    ]}
+
+                  >
                     Bayar Sekarang
                   </Text>
                 </TouchableOpacity>

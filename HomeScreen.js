@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -15,14 +15,14 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Onboarding from './components/Onboarding';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useState} from 'react';
-import {currency} from './utils';
-import {Axios} from './utils';
+import { useState } from 'react';
+import { currency } from './utils';
+import { Axios } from './utils';
 import moment from 'moment';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-function HomeScreen({navigation}) {
+function HomeScreen({ navigation }) {
   const [dataUser, setDataUser] = useState({});
   const [room, setRoom] = useState([]);
   const [dataTask, setDataTask] = useState([]);
@@ -38,8 +38,8 @@ function HomeScreen({navigation}) {
   };
 
   const getListTask = async () => {
-    const {data} = await Axios.get(`/task`);
-    console.log({dataTask: data});
+    const { data } = await Axios.get(`/task`);
+    console.log({ dataTask: data });
     if (data?.message === 'OK') {
       setDataTask(data?.data?.result);
     }
@@ -58,8 +58,28 @@ function HomeScreen({navigation}) {
     getListTask();
   }, []);
 
+  const getMaxTime = (array) => {
+    const max = Math.max(...array.map(time => {
+      const [hours, minutes] = time.split(":");
+      return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+    }));
+    const maxTime = `${Math.floor(max / 60).toString().padStart(2, '0')}:${(max % 60).toString().padStart(2, '0')}`;
+    return maxTime
+  }
+
+  const getMinTime = array => {
+    const min = Math.min(...array.map(time => {
+      const [hours, minutes] = time.split(":");
+      return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+    }));
+    const minTime = `${Math.floor(min / 60).toString().padStart(2, '0')}:${(min % 60).toString().padStart(2, '0')}`;
+
+
+    return minTime
+  }
+
   return (
-    <ScrollView style={{backgroundColor: '#C4F601', flex: 4}}>
+    <ScrollView style={{ backgroundColor: '#C4F601', flex: 4 }}>
       <View
         style={{
           alignItems: 'center',
@@ -69,21 +89,21 @@ function HomeScreen({navigation}) {
           flexDirection: 'row',
           marginLeft: 16,
         }}>
-        <View style={{width: '65%'}}>
+        <View style={{ width: '65%' }}>
           <Image source={require('./src/LogoHomescreen.png')} />
         </View>
-        <View style={{flexDirection: 'row'}}>
-          <View style={{width: '25%'}}>
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ width: '25%' }}>
             <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
               <Icon
-                style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
+                style={{ color: 'black', fontSize: 20, paddingHorizontal: 15 }}
                 name="bell"
               />
             </TouchableOpacity>
           </View>
-          <View style={{width: '25%'}}>
+          <View style={{ width: '25%' }}>
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-              <Icon1 style={{color: 'black', fontSize: 25}} name="user" />
+              <Icon1 style={{ color: 'black', fontSize: 25 }} name="user" />
             </TouchableOpacity>
           </View>
         </View>
@@ -115,11 +135,11 @@ function HomeScreen({navigation}) {
           }}>
           Hai, {dataUser?.username}
         </Text>
-        <Text style={{color: '#000000', fontSize: 13, fontWeight: '400'}}>
+        <Text style={{ color: '#000000', fontSize: 13, fontWeight: '400' }}>
           Yuk terus bergerak untuk hidup yang lebih sehat
         </Text>
       </View>
-      <View style={{backgroundColor: '#000000', flex: 1}}>
+      <View style={{ backgroundColor: '#000000', flex: 1 }}>
         <View
           style={{
             position: 'absolute',
@@ -141,15 +161,15 @@ function HomeScreen({navigation}) {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <View style={{width: '10%'}}>
-              <Icon name="wallet" style={{color: '#7c7c7c', fontSize: 20}} />
+            <View style={{ width: '10%' }}>
+              <Icon name="wallet" style={{ color: '#7c7c7c', fontSize: 20 }} />
             </View>
-            <View style={{width: '50%'}}>
-              <Text style={{color: '#ffffff', fontSize: 12}}>
+            <View style={{ width: '50%' }}>
+              <Text style={{ color: '#ffffff', fontSize: 12 }}>
                 Dompet Olahragamu
               </Text>
               <Text
-                style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>
+                style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 18 }}>
                 {currency(dataUser?.balance)}
               </Text>
             </View>
@@ -165,7 +185,7 @@ function HomeScreen({navigation}) {
                 alignItems: 'center',
               }}
               onPress={() => navigation.navigate('Dompet')}>
-              <Text style={{color: '#ffffff', fontSize: 18}}>Isi</Text>
+              <Text style={{ color: '#ffffff', fontSize: 18 }}>Isi</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -191,12 +211,12 @@ function HomeScreen({navigation}) {
 
             <Icon2
               name="navigate-next"
-              style={{color: 'white', fontSize: 25}}
+              style={{ color: 'white', fontSize: 25 }}
             />
           </View>
         </TouchableOpacity>
 
-        <View style={{marginLeft: 8}}>
+        <View style={{ marginLeft: 8 }}>
           <ScrollView
             style={{
               marginVertical: 15,
@@ -216,7 +236,7 @@ function HomeScreen({navigation}) {
               <TouchableOpacity
                 style={Styles.View}
                 onPress={() =>
-                  navigation.navigate('DetailMeetupPage', {id: item.id})
+                  navigation.navigate('DetailMeetupPage', { id: item.id })
                 }>
                 <Image
                   source={{
@@ -257,7 +277,7 @@ function HomeScreen({navigation}) {
                     }}
                   />
                   <Text
-                    style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
+                    style={{ fontSize: 12, color: '#000000', fontWeight: '400' }}>
                     {item.room_detail?.length} / {item.max_capacity}
                     {/* 7/10 */}
                   </Text>
@@ -284,7 +304,7 @@ function HomeScreen({navigation}) {
                   <Ionicon
                     name="location-outline"
                     size={18}
-                    style={{fontWeight: 'bold', color: '#ffffff'}}
+                    style={{ fontWeight: 'bold', color: '#ffffff' }}
                   />
                   <Text
                     style={{
@@ -306,7 +326,7 @@ function HomeScreen({navigation}) {
                   <Ionicon
                     name="time-outline"
                     size={18}
-                    style={{fontWeight: 'bold', color: '#ffffff'}}
+                    style={{ fontWeight: 'bold', color: '#ffffff' }}
                   />
                   <Text
                     style={{
@@ -315,11 +335,10 @@ function HomeScreen({navigation}) {
                       fontFamily: 'OpenSans',
                       color: '#ffffff',
                     }}>
-                    {moment(item.booking.booking_date).format('ddd, D MMM')}{' '}
+                    {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
                     {item.booking?.time
-                      ? `${JSON.parse(item.booking?.time)[0]} - ${
-                          JSON.parse(item.booking?.time)[1]
-                        }`
+                      ? `${getMinTime(JSON.parse(item.booking?.time))} - ${getMaxTime(JSON.parse(item.booking?.time))
+                      }`
                       : ''}
                     {/* Sabtu, 25 Nov 08.00-12.00 AM */}
                   </Text>
@@ -348,12 +367,12 @@ function HomeScreen({navigation}) {
 
             <Icon2
               name="navigate-next"
-              style={{color: 'white', fontSize: 25}}
+              style={{ color: 'white', fontSize: 25 }}
             />
           </View>
         </TouchableOpacity>
 
-        <View style={{marginLeft: 8}}>
+        <View style={{ marginLeft: 8 }}>
           <ScrollView
             style={{
               marginVertical: 15,
@@ -378,7 +397,7 @@ function HomeScreen({navigation}) {
                   source={{
                     uri: item?.banner_img ? item?.banner_img : '',
                   }}
-                  style={{width: '100%', height: 148, borderRadius: 10}}
+                  style={{ width: '100%', height: 148, borderRadius: 10 }}
                 />
                 <Text
                   style={{
@@ -401,10 +420,10 @@ function HomeScreen({navigation}) {
                   }}>
                   <Image
                     source={require('./src/Fitness-Icon.png')}
-                    style={{width: 21, height: 21, tintColor: 'white'}}
+                    style={{ width: 21, height: 21, tintColor: 'white' }}
                   />
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ width: '70%' }}>
                       <Text
                         style={{
                           marginLeft: 10,
@@ -417,9 +436,9 @@ function HomeScreen({navigation}) {
                     </View>
                     <View
                       style={{
-                        marginLeft: 117,
                         justifyContent: 'center',
                         alignItems: 'center',
+                        width: '25%',
                       }}>
                       <View>
                         <Text
@@ -444,7 +463,7 @@ function HomeScreen({navigation}) {
                     </View>
                   </View>
                 </View>
-                <View style={{flexDirection: 'row'}}>
+                <View style={{ flexDirection: 'row' }}>
                   {item?.list_task?.map((itemTask, idxTask) => (
                     <View
                       style={{
@@ -483,26 +502,6 @@ function HomeScreen({navigation}) {
                             2. Barbel 15 kg
                           </Text>
                         </View> */}
-                  <View
-                    style={{
-                      backgroundColor: '#C4F601',
-                      borderRadius: 8,
-                      height: 24,
-                      justifyContent: 'center',
-                      marginTop: 8,
-                      paddingHorizontal: 10,
-                      marginHorizontal: 8,
-                      alignItems: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: '400',
-                        color: '#000000',
-                      }}>
-                      ...
-                    </Text>
-                  </View>
                 </View>
               </TouchableOpacity>
             ))}
@@ -542,7 +541,7 @@ function HomeScreen({navigation}) {
           <TouchableOpacity>
             <Icon2
               name="navigate-next"
-              style={{color: 'white', fontSize: 25}}
+              style={{ color: 'white', fontSize: 25 }}
             />
           </TouchableOpacity>
         </View>
@@ -564,7 +563,7 @@ function HomeScreen({navigation}) {
             <View style={Styles.View2}>
               <Image
                 source={require('./src/Badminton-Icon.png')}
-                style={{width: 25, height: 25, tintColor: 'white'}}
+                style={{ width: 25, height: 25, tintColor: 'white' }}
               />
               <View
                 style={{
@@ -604,7 +603,7 @@ function HomeScreen({navigation}) {
             <View style={Styles.View2}>
               <Image
                 source={require('./src/Futsal-Icon.png')}
-                style={{width: 25, height: 25, tintColor: 'white'}}
+                style={{ width: 25, height: 25, tintColor: 'white' }}
               />
               <View
                 style={{
@@ -644,7 +643,7 @@ function HomeScreen({navigation}) {
             <View style={Styles.View2}>
               <Image
                 source={require('./src/Futsal-Icon.png')}
-                style={{width: 25, height: 25, tintColor: 'white'}}
+                style={{ width: 25, height: 25, tintColor: 'white' }}
               />
               <View
                 style={{
