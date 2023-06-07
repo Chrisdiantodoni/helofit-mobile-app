@@ -13,17 +13,34 @@ import {ProgressBar} from 'react-native-paper';
 import Svg from 'react-native-svg';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Axios} from '../utils';
 
 const {width} = Dimensions.get('window');
 
 function Promo({navigation: {goBack, navigate}}) {
   const [dataUser, setDataUser] = useState({});
+
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
-      if (res) {
-        setDataUser(JSON.parse(res));
-      }
+      const userId = JSON.parse(res)?.id;
+      console.log(userId);
+      getUser(userId);
     });
+  };
+
+  const getUser = async userId => {
+    console.log(userId);
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
     dataUserAsync();

@@ -12,21 +12,19 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
-const DetailTask = ({navigation: {goBack, navigate}, route}) => {
+const DetailEachTask = ({navigation: {goBack, navigate}, route}) => {
   const [data, setData] = useState([]);
   const [dataUser, setDataUser] = useState({});
   const taskId = route?.params?.taskId;
 
-  const getDetailTask = async () => {
+  const getTask = async () => {
     try {
-      const id = dataUser?.id;
-      console.log({id});
-      console.log(taskId);
-      const {data} = await Axios.get(`/task/progress/detail/${id}/${taskId}`);
-      console.log({data});
-      if (data.message === 'OK') {
-        setData(data.data);
-        console.log('detail', data.data);
+      const response = await Axios.get(`/task/${taskId}`);
+      console.log(response);
+      if (response.data.message === 'OK') {
+        const data = response.data?.data;
+        setData(data);
+        console.log('detail', data);
       }
     } catch (error) {
       console.log(error);
@@ -34,13 +32,11 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
   };
 
   useEffect(() => {
-    getDetailTask();
+    getTask();
     AsyncStorage.getItem('dataUser').then(res => {
       setDataUser(JSON.parse(res));
     });
   }, []);
-
-  console.log('muharis', data);
 
   return (
     <ScrollView style={styles.container}>
@@ -68,14 +64,14 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
           paddingBottom: 30,
         }}>
         <View style={{marginTop: 24, width: '80%'}}>
-          <Text style={styles.Heading28}>{data?.task?.task_name}</Text>
+          <Text style={styles.Heading28}>{data?.task_info?.task_name}</Text>
           <Text
             style={[
               styles.heading14,
               {fontSize: 14, fontWeight: '700', marginTop: 8},
             ]}>
             Berlaku sampai{' '}
-            {moment(data?.task?.expiredIn).format('DD MMMM YYYY')}
+            {moment(data?.task_info?.expiredIn).format('DD MMMM YYYY')}
           </Text>
           <View
             style={{
@@ -89,7 +85,7 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
                 style={{height: 24, width: 24, marginRight: 8}}
               />
               <Text style={styles.heading14}>
-                {data?.task?.merchant?.merchant_name}
+                {data?.task_info?.merchant?.merchant_name}
               </Text>
             </View>
             <View
@@ -104,7 +100,7 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
                     fontSize: 24,
                     fontWeight: '700',
                   }}>
-                  {data?.currentPoin}
+                  {data?.task_info?.poin}
                 </Text>
               </View>
               <View>
@@ -144,7 +140,12 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
                 source={require('../../src/CheckGreen.png')}
                 style={{width: 32, height: 32}}
               />
-            ) : null}
+            ) : (
+              <Image
+                source={require('../../src/Lock.png')}
+                style={{width: 32, height: 32}}
+              />
+            )}
           </View>
         ))}
       </View>
@@ -169,7 +170,7 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
           }}
           onPress={() => navigate('Tabs', {screen: 'Task'})}>
           <Text style={[styles.Heading28, {color: '#000000'}]}>
-            Lanjut Mengerjakan Task
+            Kerjakan Task
           </Text>
         </TouchableOpacity>
       </View>
@@ -205,4 +206,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailTask;
+export default DetailEachTask;

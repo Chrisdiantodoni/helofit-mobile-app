@@ -25,14 +25,14 @@ const StringifyAsyncStorage = ({name = '', value}) => {
 
 function Signin({navigation}) {
   const [isSecureEntry, setIsSecureEntry] = useState(true);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
   const handleLogin = async () => {
     try {
       const body = {
-        username,
+        email,
         password,
       };
       const response = await Axios.post('/authentication/login', body);
@@ -65,7 +65,7 @@ function Signin({navigation}) {
       // await AsyncStorage.setItem('token', response.data.token);
     } catch (error) {
       showMessage({
-        message: 'Username Password Salah',
+        message: 'Email Password Salah',
         type: 'danger',
       });
       console.log(error.response.statusText);
@@ -120,7 +120,8 @@ function Signin({navigation}) {
         </View>
         <TextInput
           autoCapitalize="none"
-          placeholder="Masukkan Username"
+          keyboardType="email-address"
+          placeholder="Masukkan Email"
           placeholderTextColor={'#FFFFFF'}
           style={{
             backgroundColor: '#7c7c7c',
@@ -132,8 +133,8 @@ function Signin({navigation}) {
             fontSize: 14,
             marginBottom: 16,
           }}
-          value={username}
-          onChangeText={text => setUsername(text)}
+          value={email}
+          onChangeText={text => setEmail(text)}
         />
         <View
           style={{
@@ -155,6 +156,7 @@ function Signin({navigation}) {
               placeholderTextColor={'#FFFFFF'}
               value={password}
               onChangeText={text => setPassword(text)}
+              style={{color: '#FFFFFF'}}
             />
           </View>
           <TouchableOpacity onPress={() => setIsSecureEntry(prev => !prev)}>

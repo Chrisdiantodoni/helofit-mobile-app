@@ -40,6 +40,7 @@ import PromoList from './Screen/PromoList';
 import FlashMessage from 'react-native-flash-message';
 import SplashScreen from './Screen/SplashScreen';
 import ContextProvider, {Context} from './context';
+import DetailEachTask from './Screen/Task/DetailEachTask';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -160,8 +161,8 @@ function MyTabs() {
 
 function App() {
   return (
-    <ContextProvider>
-      <NavigationContainer>
+    <NavigationContainer>
+      <ContextProvider>
         <Stack.Navigator>
           <Stack.Screen
             name="SplashScreen"
@@ -230,6 +231,11 @@ function App() {
             options={{headerShown: false}}
           />
           <Stack.Screen
+            name="DetailEachTask"
+            component={DetailEachTask}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
             name="Dompet"
             component={Dompet}
             options={{headerShown: false}}
@@ -282,8 +288,8 @@ function App() {
           />
         </Stack.Navigator>
         <FlashMessage position="top" />
-      </NavigationContainer>
-    </ContextProvider>
+      </ContextProvider>
+    </NavigationContainer>
   );
 }
 

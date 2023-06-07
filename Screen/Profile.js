@@ -12,22 +12,47 @@ import {
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {currency} from '../utils';
+import {useNavigation} from '@react-navigation/native';
+import {Axios} from '../utils';
 
-function Profile({navigation: {goBack, navigate, popToTop}}) {
+function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
   const [dataUser, setDataUser] = useState({});
+  const navigation = useNavigation();
 
   const handleLogout = () => {
-    const removeToken = AsyncStorage.removeItem('token');
-    BackHandler.exitApp();
-    return removeToken;
+    AsyncStorage.removeItem('token')
+      .then(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Signin'}],
+        });
+      })
+      .catch(error => {
+        console.log('Error logging out:', error);
+      });
   };
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
       if (res) {
-        setDataUser(JSON.parse(res));
-        console.log(dataUser);
+        const userId = JSON.parse(res)?.id;
+        console.log(userId);
+        getUser(userId);
       }
     });
+  };
+  const getUser = async userId => {
+    console.log(userId);
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -63,14 +88,14 @@ function Profile({navigation: {goBack, navigate, popToTop}}) {
       <View style={styles.Profile}>
         <View style={{justifyContent: 'center'}}>
           <Image
-            source={require('../src/Doni.png')}
-            style={{width: 48, height: 48}}
+            source={require('../src/GambarKosong.png')}
+            style={{width: 48, height: 48, borderRadius: 48 / 2}}
           />
         </View>
         <View style={{justifyContent: 'center', marginLeft: 16}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={[styles.header, {width: '55%'}]}>
-              Doni Chrisdianto
+              {dataUser?.username}
             </Text>
             <TouchableOpacity onPress={() => navigate('ProfilSaya')}>
               <Text
@@ -82,8 +107,12 @@ function Profile({navigation: {goBack, navigate, popToTop}}) {
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.heading14}>Laki-laki</Text>
-          <Text style={[styles.heading14, {fontSize: 14}]}>08887766768</Text>
+          <Text style={styles.heading14}>
+            {dataUser?.gender ? dataUser.gender : '-'}
+          </Text>
+          <Text style={[styles.heading14, {fontSize: 14}]}>
+            {dataUser?.phone_number}
+          </Text>
         </View>
       </View>
       <View>
@@ -106,15 +135,15 @@ function Profile({navigation: {goBack, navigate, popToTop}}) {
               marginTop: 5,
             }}
           />
-          <Text style={[styles.heading14, {fontSize: 14, width: '55%'}]}>
+          <Text style={[styles.heading14, {fontSize: 14, width: '50%'}]}>
             Dompet Olahragamu
           </Text>
           <Text
             style={[
               styles.heading14,
-              {fontSize: 14, color: '#C4F601', width: '20%'},
+              {fontSize: 14, color: '#C4F601', width: '25%'},
             ]}>
-            Rp. {dataUser?.balance}
+            Rp. {currency(dataUser?.balance)}
           </Text>
           <TouchableOpacity>
             <Ionicon

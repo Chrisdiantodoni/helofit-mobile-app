@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, {Component, useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,16 @@ import {
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Axios } from '../utils';
-import { showMessage } from 'react-native-flash-message';
+import {Axios} from '../utils';
+import {showMessage} from 'react-native-flash-message';
 import moment from 'moment';
 
-const Notifikasi = ({ navigation: { goBack } }) => {
+const Notifikasi = ({navigation: {goBack}}) => {
   const [dataUser, setDataUser] = useState('');
   const [dataNotif, setDataNotif] = useState([]);
   const [dataRoom, setDataRoom] = useState([]);
+  const flatListRef = useRef(null);
+
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
       setDataUser(JSON.parse(res));
@@ -26,6 +28,7 @@ const Notifikasi = ({ navigation: { goBack } }) => {
       getNotification(userId);
     });
   };
+
   const getNotification = async userId => {
     if (!userId) {
       showMessage({
@@ -39,12 +42,10 @@ const Notifikasi = ({ navigation: { goBack } }) => {
             console.log('data notif', response?.data?.data);
             setDataNotif(response?.data?.data);
           }
-
         })
         .catch(err => {
-          console.log({ err })
-        })
-
+          console.log({err});
+        });
     }
   };
   const handleApproved = async (roomId, userDetailId) => {
@@ -66,12 +67,19 @@ const Notifikasi = ({ navigation: { goBack } }) => {
     if (response?.data?.message == 'OK') {
       getNotification(dataUser?.id);
     }
-    console.log({ response });
+    console.log({response});
   };
   useEffect(() => {
     dataUserAsync();
     console.log(moment(new Date()).format('DD MMM YYYY'));
+    scrollToBottom();
   }, []);
+
+  const scrollToBottom = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({animated: true});
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -83,7 +91,7 @@ const Notifikasi = ({ navigation: { goBack } }) => {
           alignItems: 'center',
         }}>
         <TouchableOpacity
-          style={{ marginLeft: 24, marginRight: 32 }}
+          style={{marginLeft: 24, marginRight: 32}}
           onPress={() => goBack()}>
           <Ionicon
             name="chevron-back-outline"
@@ -95,19 +103,20 @@ const Notifikasi = ({ navigation: { goBack } }) => {
             }}
           />
         </TouchableOpacity>
-        <Text style={[styles.header, { color: '#000000', fontSize: 20 }]}>
+        <Text style={[styles.header, {color: '#000000', fontSize: 20}]}>
           Notifikasi
         </Text>
       </View>
       <View>
         <FlatList
+          ref={flatListRef}
           data={dataNotif}
           keyExtractor={item => item.id}
-          renderItem={({ item, index }) =>
+          renderItem={({item, index}) =>
             item.room?.isHost == false &&
-              item.list_user?.find(
-                find => find?.userId == dataUser?.id && find?.status == 'request',
-              ) ? (
+            item.list_user?.find(
+              find => find?.userId == dataUser?.id && find?.status == 'request',
+            ) ? (
               <SendingRequest item={item} />
             ) : (
               item.list_user?.map(itemUser => {
@@ -141,7 +150,7 @@ const Notifikasi = ({ navigation: { goBack } }) => {
   );
 };
 
-const RejectedRequest = ({ item }) => {
+const RejectedRequest = ({item}) => {
   return (
     <View>
       <View
@@ -153,20 +162,20 @@ const RejectedRequest = ({ item }) => {
           flexDirection: 'row',
           marginBottom: 8,
         }}>
-        <View style={{ width: '20%' }}>
+        <View style={{width: '20%'}}>
           <Image
             source={require('../src/Doni.png')}
-            style={{ width: 48, height: 48 }}
+            style={{width: 48, height: 48}}
           />
         </View>
-        <View style={{ marginBottom: 30 }}>
-          <Text style={[styles.heading14, { width: 267 }]}>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
             <Text>Permintaan Anda bergabung ke room meetup di tolak oleh </Text>
             <Text style={styles.heading28}>{item?.room?.room_name}</Text>
           </Text>
-          <Text style={[styles.small12, { marginTop: 8 }]}>
+          <Text style={[styles.small12, {marginTop: 8}]}>
             {moment(item.createdAt).format('DD MMM YYYY') ===
-              moment(new Date()).format('DD MMM YYYY')
+            moment(new Date()).format('DD MMM YYYY')
               ? 'Hari ini'
               : moment(item.createdAt).format('dddd')}
             , {moment(item.createdAt).format('hh:mm A')}
@@ -177,7 +186,7 @@ const RejectedRequest = ({ item }) => {
   );
 };
 
-const ApproveRequest = ({ item }) => {
+const ApproveRequest = ({item}) => {
   return (
     <View>
       <View
@@ -185,18 +194,18 @@ const ApproveRequest = ({ item }) => {
           borderRadius: 16,
           backgroundColor: '#000000',
           paddingHorizontal: 16,
-          paddingTop: 24,
+          paddingTop: 12,
           flexDirection: 'row',
-          marginBottom: 8,
+          marginBottom: 4,
         }}>
-        <View style={{ width: '20%' }}>
+        <View style={{width: '20%'}}>
           <Image
             source={require('../src/Doni.png')}
-            style={{ width: 48, height: 48 }}
+            style={{width: 48, height: 48}}
           />
         </View>
-        <View style={{ marginBottom: 30 }}>
-          <Text style={[styles.heading14, { width: 267 }]}>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
             <Text>
               <Text style={styles.heading28}>
                 {' '}
@@ -206,9 +215,9 @@ const ApproveRequest = ({ item }) => {
             </Text>
             <Text style={styles.heading28}>{item?.room?.room_name}</Text>
           </Text>
-          <Text style={[styles.small12, { marginTop: 8 }]}>
+          <Text style={[styles.small12, {marginTop: 8}]}>
             {moment(item.createdAt).format('DD MMM YYYY') ===
-              moment(new Date()).format('DD MMM YYYY')
+            moment(new Date()).format('DD MMM YYYY')
               ? 'Hari ini'
               : moment(item.createdAt).format('dddd')}
             , {moment(item.createdAt).format('hh:mm A')}
@@ -218,7 +227,7 @@ const ApproveRequest = ({ item }) => {
     </View>
   );
 };
-const SendingRequest = ({ item }) => {
+const SendingRequest = ({item}) => {
   return (
     <View>
       <View
@@ -226,26 +235,26 @@ const SendingRequest = ({ item }) => {
           borderRadius: 16,
           backgroundColor: '#000000',
           paddingHorizontal: 16,
-          paddingTop: 24,
+          paddingTop: 12,
           flexDirection: 'row',
           marginBottom: 8,
         }}>
-        <View style={{ width: '20%' }}>
+        <View style={{width: '20%'}}>
           <Image
             source={require('../src/Doni.png')}
-            style={{ width: 48, height: 48 }}
+            style={{width: 48, height: 48}}
           />
         </View>
-        <View style={{ marginBottom: 30 }}>
-          <Text style={[styles.heading14, { width: 267 }]}>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
             <Text>
               Permintaan Anda bergabung ke room meetup Sudah Terkirim ke{' '}
             </Text>
             <Text style={styles.heading28}>{item?.room?.room_name}</Text>
           </Text>
-          <Text style={[styles.small12, { marginTop: 8 }]}>
+          <Text style={[styles.small12, {marginTop: 8}]}>
             {moment(item.createdAt).format('DD MMM YYYY') ===
-              moment(new Date()).format('DD MMM YYYY')
+            moment(new Date()).format('DD MMM YYYY')
               ? 'Hari ini'
               : moment(item.createdAt).format('dddd')}
             , {moment(item.createdAt).format('hh:mm A')}
@@ -263,7 +272,7 @@ const CardRequest = ({
   handleApproved,
   handleUnapproved,
 }) => {
-  console.log({ dataUser });
+  console.log({dataUser});
   return (
     <View>
       <View
@@ -271,30 +280,30 @@ const CardRequest = ({
           borderRadius: 16,
           backgroundColor: '#000000',
           paddingHorizontal: 16,
-          paddingTop: 24,
+          paddingTop: 12,
           flexDirection: 'row',
           marginBottom: 8,
         }}>
-        <View style={{ width: '20%' }}>
+        <View style={{width: '20%'}}>
           <Image
             source={require('../src/Doni.png')}
-            style={{ width: 48, height: 48 }}
+            style={{width: 48, height: 48}}
           />
         </View>
-        <View style={{ marginBottom: 30 }}>
-          <Text style={[styles.heading14, { width: 267 }]}>
+        <View style={{marginBottom: 30}}>
+          <Text style={[styles.heading14, {width: 267}]}>
             <Text style={styles.heading28}>{itemUser.user?.username} </Text>
             <Text>ingin bergabung ke room meetup </Text>
             <Text style={styles.heading28}>{item?.room?.room_name}</Text>
           </Text>
-          <Text style={[styles.small12, { marginTop: 8 }]}>
+          <Text style={[styles.small12, {marginTop: 8}]}>
             {moment(item.createdAt).format('DD MMM YYYY') ===
-              moment(new Date()).format('DD MMM YYYY')
+            moment(new Date()).format('DD MMM YYYY')
               ? 'Hari ini'
               : moment(item.createdAt).format('dddd')}
             , {moment(item.createdAt).format('hh:mm A')}
           </Text>
-          <View style={{ flexDirection: 'row', marginTop: 8 }}>
+          <View style={{flexDirection: 'row', marginTop: 8}}>
             <TouchableOpacity
               style={{
                 borderRadius: 16,
@@ -305,7 +314,7 @@ const CardRequest = ({
                 justifyContent: 'center',
               }}
               onPress={() => handleApproved(item?.roomId, itemUser?.userId)}>
-              <Text style={[styles.heading28, { color: '#000' }]}>Setuju</Text>
+              <Text style={[styles.heading28, {color: '#000'}]}>Setuju</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -319,7 +328,7 @@ const CardRequest = ({
                 marginLeft: 24,
               }}
               onPress={() => handleUnapproved(item?.roomId, itemUser?.userId)}>
-              <Text style={[styles.heading28, { color: '#C4f601' }]}>Tolak</Text>
+              <Text style={[styles.heading28, {color: '#C4f601'}]}>Tolak</Text>
             </TouchableOpacity>
           </View>
         </View>

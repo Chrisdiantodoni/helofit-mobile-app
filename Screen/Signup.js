@@ -80,7 +80,7 @@ function Signin({navigation}) {
             name: 'dataUser',
             value: JSON.stringify(dataUser),
           });
-          navigation.replace('Tabs');
+          navigation.replace('Signin');
         }
         console.log({res: res.data});
       });

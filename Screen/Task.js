@@ -208,6 +208,7 @@ function Task({navigation: {navigate, goBack}, route}) {
       <View
         style={{
           marginTop: 8,
+          paddingTop: 24,
           backgroundColor: '#000000',
           paddingHorizontal: 16,
           borderRadius: 16,
@@ -220,7 +221,9 @@ function Task({navigation: {navigate, goBack}, route}) {
           data={taskItem}
           renderItem={({item, index}) => (
             <View key={index} style={styles.listContainer}>
-              <View style={styles.View1}>
+              <TouchableOpacity
+                style={styles.View1}
+                onPress={() => navigate('DetailEachTask', {taskId: item.id})}>
                 <Image
                   source={{
                     uri: item?.banner_img
@@ -297,7 +300,6 @@ function Task({navigation: {navigate, goBack}, route}) {
                   style={{
                     flexDirection: 'row',
                     marginBottom: 18,
-                    justifyContent: 'space-between',
                     marginHorizontal: 10,
                   }}>
                   {item?.list_task
@@ -333,7 +335,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                     <Text style={{fontSize: 12, fontWeight: '400'}}>...</Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
           )}
         />

@@ -1,5 +1,5 @@
 //import liraries
-import React, {Component, useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,62 @@ import {
   TextInput,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Axios} from '../../utils';
 
 // create a component
-const ProfilSaya = ({navigation: {goBack}}) => {
-  const [isEdit, setIsEdit] = useState('#000');
+const ProfilSaya = ({navigation}) => {
+  const [isEdit, setIsEdit] = useState(false);
+  const [dataUser, setDataUser] = useState({});
+  const [username, setUsername] = useState('');
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [bio, setBio] = useState('');
+
+  const dataUserAsync = async () => {
+    try {
+      const res = await AsyncStorage.getItem('dataUser');
+      if (res) {
+        const userId = JSON.parse(res)?.id;
+        console.log(userId);
+        getUser(userId);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUser = async userId => {
+    console.log(userId);
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+        setUsername(data?.data?.username);
+        setGender(data?.data?.gender);
+        setPhoneNumber(data?.data?.phone_number);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    dataUserAsync();
+  }, []);
+
+  const handleEdit = () => {
+    setIsEdit(true);
+  };
+
+  const goBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -24,7 +76,7 @@ const ProfilSaya = ({navigation: {goBack}}) => {
         }}>
         <TouchableOpacity
           style={{marginLeft: 24, marginRight: 32}}
-          onPress={() => goBack()}>
+          onPress={goBack}>
           <Ionicon
             name="chevron-back-outline"
             size={25}
@@ -46,20 +98,31 @@ const ProfilSaya = ({navigation: {goBack}}) => {
           flexDirection: 'row',
         }}>
         <Image
-          source={require('../../src/Doni.png')}
-          style={{height: 72, width: 72, marginTop: 32}}
+          source={require('../../src/GambarKosong.png')}
+          style={{
+            height: 72,
+            width: 72,
+            marginTop: 32,
+            borderRadius: 72 / 2,
+          }}
         />
         <TouchableOpacity
-          style={{flexDirection: 'row', position: 'absolute'}}
+          style={{
+            position: 'absolute',
+            top: 32,
+            right: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
           onPress={() => setIsEdit(isEdit => !isEdit)}>
           <Image
             source={require('../../src/Pencil.png')}
-            style={{width: 20, height: 20, marginLeft: 280}}
+            style={{width: 20, height: 20}}
           />
           <Text
             style={[
               styles.Heading28,
-              {color: '#C4F601', marginLeft: 5, fontSize: 16},
+              {paddingHorizontal: 0, color: '#C4F601', fontSize: 16},
             ]}>
             Ubah
           </Text>
@@ -70,52 +133,84 @@ const ProfilSaya = ({navigation: {goBack}}) => {
           Username
         </Text>
         <TextInput
-          editable={false}
-          value={'DoniChrisdianto'}
+          editable={isEdit}
+          value={username}
           style={[
             styles.Heading28,
-            {backgroundColor: isEdit ? '#000' : '#161616'},
+            {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
+          onChangeText={setUsername}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Jenis Kelamin
         </Text>
         <TextInput
-          editable={false}
-          value={'Laki-laki'}
+          editable={isEdit}
+          value={gender}
           style={[
             styles.Heading28,
-            {backgroundColor: isEdit ? '#000' : '#161616', color: 'white'},
+            {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
+          onChangeText={setGender}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Umur
         </Text>
         <TextInput
-          editable={false}
-          value={'23 Tahun'}
+          editable={isEdit}
+          value={age}
           style={[
             styles.Heading28,
-            {backgroundColor: isEdit ? '#000' : '#161616', color: 'white'},
+            {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
+          onChangeText={setAge}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Nomor Handphone
         </Text>
         <TextInput
-          editable={false}
-          value={'0852-9761-4911'}
-          style={[styles.Heading28, {paddingTop: 8}, {backgroundColor: isEdit}]}
+          editable={isEdit}
+          value={phoneNumber}
+          style={[
+            styles.Heading28,
+            {backgroundColor: isEdit ? '#161616' : '#000'},
+          ]}
+          onChangeText={setPhoneNumber}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Bio Singkat
         </Text>
         <TextInput
-          editable={false}
+          editable={isEdit}
           multiline
-          value={'Pecinta badminton no 1, kebugaran adalah jalan hidup saya'}
-          style={[styles.Heading28, {backgroundColor: isEdit}]}
+          value={bio}
+          style={[
+            styles.Heading28,
+            {backgroundColor: isEdit ? '#161616' : '#000'},
+          ]}
+          onChangeText={setBio}
         />
+        {isEdit && (
+          <TouchableOpacity
+            style={{
+              width: '100%',
+              height: 38,
+              backgroundColor: '#C4F601',
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 30,
+            }}
+            onPress={handleEdit}>
+            <Text
+              style={[
+                styles.heading14,
+                {fontWeight: '700', fontSize: 14, color: '#000000'},
+              ]}>
+              Simpan
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -144,7 +239,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 14,
     color: '#ffffff',
-    paddingHorizontal: 0,
+    paddingHorizontal: 10,
+    marginTop: 10,
+    borderRadius: 8,
   },
 });
 

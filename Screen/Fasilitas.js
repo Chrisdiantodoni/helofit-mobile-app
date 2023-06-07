@@ -14,8 +14,6 @@ import {Axios, currency} from '../utils';
 function Fasilitas({route, navigation: {navigate, goBack}}) {
   const [facility, setFacility] = useState([]);
   const id = route.params.id;
-  const type = route.params?.type;
-  console.log('type', type);
 
   const [selected, setSelected] = useState({
     image: require('../src/Price.png'),
@@ -129,7 +127,7 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
             <TouchableOpacity
               key={index}
               onPress={() =>
-                navigate('DetailFasilitasPage', {id: item.merchantId, type})
+                navigate('DetailFasilitasPage', {id: item.merchantId})
               }
               style={{
                 backgroundColor: '#161616',

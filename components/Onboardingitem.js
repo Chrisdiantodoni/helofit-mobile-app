@@ -18,9 +18,11 @@ const styles = StyleSheet.create({
   },
   image: {
     justifyContent: 'center',
+    alignItems: 'center',
     marginHorizontal: 16,
     borderRadius: 5,
-    width: 359,
+    width: '93%',
+    resizeMode: 'contain',
     height: 160,
     marginTop: 32,
   },

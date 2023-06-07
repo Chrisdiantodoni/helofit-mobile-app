@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -15,17 +15,27 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Onboarding from './components/Onboarding';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState } from 'react';
-import { currency } from './utils';
-import { Axios } from './utils';
+import {useState} from 'react';
+import {currency} from './utils';
+import {Axios} from './utils';
 import moment from 'moment';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
-function HomeScreen({ navigation }) {
+function HomeScreen({navigation}) {
   const [dataUser, setDataUser] = useState({});
   const [room, setRoom] = useState([]);
   const [dataTask, setDataTask] = useState([]);
+  const [facility, setFacility] = useState([]);
+
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      const userId = JSON.parse(res)?.id;
+      console.log(userId);
+      getUser(userId);
+    });
+  };
+
   const getRoom = async () => {
     try {
       const response = await Axios.get('/room');
@@ -37,49 +47,104 @@ function HomeScreen({ navigation }) {
     }
   };
 
+  const getUser = async userId => {
+    console.log(userId);
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getListTask = async () => {
-    const { data } = await Axios.get(`/task`);
-    console.log({ dataTask: data });
+    const {data} = await Axios.get(`/task`);
+    console.log({dataTask: data});
     if (data?.message === 'OK') {
       setDataTask(data?.data?.result);
     }
   };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       getRoom();
-    });
-    AsyncStorage.getItem('dataUser').then(res => {
-      setDataUser(JSON.parse(res));
+      getListTask();
+      dataUserAsync();
+      getFacility();
     });
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    getListTask();
-  }, []);
-
-  const getMaxTime = (array) => {
-    const max = Math.max(...array.map(time => {
-      const [hours, minutes] = time.split(":");
-      return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
-    }));
-    const maxTime = `${Math.floor(max / 60).toString().padStart(2, '0')}:${(max % 60).toString().padStart(2, '0')}`;
-    return maxTime
-  }
+  const getMaxTime = array => {
+    const max = Math.max(
+      ...array.map(time => {
+        const [hours, minutes] = time.split(':');
+        return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+      }),
+    );
+    const maxTime = `${Math.floor(max / 60)
+      .toString()
+      .padStart(2, '0')}:${(max % 60).toString().padStart(2, '0')}`;
+    return maxTime;
+  };
 
   const getMinTime = array => {
-    const min = Math.min(...array.map(time => {
-      const [hours, minutes] = time.split(":");
-      return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
-    }));
-    const minTime = `${Math.floor(min / 60).toString().padStart(2, '0')}:${(min % 60).toString().padStart(2, '0')}`;
+    const min = Math.min(
+      ...array.map(time => {
+        const [hours, minutes] = time.split(':');
+        return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+      }),
+    );
+    const minTime = `${Math.floor(min / 60)
+      .toString()
+      .padStart(2, '0')}:${(min % 60).toString().padStart(2, '0')}`;
 
+    return minTime;
+  };
+  const getFacility = async () => {
+    try {
+      const response = await Axios.get(`/facility?order_field=price&order=ASC`);
+      const data = response?.data?.data?.result;
+      setFacility(data || []);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    return minTime
-  }
+  const displayImages = item => {
+    switch (item?.category_name?.toLowerCase()) {
+      case 'badminton':
+        return require('./src/Badminton1.png');
+      case 'futsal':
+        return require('./src/Football.png');
+      case 'basket':
+        return require('./src/Basketball.png');
+      case 'yoga':
+        return require('./src/Yoga.png');
+      case 'tennis':
+        return require('./src/Tennis.png');
+      case 'boxing':
+        return require('./src/Boxing.png');
+      case 'fitness':
+        return require('./src/Gymming.png');
+      case 'golf':
+        return require('./src/Hockey.png');
+      case 'bowling':
+        return require('./src/Bowling.png');
+      default:
+        return null;
+        break;
+    }
+  };
 
   return (
-    <ScrollView style={{ backgroundColor: '#C4F601', flex: 4 }}>
+    <ScrollView style={{backgroundColor: '#C4F601', flex: 4}}>
       <View
         style={{
           alignItems: 'center',
@@ -89,21 +154,24 @@ function HomeScreen({ navigation }) {
           flexDirection: 'row',
           marginLeft: 16,
         }}>
-        <View style={{ width: '65%' }}>
-          <Image source={require('./src/LogoHomescreen.png')} />
+        <View style={{width: '65%'}}>
+          <Image
+            source={require('./src/LogoHomescreen.png')}
+            style={{width: 195, height: 56, resizeMode: 'stretch'}}
+          />
         </View>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ width: '25%' }}>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{width: '25%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
               <Icon
-                style={{ color: 'black', fontSize: 20, paddingHorizontal: 15 }}
+                style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
                 name="bell"
               />
             </TouchableOpacity>
           </View>
-          <View style={{ width: '25%' }}>
+          <View style={{width: '25%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-              <Icon1 style={{ color: 'black', fontSize: 25 }} name="user" />
+              <Icon1 style={{color: 'black', fontSize: 25}} name="user" />
             </TouchableOpacity>
           </View>
         </View>
@@ -135,11 +203,11 @@ function HomeScreen({ navigation }) {
           }}>
           Hai, {dataUser?.username}
         </Text>
-        <Text style={{ color: '#000000', fontSize: 13, fontWeight: '400' }}>
+        <Text style={{color: '#000000', fontSize: 13, fontWeight: '400'}}>
           Yuk terus bergerak untuk hidup yang lebih sehat
         </Text>
       </View>
-      <View style={{ backgroundColor: '#000000', flex: 1 }}>
+      <View style={{backgroundColor: '#000000', flex: 1}}>
         <View
           style={{
             position: 'absolute',
@@ -161,15 +229,15 @@ function HomeScreen({ navigation }) {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <View style={{ width: '10%' }}>
-              <Icon name="wallet" style={{ color: '#7c7c7c', fontSize: 20 }} />
+            <View style={{width: '10%'}}>
+              <Icon name="wallet" style={{color: '#7c7c7c', fontSize: 20}} />
             </View>
-            <View style={{ width: '50%' }}>
-              <Text style={{ color: '#ffffff', fontSize: 12 }}>
+            <View style={{width: '50%'}}>
+              <Text style={{color: '#ffffff', fontSize: 12}}>
                 Dompet Olahragamu
               </Text>
               <Text
-                style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 18 }}>
+                style={{color: '#ffffff', fontWeight: 'bold', fontSize: 18}}>
                 {currency(dataUser?.balance)}
               </Text>
             </View>
@@ -185,7 +253,7 @@ function HomeScreen({ navigation }) {
                 alignItems: 'center',
               }}
               onPress={() => navigation.navigate('Dompet')}>
-              <Text style={{ color: '#ffffff', fontSize: 18 }}>Isi</Text>
+              <Text style={{color: '#ffffff', fontSize: 18}}>Isi</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -211,12 +279,12 @@ function HomeScreen({ navigation }) {
 
             <Icon2
               name="navigate-next"
-              style={{ color: 'white', fontSize: 25 }}
+              style={{color: 'white', fontSize: 25}}
             />
           </View>
         </TouchableOpacity>
 
-        <View style={{ marginLeft: 8 }}>
+        <View style={{marginLeft: 8}}>
           <ScrollView
             style={{
               marginVertical: 15,
@@ -234,9 +302,10 @@ function HomeScreen({ navigation }) {
             }}>
             {room.map((item, index) => (
               <TouchableOpacity
+                key={index}
                 style={Styles.View}
                 onPress={() =>
-                  navigation.navigate('DetailMeetupPage', { id: item.id })
+                  navigation.navigate('DetailMeetupPage', {id: item.id})
                 }>
                 <Image
                   source={{
@@ -277,7 +346,7 @@ function HomeScreen({ navigation }) {
                     }}
                   />
                   <Text
-                    style={{ fontSize: 12, color: '#000000', fontWeight: '400' }}>
+                    style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
                     {item.room_detail?.length} / {item.max_capacity}
                     {/* 7/10 */}
                   </Text>
@@ -304,7 +373,7 @@ function HomeScreen({ navigation }) {
                   <Ionicon
                     name="location-outline"
                     size={18}
-                    style={{ fontWeight: 'bold', color: '#ffffff' }}
+                    style={{fontWeight: 'bold', color: '#ffffff'}}
                   />
                   <Text
                     style={{
@@ -326,7 +395,7 @@ function HomeScreen({ navigation }) {
                   <Ionicon
                     name="time-outline"
                     size={18}
-                    style={{ fontWeight: 'bold', color: '#ffffff' }}
+                    style={{fontWeight: 'bold', color: '#ffffff'}}
                   />
                   <Text
                     style={{
@@ -337,8 +406,9 @@ function HomeScreen({ navigation }) {
                     }}>
                     {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
                     {item.booking?.time
-                      ? `${getMinTime(JSON.parse(item.booking?.time))} - ${getMaxTime(JSON.parse(item.booking?.time))
-                      }`
+                      ? `${getMinTime(
+                          JSON.parse(item.booking?.time),
+                        )} - ${getMaxTime(JSON.parse(item.booking?.time))}`
                       : ''}
                     {/* Sabtu, 25 Nov 08.00-12.00 AM */}
                   </Text>
@@ -367,12 +437,12 @@ function HomeScreen({ navigation }) {
 
             <Icon2
               name="navigate-next"
-              style={{ color: 'white', fontSize: 25 }}
+              style={{color: 'white', fontSize: 25}}
             />
           </View>
         </TouchableOpacity>
 
-        <View style={{ marginLeft: 8 }}>
+        <View style={{marginLeft: 8}}>
           <ScrollView
             style={{
               marginVertical: 15,
@@ -392,12 +462,16 @@ function HomeScreen({ navigation }) {
               <TouchableOpacity
                 key={idx}
                 style={Styles.View}
-                onPress={() => navigation.navigate('DetailTask')}>
+                onPress={() =>
+                  navigation.navigate('DetailEachTask', {taskId: item.id})
+                }>
                 <Image
                   source={{
-                    uri: item?.banner_img ? item?.banner_img : '',
+                    uri: item?.banner_img
+                      ? item?.banner_img
+                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
                   }}
-                  style={{ width: '100%', height: 148, borderRadius: 10 }}
+                  style={{width: '100%', height: 148, borderRadius: 10}}
                 />
                 <Text
                   style={{
@@ -420,10 +494,10 @@ function HomeScreen({ navigation }) {
                   }}>
                   <Image
                     source={require('./src/Fitness-Icon.png')}
-                    style={{ width: 21, height: 21, tintColor: 'white' }}
+                    style={{width: 21, height: 21, tintColor: 'white'}}
                   />
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ width: '70%' }}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View style={{width: '70%'}}>
                       <Text
                         style={{
                           marginLeft: 10,
@@ -463,9 +537,10 @@ function HomeScreen({ navigation }) {
                     </View>
                   </View>
                 </View>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{flexDirection: 'row'}}>
                   {item?.list_task?.map((itemTask, idxTask) => (
                     <View
+                      key={idxTask}
                       style={{
                         backgroundColor: '#C4F601',
                         borderRadius: 8,
@@ -509,7 +584,13 @@ function HomeScreen({ navigation }) {
             <View style={Styles.View}></View> */}
           </ScrollView>
         </View>
-        <Onboarding />
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Onboarding />
+        </View>
         {/* <View
           style={{
             justifyContent: 'center',
@@ -541,7 +622,7 @@ function HomeScreen({ navigation }) {
           <TouchableOpacity>
             <Icon2
               name="navigate-next"
-              style={{ color: 'white', fontSize: 25 }}
+              style={{color: 'white', fontSize: 25}}
             />
           </TouchableOpacity>
         </View>
@@ -560,128 +641,52 @@ function HomeScreen({ navigation }) {
               bottom: 0,
               right: 30,
             }}>
-            <View style={Styles.View2}>
-              <Image
-                source={require('./src/Badminton-Icon.png')}
-                style={{ width: 25, height: 25, tintColor: 'white' }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 20,
-                }}>
-                <Text
+            {facility.map((item, index) => (
+              <View style={Styles.View2}>
+                <Image
+                  source={displayImages(item.category)}
                   style={{
-                    fontSize: 17,
-                    fontWeight: '400',
-                    color: '#C4F601',
-                    marginRight: 3,
+                    resizeMode: 'contain',
+                    width: 40,
+                    height: 40,
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
                   }}>
-                  Rp. 140.000
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: '400',
+                      color: '#C4F601',
+                      marginRight: 3,
+                    }}>
+                    Rp. {currency(item.price)}
+                  </Text>
+                </View>
 
-              <View
-                style={{
-                  width: 78,
-                  height: 38,
-                  alignItems: 'center',
-                }}>
-                <Text
+                <View
                   style={{
-                    fontSize: 14,
-                    fontWeight: '700',
-                    color: 'white',
-                    textAlign: 'center',
+                    width: '70%',
+                    height: 38,
+                    alignItems: 'center',
                   }}>
-                  Aseng Badminton
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '700',
+                      color: 'white',
+                      textAlign: 'center',
+                    }}>
+                    {item?.merchant?.merchant_name}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <View style={Styles.View2}>
-              <Image
-                source={require('./src/Futsal-Icon.png')}
-                style={{ width: 25, height: 25, tintColor: 'white' }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 20,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 17,
-                    fontWeight: '400',
-                    color: '#C4F601',
-                    marginRight: 3,
-                  }}>
-                  Rp. 140.000
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  width: 78,
-                  height: 38,
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '700',
-                    color: 'white',
-                    textAlign: 'center',
-                  }}>
-                  Entong Futsal
-                </Text>
-              </View>
-            </View>
-            <View style={Styles.View2}>
-              <Image
-                source={require('./src/Futsal-Icon.png')}
-                style={{ width: 25, height: 25, tintColor: 'white' }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 20,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 17,
-                    fontWeight: '400',
-                    color: '#C4F601',
-                    marginRight: 3,
-                  }}>
-                  Rp. 35.000
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  width: 78,
-                  height: 38,
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '700',
-                    color: 'white',
-                    textAlign: 'center',
-                  }}>
-                  John Fitness
-                </Text>
-              </View>
-            </View>
-            <View style={Styles.View2}></View>
-            <View style={Styles.View2}></View>
+            ))}
           </ScrollView>
         </View>
       </View>

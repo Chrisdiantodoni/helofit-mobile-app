@@ -14,6 +14,8 @@ import currency from '../../utils/currency';
 import {Context} from '../../context/index';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Fontisto';
+import {showMessage, hideMessage} from 'react-native-flash-message';
 
 // create a component
 const BuatRoom = ({route, navigation}) => {
@@ -30,14 +32,16 @@ const BuatRoom = ({route, navigation}) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const [dataUser, setDataUser] = useState({});
-
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
       if (res) {
-        setDataUser(JSON.parse(res));
+        const userId = JSON.parse(res)?.id;
+        console.log(userId);
+        getUser(userId);
       }
     });
   };
+
   const getHour = async () => {
     console.log({date: moment(isSelected).format('YYYY-MM-DD')});
     await Axios.post(`/facility/time/${idFacility}`, {
@@ -53,9 +57,24 @@ const BuatRoom = ({route, navigation}) => {
         console.log({err});
       });
   };
+  const getUser = async userId => {
+    console.log(userId);
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     getHour();
+    setSelectedBooking([]);
   }, [isSelected]);
 
   useEffect(() => {
@@ -111,6 +130,20 @@ const BuatRoom = ({route, navigation}) => {
     return result || [];
   };
 
+  const isMin = () => {
+    const calculate = parseInt(dataUser?.balance) - parseInt(subTotal());
+    const isMin = calculate < 0 ? true : false;
+    console.log({isMin});
+    return isMin;
+  };
+
+  const showingMessage = message => {
+    showMessage({
+      message: message,
+      type: 'danger',
+    });
+  };
+
   const handleReserve = async () => {
     const body = {
       facilityId: idFacility,
@@ -119,6 +152,7 @@ const BuatRoom = ({route, navigation}) => {
       booking_date: moment(isSelected).format('YYYY-MM-DD'),
       userId: dataUser?.id,
       time: JSON.stringify(selectedBooking.map(item => item.time)),
+      payment: type_create_room !== 'room' ? true : false,
     };
     await Axios.post(`/booking`, body)
       .then(res => {
@@ -235,7 +269,7 @@ const BuatRoom = ({route, navigation}) => {
                     ? '#C4F601'
                     : '#000000',
               }}
-              key={item}
+              key={item.time}
               // onPress={handlePress[i]}
             >
               <View>
@@ -286,15 +320,19 @@ const BuatRoom = ({route, navigation}) => {
               justifyContent: 'center',
             }}
             onPress={() => {
-              navigation.navigate('CreateRoom', {
-                idFacility,
-                merchantId,
-                img,
-                listTime: selectedBooking,
-                selectedDate: isSelected,
-                subTotal: subTotal(),
-                price,
-              });
+              if (selectedBooking.length == 0) {
+                showingMessage('Jam bermain belum dipilih!');
+              } else {
+                navigation.navigate('CreateRoom', {
+                  idFacility,
+                  merchantId,
+                  img,
+                  listTime: selectedBooking,
+                  selectedDate: isSelected,
+                  subTotal: subTotal(),
+                  price,
+                });
+              }
             }}>
             <Text style={[styles.heading14, {color: '#000000'}]}>
               Selanjutnya
@@ -349,7 +387,7 @@ const BuatRoom = ({route, navigation}) => {
               width: 55,
               height: 3,
               marginBottom: 24,
-              marginTop: 30,
+              marginTop: 18,
             }}
           />
           <View
@@ -359,18 +397,18 @@ const BuatRoom = ({route, navigation}) => {
               justifyContent: 'space-around',
             }}>
             <View style={{width: '85%', justifyContent: 'flex-start'}}>
-              <Text style={[styles.heading28, {marginBottom: 8}]}>
+              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
                 {dataReserve?.address}
               </Text>
-              <Text style={[styles.heading28, {marginBottom: 8}]}>
+              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
                 {dataReserve?.facility_info?.facility_name}
               </Text>
-              <Text style={[styles.heading28, {marginBottom: 8}]}>
-                {moment(isSelected).format('ddd, DD MMM YYYY')} ,{' '}
-                {sortTime()[0]?.time} -{' '}
-                {sortTime()[sortTime()?.length - 1]?.time}
+              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
+                {moment(isSelected).format('ddd, DD MMM')} {sortTime()[0]?.time}{' '}
+                - {sortTime()[sortTime()?.length - 1]?.time}
               </Text>
-              <Text style={[styles.heading28, {color: '#C4f601'}]}>
+              <Text
+                style={[styles.heading28, {color: '#C4f601', fontSize: 16}]}>
                 Rp {currency(subTotal())}
               </Text>
               <View
@@ -380,28 +418,56 @@ const BuatRoom = ({route, navigation}) => {
                   borderWidth: 1,
                   padding: 15,
                   justifyContent: 'center',
-                  marginVertical: 32,
+                  marginTop: 32,
+                  alignItems: 'center',
                 }}>
-                <View style={{width: '70%'}}>
-                  <Text style={[styles.heading28, {marginBottom: 8}]}>
+                <View style={{width: '15%'}}>
+                  <Icon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="wallet"
+                  />
+                </View>
+                <View style={{width: '55%'}}>
+                  <Text style={[styles.heading28, {fontSize: 16}]}>
                     Dompet Olahragamu
                   </Text>
                 </View>
                 <View style={{width: '30%'}}>
-                  <Text style={[styles.heading28, {color: '#C4f601'}]}>
-                    Rp. {dataUser?.balance}
+                  <Text
+                    style={[
+                      styles.heading28,
+                      {color: '#C4f601', fontSize: 16},
+                    ]}>
+                    Rp. {currency(dataUser?.balance)}
                   </Text>
                 </View>
               </View>
+              {isMin() ? (
+                <View style={{marginBottom: 5}}>
+                  <Text
+                    style={[
+                      styles.heading28,
+                      {color: '#F47878', fontSize: 14},
+                    ]}>
+                    Saldo Dompet Olahragamu tidak mencukupi
+                  </Text>
+                </View>
+              ) : null}
               <TouchableOpacity
                 style={{
-                  width: '90%',
+                  width: '100%',
                   height: 38,
                   backgroundColor: '#C4F601',
                   borderRadius: 8,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  marginTop: 15,
                 }}
+                disabled={isMin() ? true : false}
                 onPress={handleReserve}>
                 <Text style={[styles.heading14, {color: '#000000'}]}>
                   Bayar Sekarang
@@ -442,7 +508,6 @@ const styles = StyleSheet.create({
     height: '50%',
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: 16,
   },
   heading28: {
     fontSize: 20,
