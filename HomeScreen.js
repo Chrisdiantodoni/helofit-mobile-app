@@ -307,50 +307,54 @@ function HomeScreen({navigation}) {
                 onPress={() =>
                   navigation.navigate('DetailMeetupPage', {id: item.id})
                 }>
-                <Image
-                  source={{
-                    uri: item?.facility?.banner_img
-                      ? item?.facility?.banner_img
-                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                  }}
-                  style={{
-                    width: '100%',
-                    height: 148,
-                    borderRadius: 10,
-                  }}
-                />
-                <View
-                  style={{
-                    alignItems: 'center',
-                    position: 'absolute',
-                    top: 110,
-                    left: 240,
-                    right: 0,
-                    bottom: 0,
-                    justifyContent: 'center',
-                    backgroundColor: '#C4F601',
-                    width: 55,
-                    height: 24,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 8,
-                  }}>
-                  <Ionicon
-                    name="people-outline"
-                    size={15}
+                <View>
+                  <Image
+                    source={{
+                      uri: item?.facility?.banner_img
+                        ? item?.facility?.banner_img
+                        : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                    }}
                     style={{
-                      fontWeight: 'bold',
-                      color: '#000000',
-                      paddingRight: 2,
+                      width: '100%',
+                      height: 148,
+                      borderRadius: 10,
+                      resizeMode: 'cover',
                     }}
                   />
-                  <Text
-                    style={{fontSize: 12, color: '#000000', fontWeight: '400'}}>
-                    {item.room_detail?.length} / {item.max_capacity}
-                    {/* 7/10 */}
-                  </Text>
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: '75%',
+                      left: '80%',
+                      backgroundColor: '#C4F601',
+                      width: '14%',
+                      height: '17%',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 8,
+                    }}>
+                    <Ionicon
+                      name="people-outline"
+                      size={15}
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#000000',
+                        paddingRight: 2,
+                      }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: '#000000',
+                        fontWeight: '400',
+                      }}>
+                      {item.room_detail?.length} / {item.max_capacity}
+                      {/* 7/10 */}
+                    </Text>
+                  </View>
                 </View>
+
                 <Text
                   style={{
                     fontSize: 16,
