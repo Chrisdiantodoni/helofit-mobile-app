@@ -257,7 +257,7 @@ function HomeScreen({navigation}) {
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('List Meetup')}>
+        <View>
           <View
             style={{
               marginTop: 70,
@@ -276,13 +276,15 @@ function HomeScreen({navigation}) {
               }}>
               Main bareng teman baru
             </Text>
-
-            <Icon2
-              name="navigate-next"
-              style={{color: 'white', fontSize: 25}}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('List Meetup')}>
+              <Icon2
+                name="navigate-next"
+                style={{color: 'white', fontSize: 25}}
+              />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={{marginLeft: 8}}>
           <ScrollView
@@ -421,7 +423,7 @@ function HomeScreen({navigation}) {
             ))}
           </ScrollView>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Task')}>
+        <View>
           <View
             style={{
               marginLeft: 16,
@@ -438,13 +440,14 @@ function HomeScreen({navigation}) {
               }}>
               Buat yang suka tantangan
             </Text>
-
-            <Icon2
-              name="navigate-next"
-              style={{color: 'white', fontSize: 25}}
-            />
+            <TouchableOpacity onPress={() => navigation.navigate('Task')}>
+              <Icon2
+                name="navigate-next"
+                style={{color: 'white', fontSize: 25}}
+              />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={{marginLeft: 8}}>
           <ScrollView

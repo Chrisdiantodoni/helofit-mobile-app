@@ -1,8 +1,44 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import {currency, Axios} from '../utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Dompet = ({navigation: {goBack, navigate}}) => {
+const Dompet = ({navigation: {goBack, navigate, addListener}}) => {
+  const [dataUser, setDataUser] = useState({});
+
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser')
+      .then(res => {
+        const userId = JSON.parse(res)?.id;
+        console.log(userId);
+        getUser(userId);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    const unsubscribe = addListener('focus', () => {
+      dataUserAsync();
+    });
+    return unsubscribe;
+  }, []);
+
+  const getUser = async userId => {
+    try {
+      const response = await Axios.get(`/user/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (data?.message === 'OK') {
+        setDataUser(data?.data);
+        console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View
@@ -42,7 +78,9 @@ const Dompet = ({navigation: {goBack, navigate}}) => {
         <Text style={[styles.heading14, {color: '#FFFFFF', marginBottom: 8}]}>
           Dompet Olahragamu
         </Text>
-        <Text style={[styles.heading28, {color: '#FFFFFF'}]}>700.000</Text>
+        <Text style={[styles.heading28, {color: '#FFFFFF'}]}>
+          {currency(dataUser?.balance)}
+        </Text>
         <View style={{flexDirection: 'row', marginTop: 24}}>
           <TouchableOpacity
             style={{
@@ -53,7 +91,8 @@ const Dompet = ({navigation: {goBack, navigate}}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            }}
+            onPress={() => navigate('TopUp')}>
             <Image
               source={require('../src/Plus.png')}
               style={{width: 32, height: 32}}
@@ -74,7 +113,8 @@ const Dompet = ({navigation: {goBack, navigate}}) => {
               marginLeft: 24,
               borderWidth: 1,
               borderColor: '#C4F601',
-            }}>
+            }}
+            onPress={() => navigate('Withdraw')}>
             <Image
               source={require('../src/Tarik.png')}
               style={{width: 32, height: 32}}

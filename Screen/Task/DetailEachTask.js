@@ -30,6 +30,33 @@ const DetailEachTask = ({navigation: {goBack, navigate}, route}) => {
       console.log(error);
     }
   };
+  const handleTask = async () => {
+    const taskDetailIds = data?.task_detail?.map(item => item.id);
+    try {
+      if (!taskDetailIds || taskDetailIds.length === 0) {
+        console.log('No taskDetailId found.');
+        return;
+      }
+      for (const taskDetailId of taskDetailIds) {
+        const body = {
+          taskId,
+          userId: dataUser?.id,
+          status: 'berjalan',
+          taskDetailId,
+        };
+        await Axios.post('/task', body)
+          .then(res => {
+            if (res) {
+              console.log(res);
+            }
+          })
+          .catch(err => console.log(err));
+      }
+      // navigate('Tabs', {screen: 'Task'});
+    } catch (error) {
+      console.log('Error creating task:', error);
+    }
+  };
 
   useEffect(() => {
     getTask();
@@ -168,7 +195,7 @@ const DetailEachTask = ({navigation: {goBack, navigate}, route}) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onPress={() => navigate('Tabs', {screen: 'Task'})}>
+          onPress={handleTask}>
           <Text style={[styles.Heading28, {color: '#000000'}]}>
             Kerjakan Task
           </Text>

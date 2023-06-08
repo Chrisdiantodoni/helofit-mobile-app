@@ -26,8 +26,8 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
   const [title, setTitle] = useState(null);
   const [male, setMale] = useState('');
   const [female, setFemale] = useState('');
-  const [fromAge, setFromAge] = useState(0);
-  const [toAge, setToAge] = useState(0);
+  const [fromAge, setFromAge] = useState(null);
+  const [toAge, setToAge] = useState(null);
   const [dataUser, setDataUser] = useState({});
   const [listTime, setListTime] = useState([]);
   const idFacility = route.params.idFacility;
@@ -337,7 +337,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 onChangeText={e => setFromAge(e)}
                 keyboardType="number-pad"
               />
-              {fromAge < 17 && fromAge != 0 ? (
+              {fromAge < 19 && fromAge != null ? (
                 <Text
                   style={[
                     styles.heading28,
@@ -348,7 +348,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                       color: '#DC3545',
                     },
                   ]}>
-                  Batas umur 17 Tahun
+                  Batas umur 18 Tahun
                 </Text>
               ) : null}
             </View>
@@ -429,6 +429,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 borderRadius: 8,
                 height: 38,
               }}
+              disabled={fromAge < 19 && fromAge != null ? true : false}
               onPress={() => {
                 setIsVisible(true), getDetailFacility();
               }}>
@@ -464,24 +465,80 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                 justifyContent: 'space-around',
               }}>
               <View style={{width: '85%', justifyContent: 'flex-start'}}>
-                <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
-                  {data?.address}
-                </Text>
-                <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
-                  {dataReserve?.facility_info?.facility_name}
-                </Text>
-                <Text
-                  style={[styles.heading28, {marginBottom: 8, fontSize: 20}]}>
-                  {moment(selectedDate).format('ddd, DD MMM YYYY')} ,{' '}
-                  {sortTime()[0]?.time} -{' '}
-                  {sortTime()[sortTime()?.length - 1]?.time}
-                </Text>
-                <Text
-                  style={[styles.heading28, {color: '#C4f601', fontSize: 20}]}>
-                  Rp. {currency(DpSubtotal())}
-                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                  }}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="location-outline"
+                  />
+                  <View>
+                    <Text
+                      style={[
+                        styles.heading28,
+                        {marginBottom: 8, fontSize: 16},
+                      ]}>
+                      {data?.address}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.heading28,
+                        {marginBottom: 8, fontSize: 14},
+                      ]}>
+                      {dataReserve?.facility_info?.facility_name}
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                    alignItems: 'center',
+                  }}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="time-outline"
+                  />
+                  <Text
+                    style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
+                    {moment(selectedDate).format('ddd, DD MMM YYYY')} ,{' '}
+                    {sortTime()[0]?.time} -{' '}
+                    {sortTime()[sortTime()?.length - 1]?.time}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                    alignItems: 'center',
+                  }}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="pricetag-outline"
+                  />
+                  <Text
+                    style={[
+                      styles.heading28,
+                      {color: '#C4f601', fontSize: 16},
+                    ]}>
+                    Rp. {currency(DpSubtotal())}
+                  </Text>
+                </View>
+
                 <View
                   style={{
                     flexDirection: 'row',

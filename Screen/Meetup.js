@@ -209,7 +209,7 @@ function Meetup({navigation: {navigate, goBack}}) {
                   fontFamily: 'OpenSans',
                   color: '#ffffff',
                 }}>
-                {moment(item.booking.booking_date).format('ddd, D MMM')}{' '}
+                {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
                 {item.booking?.time
                   ? `${JSON.parse(item.booking?.time)[0]} - ${
                       JSON.parse(item.booking?.time)[1]

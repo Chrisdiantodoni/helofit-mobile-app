@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {ProgressBar} from 'react-native-paper';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import {Axios} from '../utils';
+import {Axios, currency} from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
@@ -113,6 +113,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                 onPress={() =>
                   navigate('DetailTask', {
                     taskId: item?.taskId,
+                    userId: item?.userId,
                   })
                 }>
                 <Image
@@ -184,7 +185,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                             fontWeight: '700',
                             fontFamily: 'OpenSans',
                           }}>
-                          {item?.current_poin}
+                          {currency(item?.current_poin)}
                         </Text>
                       </View>
                       <View>
@@ -280,7 +281,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                             fontSize: 20,
                             fontWeight: '700',
                           }}>
-                          {item?.poin}
+                          {currency(item?.poin)}
                         </Text>
                       </View>
                       <View>

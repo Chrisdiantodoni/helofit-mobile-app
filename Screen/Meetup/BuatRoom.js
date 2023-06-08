@@ -14,6 +14,7 @@ import currency from '../../utils/currency';
 import {Context} from '../../context/index';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Fontisto';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
@@ -320,7 +321,7 @@ const BuatRoom = ({route, navigation}) => {
               justifyContent: 'center',
             }}
             onPress={() => {
-              if (selectedBooking.length == 0) {
+              if (selectedBooking.length === 0) {
                 showingMessage('Jam bermain belum dipilih!');
               } else {
                 navigation.navigate('CreateRoom', {
@@ -361,9 +362,13 @@ const BuatRoom = ({route, navigation}) => {
               justifyContent: 'center',
             }}
             onPress={() => {
-              setIsVisible(true);
-              getDetailFacility();
-              sortTime();
+              if (selectedBooking.length === 0) {
+                showingMessage('Jam bermain belum dipilih!');
+              } else {
+                setIsVisible(true);
+                getDetailFacility();
+                sortTime();
+              }
             }}>
             <Text style={[styles.heading14, {color: '#000000'}]}>
               Reservasi
@@ -397,20 +402,72 @@ const BuatRoom = ({route, navigation}) => {
               justifyContent: 'space-around',
             }}>
             <View style={{width: '85%', justifyContent: 'flex-start'}}>
-              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
-                {dataReserve?.address}
-              </Text>
-              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
-                {dataReserve?.facility_info?.facility_name}
-              </Text>
-              <Text style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
-                {moment(isSelected).format('ddd, DD MMM')} {sortTime()[0]?.time}{' '}
-                - {sortTime()[sortTime()?.length - 1]?.time}
-              </Text>
-              <Text
-                style={[styles.heading28, {color: '#C4f601', fontSize: 16}]}>
-                Rp {currency(subTotal())}
-              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  alignItems: 'center',
+                }}>
+                <Ionicon
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 20,
+                    paddingHorizontal: 10,
+                  }}
+                  name="location-outline"
+                />
+                <View>
+                  <Text
+                    style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
+                    {dataReserve?.address}
+                  </Text>
+                  <Text
+                    style={[styles.heading28, {marginBottom: 8, fontSize: 14}]}>
+                    {dataReserve?.facility_info?.facility_name}
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  alignItems: 'center',
+                }}>
+                <Ionicon
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 20,
+                    paddingHorizontal: 10,
+                  }}
+                  name="time-outline"
+                />
+                <Text
+                  style={[styles.heading28, {marginBottom: 8, fontSize: 16}]}>
+                  {moment(isSelected).format('ddd, DD MMM')}{' '}
+                  {sortTime()[0]?.time} -{' '}
+                  {sortTime()[sortTime()?.length - 1]?.time}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  alignItems: 'center',
+                }}>
+                <Ionicon
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 20,
+                    paddingHorizontal: 10,
+                  }}
+                  name="pricetag-outline"
+                />
+                <Text
+                  style={[styles.heading28, {color: '#C4f601', fontSize: 16}]}>
+                  Rp {currency(subTotal())}
+                </Text>
+              </View>
+
               <View
                 style={{
                   flexDirection: 'row',

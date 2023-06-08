@@ -41,6 +41,10 @@ import FlashMessage from 'react-native-flash-message';
 import SplashScreen from './Screen/SplashScreen';
 import ContextProvider, {Context} from './context';
 import DetailEachTask from './Screen/Task/DetailEachTask';
+import Reserved from './Screen/Reserve/Reserved';
+import TopUp from './Screen/wallet/TopUp';
+import Withdraw from './Screen/wallet/Withdraw';
+import ConfirmTopUp from './Screen/wallet/ConfirmTopUp';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -284,6 +288,26 @@ function App() {
           <Stack.Screen
             name="PromoList"
             component={PromoList}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="TopUp"
+            component={TopUp}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Withdraw"
+            component={Withdraw}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Reserved"
+            component={Reserved}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ConfirmTopUp"
+            component={ConfirmTopUp}
             options={{headerShown: false}}
           />
         </Stack.Navigator>

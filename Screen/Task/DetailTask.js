@@ -7,22 +7,24 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {Axios} from '../../utils';
+import {Axios, currency} from '../../utils';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
-const DetailTask = ({navigation: {goBack, navigate}, route}) => {
+const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
   const [data, setData] = useState([]);
   const [dataUser, setDataUser] = useState({});
   const taskId = route?.params?.taskId;
+  const userId = route?.params?.userId;
 
   const getDetailTask = async () => {
     try {
-      const id = dataUser?.id;
-      console.log({id});
+      console.log({taskId});
       console.log(taskId);
-      const {data} = await Axios.get(`/task/progress/detail/${id}/${taskId}`);
+      const {data} = await Axios.get(
+        `/task/progress/detail/${userId}/${taskId}`,
+      );
       console.log({data});
       if (data.message === 'OK') {
         setData(data.data);
@@ -34,11 +36,15 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
   };
 
   useEffect(() => {
-    getDetailTask();
+    const unsubscribe = addListener('focus', () => {
+      getDetailTask();
+    });
     AsyncStorage.getItem('dataUser').then(res => {
       setDataUser(JSON.parse(res));
     });
-  }, []);
+    return unsubscribe;
+  }, [addListener]);
+  useEffect(() => {}, []);
 
   console.log('muharis', data);
 
@@ -104,7 +110,7 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
                     fontSize: 24,
                     fontWeight: '700',
                   }}>
-                  {data?.currentPoin}
+                  {currency(data?.currentPoin)}
                 </Text>
               </View>
               <View>
@@ -144,7 +150,12 @@ const DetailTask = ({navigation: {goBack, navigate}, route}) => {
                 source={require('../../src/CheckGreen.png')}
                 style={{width: 32, height: 32}}
               />
-            ) : null}
+            ) : (
+              <Image
+                source={require('../../src/Lock.png')}
+                style={{width: 32, height: 32}}
+              />
+            )}
           </View>
         ))}
       </View>

@@ -1,12 +1,19 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 // create a component
 const PromoList = ({navigation: {navigate, goBack}}) => {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View
         style={{
           backgroundColor: '#C4F601',
@@ -53,7 +60,7 @@ const PromoList = ({navigation: {navigate, goBack}}) => {
 
         <Image />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

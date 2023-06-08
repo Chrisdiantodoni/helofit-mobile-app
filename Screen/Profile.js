@@ -15,7 +15,9 @@ import {currency} from '../utils';
 import {useNavigation} from '@react-navigation/native';
 import {Axios} from '../utils';
 
-function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
+function Profile({
+  navigation: {goBack, navigate, addListener, popToTop, replace},
+}) {
   const [dataUser, setDataUser] = useState({});
   const navigation = useNavigation();
 
@@ -56,7 +58,10 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
   };
 
   useEffect(() => {
-    dataUserAsync();
+    const unsubscribe = addListener('focus', () => {
+      dataUserAsync();
+    });
+    return unsubscribe;
   }, []);
 
   return (
@@ -124,6 +129,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('Dompet')}>
           <Image
@@ -168,6 +174,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('FollowMeetup')}>
           <Image
@@ -176,6 +183,43 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
           />
           <Text style={[styles.heading14, {fontSize: 14, width: '75%'}]}>
             Meetup yang akan berlangsung
+          </Text>
+
+          <TouchableOpacity>
+            <Ionicon
+              name="chevron-forward-outline"
+              size={25}
+              style={{
+                fontWeight: 'bold',
+                color: '#FFF',
+                paddingRight: 2,
+              }}
+            />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#000000',
+            flexDirection: 'row',
+            paddingLeft: 16,
+            paddingVertical: 24,
+            borderRadius: 16,
+            alignItems: 'center',
+          }}
+          onPress={() => navigate('Reserved')}>
+          <Image
+            source={require('../src/Fasilitas2.png')}
+            style={{
+              height: 18,
+              width: 24,
+              marginRight: 20,
+              resizeMode: 'contain',
+            }}
+          />
+          <Text style={[styles.heading14, {fontSize: 14, width: '75%'}]}>
+            Reservasi yang telah dilakukan
           </Text>
 
           <TouchableOpacity>
@@ -207,6 +251,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('Tabs', {screen: 'Task'})}>
           <Image
@@ -253,6 +298,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('PromoList')}>
           <Image
@@ -292,6 +338,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('Bantuan')}>
           <Image
@@ -331,6 +378,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('Tentang')}>
           <Image
@@ -370,6 +418,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={() => navigate('SyaratKetentuan')}>
           <Image
@@ -409,6 +458,7 @@ function Profile({navigation: {goBack, navigate, popToTop, replace}}) {
             paddingLeft: 16,
             paddingVertical: 24,
             borderRadius: 16,
+            alignItems: 'center',
           }}
           onPress={handleLogout}>
           <Image
