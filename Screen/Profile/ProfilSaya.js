@@ -1,4 +1,4 @@
-//import liraries
+// import libraries
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -11,16 +11,20 @@ import {
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Axios} from '../../utils';
-
+import DocumentPicker from 'react-native-document-picker';
+import * as ImagePicker from 'react-native-image-picker';
 // create a component
 const ProfilSaya = ({navigation}) => {
   const [isEdit, setIsEdit] = useState(false);
+  const [userId, setUserId] = useState({});
   const [dataUser, setDataUser] = useState({});
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [bio, setBio] = useState('');
+  const [imageBlob, setImageBlob] = useState(null);
+  const [photo, setPhoto] = useState(null);
 
   const dataUserAsync = async () => {
     try {
@@ -29,6 +33,7 @@ const ProfilSaya = ({navigation}) => {
         const userId = JSON.parse(res)?.id;
         console.log(userId);
         getUser(userId);
+        setUserId(userId);
       }
     } catch (error) {
       console.log(error);
@@ -45,24 +50,72 @@ const ProfilSaya = ({navigation}) => {
         setDataUser(data?.data);
         console.log('dataUser', data?.data);
         setUsername(data?.data?.username);
+        setPhoto(data?.data?.profile_img);
         setGender(data?.data?.gender);
         setPhoneNumber(data?.data?.phone_number);
+        setAge(data?.data?.age);
+        setBio(data?.data?.bio);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+  const handleChoosePhoto = () => {
+    const options = {
+      title: 'Select Image',
+      mediaType: 'photo',
+      maxWidth: 500,
+      maxHeight: 500,
+      quality: 0.8,
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = {uri: response.assets[0].uri};
+        console.log(source.uri);
+        // Do something with the selected image source
+        // For example, set it in state to display in your component
+        setPhoto(source.uri);
+      }
+    });
   };
 
   useEffect(() => {
     dataUserAsync();
   }, []);
 
-  const handleEdit = () => {
-    setIsEdit(true);
+  const handleEdit = async () => {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('gender', gender);
+    formData.append('age', age);
+    formData.append('phone_number', phoneNumber);
+    formData.append('bio', bio);
+    // formData.append('profile_img', photo);
+    try {
+      const res = await Axios.put(`/user/${userId}`, formData);
+      console.log(res);
+      // navigation.goBack(); // Uncomment this line if you want to navigate back
+    } catch (err) {
+      console.log(err);
+    }
+    console.log({formData});
   };
 
   const goBack = () => {
     navigation.goBack();
+  };
+
+  const handleImageError = () => {
+    console.log('Error loading image');
   };
 
   return (
@@ -97,15 +150,26 @@ const ProfilSaya = ({navigation}) => {
           alignItems: 'center',
           flexDirection: 'row',
         }}>
-        <Image
-          source={require('../../src/GambarKosong.png')}
-          style={{
-            height: 72,
-            width: 72,
-            marginTop: 32,
-            borderRadius: 72 / 2,
-          }}
-        />
+        <TouchableOpacity disabled={!isEdit} onPress={handleChoosePhoto}>
+          <Image
+            source={{
+              uri: photo
+                ? typeof photo === 'string'
+                  ? photo
+                  : photo
+                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+            }}
+            style={{
+              height: 72,
+              width: 72,
+              marginTop: 32,
+              borderRadius: 72 / 2,
+              resizeMode: 'cover',
+            }}
+            onError={handleImageError}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={{
             position: 'absolute',
@@ -139,7 +203,7 @@ const ProfilSaya = ({navigation}) => {
             styles.Heading28,
             {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
-          onChangeText={setUsername}
+          onChangeText={text => setUsername(text)}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Jenis Kelamin
@@ -151,7 +215,7 @@ const ProfilSaya = ({navigation}) => {
             styles.Heading28,
             {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
-          onChangeText={setGender}
+          onChangeText={text => setGender(text)}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Umur
@@ -175,20 +239,19 @@ const ProfilSaya = ({navigation}) => {
             styles.Heading28,
             {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
-          onChangeText={setPhoneNumber}
+          onChangeText={text => setPhoneNumber(text)}
         />
         <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
           Bio Singkat
         </Text>
         <TextInput
           editable={isEdit}
-          multiline
           value={bio}
           style={[
             styles.Heading28,
             {backgroundColor: isEdit ? '#161616' : '#000'},
           ]}
-          onChangeText={setBio}
+          onChangeText={text => setBio(text)}
         />
         {isEdit && (
           <TouchableOpacity
@@ -201,7 +264,7 @@ const ProfilSaya = ({navigation}) => {
               justifyContent: 'center',
               marginTop: 30,
             }}
-            onPress={handleEdit}>
+            onPress={() => handleEdit()}>
             <Text
               style={[
                 styles.heading14,

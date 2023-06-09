@@ -108,21 +108,21 @@ const Notifikasi = ({navigation: {goBack}}) => {
         </Text>
       </View>
       <View>
-        <FlatList
-          ref={flatListRef}
-          data={dataNotif}
-          keyExtractor={item => item.id}
-          renderItem={({item, index}) =>
-            item.room?.isHost == false &&
-            item.list_user?.find(
-              find => find?.userId == dataUser?.id && find?.status == 'request',
-            ) ? (
-              <SendingRequest item={item} />
-            ) : (
-              item.list_user?.map(itemUser => {
+        <ScrollView>
+          {dataNotif.map((item, index) => {
+            if (
+              item.room?.isHost === false &&
+              item.list_user?.find(
+                find =>
+                  find?.userId === dataUser?.id && find?.status === 'request',
+              )
+            ) {
+              return <SendingRequest item={item} key={item.id} />;
+            } else {
+              return item.list_user?.map(itemUser => {
                 if (
-                  itemUser?.status == 'request' &&
-                  item.room?.isHost == true
+                  itemUser?.status === 'request' &&
+                  item.room?.isHost === true
                 ) {
                   return (
                     <CardRequest
@@ -134,17 +134,17 @@ const Notifikasi = ({navigation: {goBack}}) => {
                       handleUnapproved={handleUnapproved}
                     />
                   );
-                } else if (itemUser?.userId == dataUser?.id) {
-                  if (itemUser?.status == 'complete') {
-                    return <ApproveRequest item={item} />;
+                } else if (itemUser?.userId === dataUser?.id) {
+                  if (itemUser?.status === 'complete') {
+                    return <ApproveRequest item={item} key={item.id} />;
                   } else {
-                    return <RejectedRequest item={item} />;
+                    return <RejectedRequest item={item} key={item.id} />;
                   }
                 }
-              })
-            )
-          }
-        />
+              });
+            }
+          })}
+        </ScrollView>
       </View>
     </View>
   );
