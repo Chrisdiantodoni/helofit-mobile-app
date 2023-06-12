@@ -40,8 +40,8 @@ const FollowMeetup = ({navigation: {goBack, navigate}}) => {
   }, []);
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      <View>
         <View
           style={{
             backgroundColor: '#C4F601',
@@ -72,6 +72,7 @@ const FollowMeetup = ({navigation: {goBack, navigate}}) => {
             Jangan lupa terus pantau room meetup yang sudah ada kamu didalamnya
             ya
           </Text>
+          <View style={{justifyContent: 'center', alignItems: 'center'}}></View>
           {data?.length === 0
             ? null
             : data?.map((item, idx) => (
@@ -199,8 +200,9 @@ const FollowMeetup = ({navigation: {goBack, navigate}}) => {
 // define your styles
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#161616',
+    backgroundColor: '#000000',
     flex: 1,
+    paddingBottom: 16,
   },
   header: {
     fontSize: 20,
@@ -226,6 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#161616',
     borderRadius: 10,
     marginTop: 24,
+    paddingBottom: 10,
   },
 });
 

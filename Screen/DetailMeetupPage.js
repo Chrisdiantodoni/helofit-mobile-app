@@ -49,19 +49,19 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
       console.log(error);
     }
   };
-
   const handlePlayer = type => {
     switch (type) {
       case 'minus':
-        setTotalPlayer(totalPlayer == 1 ? 1 : totalPlayer - 1);
+        setTotalPlayer(totalPlayer === 1 ? 1 : totalPlayer - 1);
         break;
       case 'plus':
-        setTotalPlayer(
-          parseInt(data.room_detail?.length) - parseInt(data?.max_capacity) ===
-            totalPlayer + 1
-            ? totalPlayer + 1
-            : totalPlayer,
-        );
+        const maxCapacity = parseInt(data?.max_capacity);
+        const currentPlayers = parseInt(data.room_detail?.length);
+        const remainingSlots = maxCapacity - currentPlayers;
+
+        if (remainingSlots > 0 && totalPlayer < remainingSlots) {
+          setTotalPlayer(totalPlayer + 1);
+        }
         break;
       default:
         break;
@@ -358,7 +358,9 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                 {moment(data?.booking?.booking_date).format('ddd, D MMM')}{' '}
                 {data?.booking?.time
                   ? `${JSON.parse(data?.booking?.time)[0]} - ${
-                      JSON.parse(data?.booking?.time)[1]
+                      JSON.parse(data?.booking?.time)[1] === undefined
+                        ? JSON.parse(data?.booking?.time)[0]
+                        : '-'
                     }`
                   : ''}
               </Text>
@@ -517,7 +519,39 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             </TouchableOpacity>
           </View>
         </View> */}
-        {data?.isJoin ? (
+        {data?.isJoin && data?.status_room === 'playing' ? (
+          <View
+            style={{
+              bottom: 0,
+              backgroundColor: '#000',
+              height: 70,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              style={{
+                width: '90%',
+                marginBottom: 10,
+                height: 38,
+                backgroundColor: '#C4F601',
+                borderRadius: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              disabled={true}
+              onPress={handleStartMeet}>
+              <Text
+                style={[
+                  styles.heading14,
+                  {color: '#000000', fontSize: 14, marginBottom: 0},
+                ]}>
+                Sudah Mulai Meetup
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : data?.isJoin && data?.status_room === 'waiting' ? (
           isHost() ? (
             parseInt(data.max_capacity) - parseInt(data.room_detail?.length) !=
             0 ? null : (

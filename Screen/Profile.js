@@ -26,7 +26,7 @@ function Profile({
       .then(() => {
         navigation.reset({
           index: 0,
-          routes: [{name: 'Signin'}],
+          routes: [{name: 'Welcome'}],
         });
       })
       .catch(error => {
