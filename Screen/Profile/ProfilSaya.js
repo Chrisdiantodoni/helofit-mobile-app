@@ -99,11 +99,20 @@ const ProfilSaya = ({navigation}) => {
     formData.append('age', age);
     formData.append('phone_number', phoneNumber);
     formData.append('bio', bio);
-    // formData.append('profile_img', photo);
+
+    if (photo) {
+      const uriParts = photo.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+      formData.append('profile_img', {
+        uri: photo,
+        name: `photo.${fileType}`,
+        type: `image/${fileType}`,
+      });
+    }
     try {
       const res = await Axios.put(`/user/${userId}`, formData);
       console.log(res);
-      // navigation.goBack(); // Uncomment this line if you want to navigate back
+      navigation.goBack();
     } catch (err) {
       console.log(err);
     }
@@ -117,6 +126,7 @@ const ProfilSaya = ({navigation}) => {
   const handleImageError = () => {
     console.log('Error loading image');
   };
+  console.log(photo);
 
   return (
     <View style={styles.container}>
@@ -154,9 +164,7 @@ const ProfilSaya = ({navigation}) => {
           <Image
             source={{
               uri: photo
-                ? typeof photo === 'string'
-                  ? photo
-                  : photo
+                ? photo
                 : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
             }}
             style={{
@@ -166,7 +174,6 @@ const ProfilSaya = ({navigation}) => {
               borderRadius: 72 / 2,
               resizeMode: 'cover',
             }}
-            onError={handleImageError}
           />
         </TouchableOpacity>
 

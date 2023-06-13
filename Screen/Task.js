@@ -16,16 +16,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
-function Task({navigation: {navigate, goBack}, route}) {
+function Task({navigation: {navigate, goBack, addListener}, route}) {
   const [taskItem, setTaskItem] = useState([]);
   const [data, setData] = useState([]);
   const [dataUser, setDataUser] = useState({});
-
-  const getUserTask = async () => {
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      const userId = JSON.parse(res)?.id;
+      console.log(userId);
+      getUserTask(userId);
+    });
+  };
+  const getUserTask = async userId => {
     try {
-      const id = dataUser?.id;
-      if (id) {
-        const {data} = await Axios.get(`/task/progress2/${id}`);
+      if (userId) {
+        const {data} = await Axios.get(`/task/progress2/${userId}`);
         console.log('inni data', data, id);
         if (data.message === 'OK') {
           setData(data.data);
@@ -42,18 +47,18 @@ function Task({navigation: {navigate, goBack}, route}) {
       const response = await Axios.get('/task');
       const data = response.data?.data?.result;
       setTaskItem(data || []);
-      console.log(data);
+      console.log('dataTask', data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    AsyncStorage.getItem('dataUser').then(res => {
-      setDataUser(JSON.parse(res));
+    const unsubscribe = addListener('focus', () => {
       getTask();
-      getUserTask();
+      dataUserAsync();
     });
+    return unsubscribe;
   }, []);
 
   return (
@@ -160,7 +165,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                     style={{width: 21, height: 21, tintColor: 'white'}}
                   />
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
+                    <View style={{width: '80%'}}>
                       <Text
                         style={{
                           marginLeft: 10,
@@ -173,7 +178,6 @@ function Task({navigation: {navigate, goBack}, route}) {
                     </View>
                     <View
                       style={{
-                        marginLeft: 117,
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>
@@ -185,7 +189,7 @@ function Task({navigation: {navigate, goBack}, route}) {
                             fontWeight: '700',
                             fontFamily: 'OpenSans',
                           }}>
-                          {currency(item?.current_poin)}
+                          {currency(item?.task?.poin)}
                         </Text>
                       </View>
                       <View>
@@ -257,7 +261,10 @@ function Task({navigation: {navigate, goBack}, route}) {
                     style={{width: 21, height: 21, tintColor: 'white'}}
                   />
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View>
+                    <View
+                      style={{
+                        width: '80%',
+                      }}>
                       <Text
                         style={{
                           marginLeft: 10,
@@ -270,7 +277,6 @@ function Task({navigation: {navigate, goBack}, route}) {
                     </View>
                     <View
                       style={{
-                        marginLeft: 160,
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>

@@ -120,7 +120,7 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
           ))}
         </ScrollView>
       </View>
-      <View style={{marginTop: 40, marginHorizontal: 16}}>
+      <View style={{marginTop: 24, marginHorizontal: 16}}>
         <FlatList
           data={facility}
           renderItem={({item, index}) => (
@@ -134,6 +134,7 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
                 paddingLeft: 24,
                 paddingVertical: 16,
                 borderRadius: 8,
+                marginTop: 16,
               }}>
               <Text style={styles.Heading28}>
                 {item.merchant?.merchant_name}

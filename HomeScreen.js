@@ -329,7 +329,7 @@ function HomeScreen({navigation}) {
                       top: '75%',
                       left: '80%',
                       backgroundColor: '#C4F601',
-                      width: '14%',
+                      width: '16%',
                       height: '17%',
                       flexDirection: 'row',
                       alignItems: 'center',

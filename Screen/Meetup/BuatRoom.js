@@ -31,7 +31,6 @@ const BuatRoom = ({route, navigation}) => {
   const price = route.params.price;
   const [dataReserve, setDataReserve] = useState({});
   const [isVisible, setIsVisible] = useState(false);
-
   const [dataUser, setDataUser] = useState({});
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {

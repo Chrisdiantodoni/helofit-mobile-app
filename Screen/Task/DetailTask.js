@@ -44,9 +44,6 @@ const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
     });
     return unsubscribe;
   }, [addListener]);
-  useEffect(() => {}, []);
-
-  console.log('muharis', data);
 
   return (
     <ScrollView style={styles.container}>
@@ -138,6 +135,7 @@ const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
         <Text style={[styles.Heading28, {color: '#FFF', marginBottom: 24}]}>
           Task yang harus dikerjakan
         </Text>
+        {console.log({data_nya: data})}
         {data?.task_detail?.map((item, idx) => (
           <View style={styles.Task}>
             <View style={{paddingLeft: 32, width: '85%'}}>
@@ -145,7 +143,7 @@ const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
                 {item?.task_name}
               </Text>
             </View>
-            {item.status ? (
+            {data?.taskDetailId?.includes(JSON.stringify(item?.id)) ? (
               <Image
                 source={require('../../src/CheckGreen.png')}
                 style={{width: 32, height: 32}}

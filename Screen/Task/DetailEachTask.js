@@ -33,26 +33,20 @@ const DetailEachTask = ({navigation: {goBack, navigate}, route}) => {
   const handleTask = async () => {
     const taskDetailIds = data?.task_detail?.map(item => item.id);
     try {
-      if (!taskDetailIds || taskDetailIds.length === 0) {
-        console.log('No taskDetailId found.');
-        return;
-      }
-      for (const taskDetailId of taskDetailIds) {
-        const body = {
-          taskId,
-          userId: dataUser?.id,
-          status: 'berjalan',
-          taskDetailId,
-        };
-        await Axios.post('/task', body)
-          .then(res => {
-            if (res) {
-              console.log(res);
-            }
-          })
-          .catch(err => console.log(err));
-      }
-      // navigate('Tabs', {screen: 'Task'});
+      const body = {
+        taskId,
+        userId: dataUser?.id,
+        status: 'berjalan',
+        taskDetailIds,
+      };
+      await Axios.post('/task', body)
+        .then(res => {
+          if (res) {
+            console.log(res);
+          }
+        })
+        .catch(err => console.log(err));
+      navigate('Tabs', {screen: 'Task'});
     } catch (error) {
       console.log('Error creating task:', error);
     }

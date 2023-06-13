@@ -19,8 +19,7 @@ import Icon from 'react-native-vector-icons/Fontisto';
 import {showMessage, hideMessage} from 'react-native-flash-message';
 
 const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
-  const [totalPlayer, setTotalPlayer] = useState(1);
-  const [isGrow, setIsGrow] = useState(0);
+  const [totalPlayer, setTotalPlayer] = useState(2);
   const [deskripsi, setDeskripsi] = useState('');
   const [data, setData] = useState({});
   const [title, setTitle] = useState(null);
@@ -52,7 +51,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
   const handleTotalPlayer = type => {
     switch (type) {
       case 'minus':
-        setTotalPlayer(totalPlayer === 1 ? 1 : totalPlayer - 1);
+        setTotalPlayer(totalPlayer === 2 ? 2 : totalPlayer - 1);
         break;
       case 'plus':
         setTotalPlayer(totalPlayer + 1);
