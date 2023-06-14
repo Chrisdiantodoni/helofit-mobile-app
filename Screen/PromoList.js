@@ -1,5 +1,5 @@
 //import liraries
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,38 @@ import {
   ScrollView,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Axios} from '../utils';
 
-// create a component
-const PromoList = ({navigation: {navigate, goBack}}) => {
+const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
+  const [dataUser, setDataUser] = useState({});
+  const [promo, setPromo] = useState([]);
+
+  const getPromoUser = async userId => {
+    const response = await Axios.get(`/promo/ownPromo/${userId}`);
+    try {
+      if (response.data.message === 'OK') {
+        console.log('data', response);
+        const data = response?.data?.data;
+        setPromo(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const dataUserAsync = async () => {
+    await AsyncStorage.getItem('dataUser').then(res => {
+      const userId = JSON.parse(res)?.id;
+      console.log(userId);
+      getPromoUser(userId);
+    });
+  };
+  useEffect(() => {
+    const unsubscribe = addListener('focus', () => {
+      dataUserAsync();
+    });
+    return unsubscribe;
+  }, [addListener]);
   return (
     <ScrollView style={styles.container}>
       <View
@@ -48,17 +77,32 @@ const PromoList = ({navigation: {navigate, goBack}}) => {
           Gunakan Promo yang telah kamu tukar dengan poin yang kamu miliki ya
         </Text>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          <Image
-            source={require('../src/BannerGym.png')}
-            style={{width: 343, height: 160, borderRadius: 16, marginTop: 32}}
-          />
-          <Image
-            source={require('../src/BannerGym.png')}
-            style={{width: 343, height: 160, borderRadius: 16, marginTop: 32}}
-          />
+          {console.log(
+            promo
+              ?.filter(item => item.status_promo === 'Belum Digunakan')
+              .map(item => item.id),
+          )}
+          {promo
+            ?.filter(item => item.status_promo === 'Belum Digunakan')
+            .map((item, index) => (
+              <TouchableOpacity
+                style={{
+                  width: '95%',
+                  height: 160,
+                  borderRadius: 16,
+                  marginTop: 32,
+                }}>
+                <Image
+                  source={{uri: item.promo?.promo_img}}
+                  style={{
+                    width: '95%',
+                    height: 160,
+                    borderRadius: 16,
+                  }}
+                />
+              </TouchableOpacity>
+            ))}
         </View>
-
-        <Image />
       </View>
     </ScrollView>
   );

@@ -13,6 +13,7 @@ import {ProgressBar} from 'react-native-paper';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {Axios, currency} from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 
 const {width} = Dimensions.get('window');
 
@@ -31,7 +32,7 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
     try {
       if (userId) {
         const {data} = await Axios.get(`/task/progress2/${userId}`);
-        console.log('inni data', data, id);
+        console.log('inni data', data);
         if (data.message === 'OK') {
           setData(data.data);
           console.log({data: data.data});
@@ -59,7 +60,7 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
       dataUserAsync();
     });
     return unsubscribe;
-  }, []);
+  }, [addListener]);
 
   return (
     <ScrollView style={{backgroundColor: '#161616', flex: 1}}>
@@ -223,7 +224,9 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
           Dapatkan poin dari task yang kamu kerjakan
         </Text>
         <FlatList
-          data={taskItem}
+          data={taskItem.filter(
+            item => moment(item.expiredIn) >= moment().startOf('day'),
+          )}
           renderItem={({item, index}) => (
             <View key={index} style={styles.listContainer}>
               <TouchableOpacity

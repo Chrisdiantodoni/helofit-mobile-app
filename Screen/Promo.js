@@ -14,12 +14,19 @@ import Svg from 'react-native-svg';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Axios} from '../utils';
-
+import moment from 'moment';
 const {width} = Dimensions.get('window');
 
-function Promo({navigation: {goBack, navigate}}) {
+function Promo({navigation: {goBack, navigate, addListener}}) {
   const [dataUser, setDataUser] = useState({});
-
+  const [promo, setPromo] = useState([]);
+  const [promoName, setPromoName] = useState('');
+  const [poin, setPoin] = useState('');
+  const [expiredIn, setExpiredIn] = useState('');
+  const [modalBanner, setModalBanner] = useState(null);
+  const [merchantName, setMerchantName] = useState('');
+  const [idPromo, setPromoId] = useState('');
+  const [merchantId, setMerchantId] = useState('');
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
       const userId = JSON.parse(res)?.id;
@@ -43,9 +50,52 @@ function Promo({navigation: {goBack, navigate}}) {
     }
   };
   useEffect(() => {
-    dataUserAsync();
-  }, []);
+    const unsubscribe = addListener('focus', () => {
+      dataUserAsync();
+      getPromoUser();
+    });
+    return unsubscribe;
+  }, [addListener]);
   const [isVisible, setIsVisible] = useState(false);
+
+  const getPromoUser = async () => {
+    const response = await Axios.get('/promo');
+    try {
+      if (response.data.message === 'OK') {
+        console.log('data', response);
+        const data = response?.data?.data;
+        setPromo(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleShowModal = item => {
+    setIsVisible(true);
+    setPromoName(item.promo_name);
+    setModalBanner(item.promo_img);
+    setPoin(item.point);
+    setExpiredIn(item.ExpiredIn);
+    setMerchantName(item.merchant?.merchant_name);
+    setPromoId(item.id);
+    setMerchantId(item.merchant?.id);
+  };
+
+  const handleUsePromo = async (idPromo, poin, merchantId) => {
+    const body = {
+      promoId: idPromo,
+      userId: dataUser?.id,
+      status_promo: 'belum digunakan',
+      poin: poin,
+      merchantId,
+    };
+    await Axios.post('/promo', body)
+      .then(res => console.log(res))
+      .catch(error => console.log(error));
+    console.log({body});
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View
@@ -124,130 +174,33 @@ function Promo({navigation: {goBack, navigate}}) {
           </TouchableOpacity>
         </View>
       </View>
-      <View
-        style={{
-          backgroundColor: '#000000',
-          marginTop: 8,
-          paddingHorizontal: 16,
-          borderRadius: 16,
-          flex: 1,
-        }}>
-        <View
-          style={{flexDirection: 'row', alignItems: 'center', marginTop: 16}}>
-          <Text style={styles.Heading28}>Puas-puasin main badminton</Text>
-          <Ionicon
-            name="chevron-forward-outline"
-            size={25}
-            style={{
-              fontWeight: 'bold',
-              color: '#ffffff',
-              paddingRight: 2,
-            }}
-          />
-        </View>
-        <ScrollView
-          style={{
-            marginVertical: 15,
-            height: 138,
-            borderRadius: 10,
-          }}
-          horizontal={true}
-          snapToAlignment={'center'}
-          showsHorizontalScrollIndicator={false}
-          contentInset={{
-            top: 0,
-            left: 30,
-            bottom: 0,
-            right: 30,
-          }}>
-          <View style={styles.View}>
-            <TouchableOpacity onPress={() => setIsVisible(true)}>
-              <Image
-                source={require('../src/Tony-1.png')}
-                style={{
-                  width: '100%',
-                  height: 138,
-                  resizeMode: 'cover',
-                  borderRadius: 10,
-                }}
-              />
-              <View style={{position: 'absolute', top: 109, left: 11}}>
-                <Text
-                  style={[
-                    styles.Banner,
-                    {textShadowOffset: {width: -2, height: -0.5}},
-                  ]}>
-                  BANNER PROMO 1
-                </Text>
+
+      <ScrollView>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          {promo
+            ?.filter(
+              filter => moment(filter.ExpiredIn) >= moment().startOf('day'),
+            )
+            .map((item, index) => (
+              <View style={styles.card}>
+                <TouchableOpacity onPress={() => handleShowModal(item)}>
+                  <Image
+                    source={{uri: item.promo_img}}
+                    style={{
+                      width: '100%',
+                      height: 138,
+                      resizeMode: 'cover',
+                      borderRadius: 10,
+                    }}
+                  />
+                  <Text style={[styles.Heading28, {marginTop: 10}]}>
+                    {item.promo_name}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-        <View
-          style={{flexDirection: 'row', alignItems: 'center', marginTop: 16}}>
-          <Text style={styles.Heading28}>Futsal jadi lebih murah</Text>
-          <Ionicon
-            name="chevron-forward-outline"
-            size={25}
-            style={{
-              fontWeight: 'bold',
-              color: '#ffffff',
-              paddingRight: 2,
-            }}
-          />
+            ))}
         </View>
-        <ScrollView
-          style={{
-            marginVertical: 15,
-            height: 138,
-            borderRadius: 10,
-          }}
-          horizontal={true}
-          snapToAlignment={'center'}
-          showsHorizontalScrollIndicator={false}
-          contentInset={{
-            top: 0,
-            left: 30,
-            bottom: 0,
-            right: 30,
-          }}>
-          <View style={styles.View}></View>
-          <View style={styles.View}></View>
-          <View style={styles.View}></View>
-        </ScrollView>
-        <View
-          style={{flexDirection: 'row', alignItems: 'center', marginTop: 16}}>
-          <Text style={styles.Heading28}>Diskon ketika main Basket</Text>
-          <Ionicon
-            name="chevron-forward-outline"
-            size={25}
-            style={{
-              fontWeight: 'bold',
-              color: '#ffffff',
-              paddingRight: 2,
-            }}
-          />
-        </View>
-        <ScrollView
-          style={{
-            marginVertical: 15,
-            height: 138,
-            borderRadius: 10,
-          }}
-          horizontal={true}
-          snapToAlignment={'center'}
-          showsHorizontalScrollIndicator={false}
-          contentInset={{
-            top: 0,
-            left: 30,
-            bottom: 0,
-            right: 30,
-          }}>
-          <View style={styles.View}></View>
-          <View style={styles.View}></View>
-          <View style={styles.View}></View>
-        </ScrollView>
-      </View>
+      </ScrollView>
 
       <Modal
         isVisible={isVisible}
@@ -269,10 +222,11 @@ function Promo({navigation: {goBack, navigate}}) {
             }}
           />
           <Image
-            source={require('../src/BannerPromo.png')}
+            source={{uri: modalBanner}}
             style={{
               resizeMode: 'cover',
               width: '100%',
+              height: 160,
               borderRadius: 10,
               marginBottom: 24,
             }}
@@ -285,14 +239,14 @@ function Promo({navigation: {goBack, navigate}}) {
             }}>
             <View style={{width: '85%', justifyContent: 'flex-start'}}>
               <Text style={[styles.heading28, {marginBottom: 8}]}>
-                Potongan Tarif Lapangan dari 50.000 jadi 35.000/Jam
+                {promoName}
               </Text>
               <Text
                 style={[
                   styles.heading28,
                   {fontSize: 14, lineHeight: 19, color: '#FFFFFF'},
                 ]}>
-                Berlaku sampai 30 Februari 2023
+                Berlaku sampai {moment(expiredIn).format('DD MMMM YYYY')}
               </Text>
             </View>
             <View
@@ -311,7 +265,7 @@ function Promo({navigation: {goBack, navigate}}) {
                       fontSize: 24,
                       fontWeight: '700',
                     }}>
-                    15
+                    {poin}
                   </Text>
                 </View>
                 <View>
@@ -348,7 +302,7 @@ function Promo({navigation: {goBack, navigate}}) {
                   color: '#FFFFFF',
                 },
               ]}>
-              Medan Basket
+              {merchantName}
             </Text>
           </View>
           <TouchableOpacity
@@ -362,7 +316,8 @@ function Promo({navigation: {goBack, navigate}}) {
               borderRadius: 8,
               marginTop: 80,
             }}
-            onPress={() => setIsVisible(false)}>
+            disabled={parseInt(poin) > parseInt(dataUser?.point) ? true : false}
+            onPress={() => handleUsePromo(idPromo, poin, merchantId)}>
             <Text
               style={{
                 color: '#000000',
@@ -370,7 +325,9 @@ function Promo({navigation: {goBack, navigate}}) {
                 fontSize: 16,
                 alignSelf: 'center',
               }}>
-              Tukarkan Poin
+              {parseInt(poin) > parseInt(dataUser?.point)
+                ? 'Poin anda belum mencukupi..'
+                : 'Tukarkan Poin'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -407,24 +364,24 @@ const styles = StyleSheet.create({
     color: '#FFF',
     width: '90%',
   },
-  View: {
-    backgroundColor: '#161616',
-    width: width - 80,
-    borderRadius: 10,
-    marginRight: 16,
+
+  card: {
+    borderRadius: 16,
+    backgroundColor: '#000000',
+    borderColor: '#ffffff',
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 26,
+    width: '95%',
+    marginHorizontal: 10,
   },
-  Banner: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000000',
-    textShadowColor: '#C4F601',
-    textShadowRadius: 0.1,
-    textShadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    fontFamily: 'OpenSans',
+  inCard: {
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#000000',
   },
+
   Modal: {
     backgroundColor: '#161616',
     borderRadius: 10,
