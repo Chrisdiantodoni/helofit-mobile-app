@@ -11,10 +11,18 @@ import {
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Axios} from '../utils';
+import Modal from 'react-native-modal';
+import moment from 'moment';
 
 const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
   const [dataUser, setDataUser] = useState({});
   const [promo, setPromo] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [modalBanner, setModalBanner] = useState(null);
+  const [merchantName, setMerchantName] = useState('');
+  const [promoName, setPromoName] = useState('');
+  const [poin, setPoin] = useState('');
+  const [expiredIn, setExpiredIn] = useState('');
 
   const getPromoUser = async userId => {
     const response = await Axios.get(`/promo/ownPromo/${userId}`);
@@ -34,6 +42,15 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
       console.log(userId);
       getPromoUser(userId);
     });
+  };
+
+  const handleShowModal = item => {
+    setIsVisible(true);
+    setPromoName(item.promo?.promo_name);
+    setModalBanner(item.promo?.promo_img);
+    setPoin(item.promo?.point);
+    setExpiredIn(item.ExpiredIn);
+    setMerchantName(item?.promo?.merchant?.merchant_name);
   };
   useEffect(() => {
     const unsubscribe = addListener('focus', () => {
@@ -77,11 +94,6 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
           Gunakan Promo yang telah kamu tukar dengan poin yang kamu miliki ya
         </Text>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          {console.log(
-            promo
-              ?.filter(item => item.status_promo === 'Belum Digunakan')
-              .map(item => item.id),
-          )}
           {promo
             ?.filter(item => item.status_promo === 'Belum Digunakan')
             .map((item, index) => (
@@ -91,7 +103,8 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
                   height: 160,
                   borderRadius: 16,
                   marginTop: 32,
-                }}>
+                }}
+                onPress={() => handleShowModal(item)}>
                 <Image
                   source={{uri: item.promo?.promo_img}}
                   style={{
@@ -104,6 +117,111 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
             ))}
         </View>
       </View>
+      <Modal
+        isVisible={isVisible}
+        style={{justifyContent: 'flex-end', margin: 0}}
+        animationInTiming={900}
+        animationOutTiming={500}
+        swipeDirection={'down'}
+        backdropOpacity={0.1}
+        onBackdropPress={() => setIsVisible(false)}
+        onSwipeComplete={() => setIsVisible(false)}>
+        <View style={styles.Modal}>
+          <View
+            style={{
+              backgroundColor: '#7C7C7C',
+              width: 55,
+              height: 3,
+              marginBottom: 24,
+              marginTop: 14,
+            }}
+          />
+          <Image
+            source={{uri: modalBanner}}
+            style={{
+              resizeMode: 'cover',
+              width: '100%',
+              height: 160,
+              borderRadius: 10,
+              marginBottom: 24,
+            }}
+          />
+          <View
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}>
+            <View style={{width: '85%', justifyContent: 'flex-start'}}>
+              <Text style={[styles.Heading28, {marginBottom: 8}]}>
+                {promoName}
+              </Text>
+              <Text
+                style={[
+                  styles.Heading28,
+                  {fontSize: 14, lineHeight: 19, color: '#FFFFFF'},
+                ]}>
+                Berlaku sampai {moment(expiredIn).format('DD MMMM YYYY')}
+              </Text>
+            </View>
+            <View
+              style={{
+                marginRight: 10,
+                marginTop: 40,
+              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}>
+                <View>
+                  <Text
+                    style={{
+                      color: '#C4F601',
+                      fontSize: 24,
+                      fontWeight: '700',
+                    }}>
+                    {poin}
+                  </Text>
+                </View>
+                <View>
+                  <Text
+                    style={{
+                      color: '#C4F601',
+                      fontSize: 16,
+                      fontWeight: '700',
+                    }}>
+                    POIN
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignSelf: 'flex-start',
+              alignItems: 'center',
+              marginTop: 24,
+            }}>
+            <Image
+              source={require('../src/Basketball1.png')}
+              style={{width: 20, height: 20, marginRight: 11}}
+            />
+            <Text
+              style={[
+                styles.Heading28,
+                {
+                  fontSize: 16,
+                  lineHeight: 19,
+                  color: '#FFFFFF',
+                },
+              ]}>
+              {merchantName}
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -134,6 +252,14 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenSans',
     color: '#FFFFFF',
     paddingTop: 5,
+  },
+  Modal: {
+    backgroundColor: '#161616',
+    borderRadius: 10,
+    height: '70%',
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 16,
   },
 });
 

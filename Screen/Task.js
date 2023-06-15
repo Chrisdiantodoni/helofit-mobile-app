@@ -155,7 +155,7 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
                     ? 'Berakhir Hari Ini'
                     : `Berakhir dalam ${item?.expiredInDays} hari lagi`}
                 </Text>
-                <TouchableOpacity
+                <View
                   style={{
                     flexDirection: 'row',
                     marginLeft: 20,
@@ -206,7 +206,7 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
                       </View>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             ))}
         </ScrollView>

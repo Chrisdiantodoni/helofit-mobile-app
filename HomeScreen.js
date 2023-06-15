@@ -27,6 +27,7 @@ function HomeScreen({navigation}) {
   const [room, setRoom] = useState([]);
   const [dataTask, setDataTask] = useState([]);
   const [facility, setFacility] = useState([]);
+  const [promo, setPromo] = useState([]);
 
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
@@ -41,7 +42,7 @@ function HomeScreen({navigation}) {
       const response = await Axios.get('/room');
       const data = response.data?.data?.result;
       setRoom(data || []);
-      console.log(data);
+      console.log('data Room', room);
     } catch (error) {
       console.log(error);
     }
@@ -76,6 +77,7 @@ function HomeScreen({navigation}) {
       getListTask();
       dataUserAsync();
       getFacility();
+      getPromoUser();
     });
     return unsubscribe;
   }, [navigation]);
@@ -112,6 +114,18 @@ function HomeScreen({navigation}) {
       const data = response?.data?.data?.result;
       setFacility(data || []);
       console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getPromoUser = async () => {
+    const response = await Axios.get('/promo');
+    try {
+      if (response.data.message === 'OK') {
+        console.log('data', response);
+        const data = response?.data?.data;
+        setPromo(data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -302,125 +316,130 @@ function HomeScreen({navigation}) {
               bottom: 0,
               right: 30,
             }}>
-            {room.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={Styles.View}
-                onPress={() =>
-                  navigation.navigate('DetailMeetupPage', {id: item.id})
-                }>
-                <View>
-                  <Image
-                    source={{
-                      uri: item?.facility?.banner_img
-                        ? item?.facility?.banner_img
-                        : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                    }}
+            {room
+              .filter(
+                filter =>
+                  moment(filter.room_expired) >= moment().startOf('day'),
+              )
+              .map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={Styles.View}
+                  onPress={() =>
+                    navigation.navigate('DetailMeetupPage', {id: item.id})
+                  }>
+                  <View>
+                    <Image
+                      source={{
+                        uri: item?.facility?.banner_img
+                          ? item?.facility?.banner_img
+                          : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                      }}
+                      style={{
+                        width: '100%',
+                        height: 148,
+                        borderRadius: 10,
+                        resizeMode: 'cover',
+                      }}
+                    />
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: '75%',
+                        left: '80%',
+                        backgroundColor: '#C4F601',
+                        width: '16%',
+                        height: '17%',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 8,
+                      }}>
+                      <Ionicon
+                        name="people-outline"
+                        size={15}
+                        style={{
+                          fontWeight: 'bold',
+                          color: '#000000',
+                          paddingRight: 2,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: '#000000',
+                          fontWeight: '400',
+                        }}>
+                        {item.room_detail?.length} / {item.max_capacity}
+                        {/* 7/10 */}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text
                     style={{
-                      width: '100%',
-                      height: 148,
-                      borderRadius: 10,
-                      resizeMode: 'cover',
-                    }}
-                  />
+                      fontSize: 16,
+                      marginLeft: 15,
+                      marginTop: 8,
+                      color: '#C4F601',
+                      fontWeight: '700',
+                      fontFamily: 'OpenSans',
+                      marginBottom: 8,
+                    }}>
+                    {item.room_name}
+                  </Text>
                   <View
                     style={{
-                      position: 'absolute',
-                      top: '75%',
-                      left: '80%',
-                      backgroundColor: '#C4F601',
-                      width: '16%',
-                      height: '17%',
                       flexDirection: 'row',
+                      marginLeft: 20,
+                      marginVertical: 8,
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 8,
                     }}>
                     <Ionicon
-                      name="people-outline"
-                      size={15}
-                      style={{
-                        fontWeight: 'bold',
-                        color: '#000000',
-                        paddingRight: 2,
-                      }}
+                      name="location-outline"
+                      size={18}
+                      style={{fontWeight: 'bold', color: '#ffffff'}}
                     />
                     <Text
                       style={{
+                        marginLeft: 10,
                         fontSize: 12,
-                        color: '#000000',
-                        fontWeight: '400',
+                        color: '#ffffff',
+                        fontFamily: 'OpenSans',
                       }}>
-                      {item.room_detail?.length} / {item.max_capacity}
-                      {/* 7/10 */}
+                      {item.facility?.merchant?.address || '-'}
+                      {/* Bilal GOR Badminton, Tembung */}
                     </Text>
                   </View>
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginLeft: 15,
-                    marginTop: 8,
-                    color: '#C4F601',
-                    fontWeight: '700',
-                    fontFamily: 'OpenSans',
-                    marginBottom: 8,
-                  }}>
-                  {item.room_name}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 20,
-                    marginVertical: 8,
-                    alignItems: 'center',
-                  }}>
-                  <Ionicon
-                    name="location-outline"
-                    size={18}
-                    style={{fontWeight: 'bold', color: '#ffffff'}}
-                  />
-                  <Text
+                  <View
                     style={{
-                      marginLeft: 10,
-                      fontSize: 12,
-                      color: '#ffffff',
-                      fontFamily: 'OpenSans',
+                      flexDirection: 'row',
+                      marginLeft: 20,
+                      alignItems: 'center',
                     }}>
-                    {item.facility?.merchant?.address || '-'}
-                    {/* Bilal GOR Badminton, Tembung */}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 20,
-                    alignItems: 'center',
-                  }}>
-                  <Ionicon
-                    name="time-outline"
-                    size={18}
-                    style={{fontWeight: 'bold', color: '#ffffff'}}
-                  />
-                  <Text
-                    style={{
-                      marginLeft: 10,
-                      fontSize: 12,
-                      fontFamily: 'OpenSans',
-                      color: '#ffffff',
-                    }}>
-                    {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
-                    {item.booking?.time
-                      ? `${getMinTime(
-                          JSON.parse(item.booking?.time),
-                        )} - ${getMaxTime(JSON.parse(item.booking?.time))}`
-                      : ''}
-                    {/* Sabtu, 25 Nov 08.00-12.00 AM */}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+                    <Ionicon
+                      name="time-outline"
+                      size={18}
+                      style={{fontWeight: 'bold', color: '#ffffff'}}
+                    />
+                    <Text
+                      style={{
+                        marginLeft: 10,
+                        fontSize: 12,
+                        fontFamily: 'OpenSans',
+                        color: '#ffffff',
+                      }}>
+                      {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
+                      {item.booking?.time
+                        ? `${getMinTime(
+                            JSON.parse(item.booking?.time),
+                          )} - ${getMaxTime(JSON.parse(item.booking?.time))}`
+                        : ''}
+                      {/* Sabtu, 25 Nov 08.00-12.00 AM */}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
           </ScrollView>
         </View>
         <View>
@@ -465,110 +484,114 @@ function HomeScreen({navigation}) {
               bottom: 0,
               right: 30,
             }}>
-            {dataTask?.map((item, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={Styles.View}
-                onPress={() =>
-                  navigation.navigate('DetailEachTask', {taskId: item.id})
-                }>
-                <Image
-                  source={{
-                    uri: item?.banner_img
-                      ? item?.banner_img
-                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                  }}
-                  style={{width: '100%', height: 148, borderRadius: 10}}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginLeft: 15,
-                    marginTop: 8,
-                    color: '#C4F601',
-                    fontWeight: '700',
-                    fontFamily: 'OpenSans',
-                    marginBottom: 8,
-                  }}>
-                  {item.task_name}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 20,
-                    marginVertical: 8,
-                    alignItems: 'center',
-                  }}>
+            {dataTask
+              ?.filter(
+                item => moment(item.expiredIn) >= moment().startOf('day'),
+              )
+              .map((item, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={Styles.View}
+                  onPress={() =>
+                    navigation.navigate('DetailEachTask', {taskId: item.id})
+                  }>
                   <Image
-                    source={require('./src/Fitness-Icon.png')}
-                    style={{width: 21, height: 21, tintColor: 'white'}}
+                    source={{
+                      uri: item?.banner_img
+                        ? item?.banner_img
+                        : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                    }}
+                    style={{width: '100%', height: 148, borderRadius: 10}}
                   />
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View style={{width: '70%'}}>
-                      <Text
-                        style={{
-                          marginLeft: 10,
-                          fontSize: 12,
-                          color: '#ffffff',
-                          fontFamily: 'OpenSans',
-                        }}>
-                        {item?.merchant?.merchant_name}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: '25%',
-                      }}>
-                      <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginLeft: 15,
+                      marginTop: 8,
+                      color: '#C4F601',
+                      fontWeight: '700',
+                      fontFamily: 'OpenSans',
+                      marginBottom: 8,
+                    }}>
+                    {item.task_name}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginLeft: 20,
+                      marginVertical: 8,
+                      alignItems: 'center',
+                    }}>
+                    <Image
+                      source={require('./src/Fitness-Icon.png')}
+                      style={{width: 21, height: 21, tintColor: 'white'}}
+                    />
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <View style={{width: '70%'}}>
                         <Text
                           style={{
-                            color: '#C4F601',
-                            fontSize: 20,
-                            fontWeight: '700',
+                            marginLeft: 10,
+                            fontSize: 12,
+                            color: '#ffffff',
+                            fontFamily: 'OpenSans',
                           }}>
-                          {item.poin}
+                          {item?.merchant?.merchant_name}
                         </Text>
                       </View>
-                      <View>
-                        <Text
-                          style={{
-                            color: '#C4F601',
-                            fontSize: 12,
-                            fontWeight: '700',
-                          }}>
-                          POIN
-                        </Text>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: '25%',
+                        }}>
+                        <View>
+                          <Text
+                            style={{
+                              color: '#C4F601',
+                              fontSize: 20,
+                              fontWeight: '700',
+                            }}>
+                            {item.poin}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text
+                            style={{
+                              color: '#C4F601',
+                              fontSize: 12,
+                              fontWeight: '700',
+                            }}>
+                            POIN
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  {item?.list_task?.map((itemTask, idxTask) => (
-                    <View
-                      key={idxTask}
-                      style={{
-                        backgroundColor: '#C4F601',
-                        borderRadius: 8,
-                        paddingHorizontal: 10,
-                        height: 24,
-                        justifyContent: 'center',
-                        marginTop: 8,
-                        marginHorizontal: 8,
-                        alignItems: 'center',
-                      }}>
-                      <Text
+                  <View style={{flexDirection: 'row'}}>
+                    {item?.list_task?.map((itemTask, idxTask) => (
+                      <View
+                        key={idxTask}
                         style={{
-                          fontSize: 12,
-                          fontWeight: '400',
-                          color: '#000000',
+                          backgroundColor: '#C4F601',
+                          borderRadius: 8,
+                          paddingHorizontal: 10,
+                          height: 24,
+                          justifyContent: 'center',
+                          marginTop: 8,
+                          marginHorizontal: 8,
+                          alignItems: 'center',
                         }}>
-                        {idxTask + 1}. {itemTask?.task_name}
-                      </Text>
-                    </View>
-                  ))}
-                  {/* <View
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '400',
+                            color: '#000000',
+                          }}>
+                          {idxTask + 1}. {itemTask?.task_name}
+                        </Text>
+                      </View>
+                    ))}
+                    {/* <View
                           style={{
                             backgroundColor: '#C4F601',
                             borderRadius: 8,
@@ -584,9 +607,9 @@ function HomeScreen({navigation}) {
                             2. Barbel 15 kg
                           </Text>
                         </View> */}
-                </View>
-              </TouchableOpacity>
-            ))}
+                  </View>
+                </TouchableOpacity>
+              ))}
             {/* <View style={Styles.View}></View>
             <View style={Styles.View}></View> */}
           </ScrollView>
@@ -596,7 +619,7 @@ function HomeScreen({navigation}) {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Onboarding />
+          <Onboarding data={promo} />
         </View>
         {/* <View
           style={{

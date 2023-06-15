@@ -82,15 +82,16 @@ const TopUp = ({navigation: {goBack, navigate}}) => {
               color: '#FFFFFF',
               fontSize: 16,
             }}
-            listItemLabelStyle={{
-              fontWeight: '700',
-              color: '#FFFFFF',
-              fontSize: 16,
-            }}
             listItemContainer={{
               height: 40,
               backgroundColor: '#7c7c7c',
               color: '#FFFFFF',
+            }}
+            listItemLabelStyle={{
+              backgroundColor: '#7c7c7c',
+              color: '#FFFFFF',
+              fontSize: 16,
+              fontWeight: '700',
             }}
             selectedItemLabelStyle={{
               fontWeight: '700',

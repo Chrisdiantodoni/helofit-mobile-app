@@ -393,7 +393,11 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
           {data?.room_detail?.slice(0, 4).map(item => {
             return (
               <Image
-                source={require('../src/Avatar.png')}
+                source={{
+                  uri: item.user?.profile_img
+                    ? item.user?.profile_img
+                    : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                }}
                 style={{
                   width: 32,
                   height: 32,
@@ -667,8 +671,17 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                               alignItems: 'center',
                             }}>
                             <Image
-                              source={require('../src/Avatar.png')}
-                              style={{width: 32, height: 32, marginRight: 16}}
+                              source={{
+                                uri: item.user?.profile_img
+                                  ? item.user?.profile_img
+                                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                              }}
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 32 / 2,
+                                marginRight: 16,
+                              }}
                             />
                             <Text style={styles.heading14}>
                               {item?.user?.username}

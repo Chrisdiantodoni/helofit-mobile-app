@@ -5,7 +5,12 @@ function Onboardingitem({item}) {
   const {width} = useWindowDimensions();
   return (
     <View style={(styles.container, {width})}>
-      <Image source={item.image} style={styles.image} />
+      <Image
+        source={{
+          uri: item['promo_img'] ? item['promo_img'] : item['banner_img'],
+        }}
+        style={styles.image}
+      />
     </View>
   );
 }

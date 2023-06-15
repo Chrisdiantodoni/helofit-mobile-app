@@ -1,30 +1,10 @@
 import React, {Component, useState, useRef} from 'react';
 import {View, Text, StyleSheet, FlatList, Animated} from 'react-native';
-
 import slides from '../slides';
 import Onboardingitem from './Onboardingitem';
 import Paginator from './Paginator';
 
-const dataSlide = [
-  {
-    id: 1,
-    image: require('../src/BannerPromo.png'),
-  },
-  {
-    id: 2,
-    image: require('../src/BannerPromo.png'),
-  },
-  {
-    id: 3,
-    image: require('../src/BannerPromo.png'),
-  },
-  {
-    id: 4,
-    image: require('../src/BannerPromo.png'),
-  },
-];
-
-export default Onboarding = ({data = dataSlide}) => {
+export default Onboarding = ({data}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const viewableItemsChanged = useRef(({viewableItems}) => {
@@ -51,7 +31,7 @@ export default Onboarding = ({data = dataSlide}) => {
         )}
         onViewableItemsChanged={viewableItemsChanged}
       />
-      <Paginator data={slides} scrollX={scrollX} />
+      <Paginator data={data} scrollX={scrollX} />
     </View>
   );
 };

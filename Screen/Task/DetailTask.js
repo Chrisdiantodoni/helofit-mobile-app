@@ -107,7 +107,7 @@ const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
                     fontSize: 24,
                     fontWeight: '700',
                   }}>
-                  {currency(data?.currentPoin)}
+                  {currency(data?.task?.poin)}
                 </Text>
               </View>
               <View>

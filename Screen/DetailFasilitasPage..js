@@ -91,9 +91,16 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
   return (
     <ScrollView style={styles.container}>
       <HeaderDetailFacility goBack={goBack} data={data} getHarga={getHarga()} />
+      {console.log(data?.img_merchant)}
       {/* carousel=================== */}
       <View style={{height: 220}}>
-        <Onboarding />
+        <Image
+          source={{
+            uri: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
+          }}
+          style={{width: '95%', height: 200}}
+        />
+        {/* <Onboarding data={data} /> */}
       </View>
       {/* <View style={[styles.subContainer3, {marginHorizontal: 0}]}>
       </View> */}
