@@ -41,8 +41,8 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
       const response = await Axios.get(`/user/${userId}`);
       console.log(response);
       const data = response?.data;
-      if (data?.message === 'OK') {
-        setDataUser(data?.data);
+      if (response?.data?.message === 'OK') {
+        setDataUser(data?.data?.user_info);
         console.log('dataUser', data?.data);
       }
     } catch (error) {
@@ -90,9 +90,17 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
       poin: poin,
       merchantId,
     };
-    await Axios.post('/promo', body)
-      .then(res => console.log(res))
-      .catch(error => console.log(error));
+    try {
+      await Axios.post('/promo', body)
+        .then(res => {
+          console.log(res);
+          alert('Sukses Apply Promo');
+        })
+        .catch(error => console.log(error));
+    } catch (error) {
+      console.log(error);
+    }
+
     console.log({body});
   };
 

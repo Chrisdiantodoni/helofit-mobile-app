@@ -47,14 +47,14 @@ const ProfilSaya = ({navigation}) => {
       console.log(response);
       const data = response?.data;
       if (data?.message === 'OK') {
-        setDataUser(data?.data);
-        console.log('dataUser', data?.data);
-        setUsername(data?.data?.username);
-        setPhoto(data?.data?.profile_img);
-        setGender(data?.data?.gender);
-        setPhoneNumber(data?.data?.phone_number);
-        setAge(data?.data?.age);
-        setBio(data?.data?.bio);
+        setDataUser(data?.data?.user_info);
+        console.log('dataUser', data?.data?.user_info);
+        setUsername(data?.data?.user_info?.username);
+        setPhoto(data?.data?.user_info?.profile_img);
+        setGender(data?.data?.user_info?.gender);
+        setPhoneNumber(data?.data?.user_info?.phone_number);
+        setAge(data?.data?.user_info?.age);
+        setBio(data?.data?.user_info?.bio);
       }
     } catch (error) {
       console.log(error);

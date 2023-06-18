@@ -93,61 +93,63 @@ const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
           tempat dan waktu
         </Text>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          {dataReserve.map((item, idx) => (
-            <View style={styles.card}>
-              <View style={styles.inCard}>
-                <Ionicon
-                  style={{
-                    color: '#FFFFFF',
-                    fontSize: 20,
-                    paddingHorizontal: 10,
-                  }}
-                  name="location-outline"
-                />
-                <View>
+          {dataReserve
+            .filter(filter => filter.type === 'reserve')
+            .map((item, idx) => (
+              <View key={idx} style={styles.card}>
+                <View style={styles.inCard}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="location-outline"
+                  />
+                  <View>
+                    <Text style={styles.Heading28}>
+                      {item?.facility?.merchant?.address}
+                    </Text>
+                    <Text style={styles.heading14}>
+                      {item.facility?.facility_name}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.inCard}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="time-outline"
+                  />
                   <Text style={styles.Heading28}>
-                    {item?.facility?.merchant?.address}
-                  </Text>
-                  <Text style={styles.heading14}>
-                    {item.facility?.facility_name}
+                    {moment(item.booking_date).format('ddd, DD MMM')}{' '}
+                    {JSON.parse(item.time)[0]} -{' '}
+                    {JSON.parse(item.time)[JSON.parse(item.time).length - 1]}
                   </Text>
                 </View>
+                <View style={styles.inCard}>
+                  <Ionicon
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      paddingHorizontal: 10,
+                    }}
+                    name="pricetag-outline"
+                  />
+                  <Text style={[styles.Heading28, {color: '#C4F601'}]}>
+                    Rp.{currency(item.total)}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleCancelReserve(item.userId, item.id)}>
+                  <Text style={styles.Heading28}>Batalkan Reservasi</Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles.inCard}>
-                <Ionicon
-                  style={{
-                    color: '#FFFFFF',
-                    fontSize: 20,
-                    paddingHorizontal: 10,
-                  }}
-                  name="time-outline"
-                />
-                <Text style={styles.Heading28}>
-                  {moment(item.booking_date).format('ddd, DD MMM')}{' '}
-                  {JSON.parse(item.time)[0]} -{' '}
-                  {JSON.parse(item.time)[JSON.parse(item.time).length - 1]}
-                </Text>
-              </View>
-              <View style={styles.inCard}>
-                <Ionicon
-                  style={{
-                    color: '#FFFFFF',
-                    fontSize: 20,
-                    paddingHorizontal: 10,
-                  }}
-                  name="pricetag-outline"
-                />
-                <Text style={[styles.Heading28, {color: '#C4F601'}]}>
-                  Rp.{currency(item.total)}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleCancelReserve(item.userId, item.id)}>
-                <Text style={styles.Heading28}>Batalkan Reservasi</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+            ))}
         </View>
       </View>
     </ScrollView>

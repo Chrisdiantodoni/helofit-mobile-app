@@ -105,120 +105,124 @@ function Meetup({navigation: {navigate, goBack}}) {
           Temukan orang yang sehobi dengan kamu dan buat jaringan komunitas
           lebih luas
         </Text>
-        {room.map((item, index) => (
-          <TouchableOpacity
-            style={styles.View}
-            onPress={() => navigate('DetailMeetupPage', {id: item.id})}>
-            <Image
-              source={{
-                uri: item?.facility?.banner_img
-                  ? item?.facility?.banner_img
-                  : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-              }}
-              style={{
-                width: '100%',
-                height: 148,
-                borderRadius: 10,
-              }}
-            />
-            <View
-              style={{
-                alignItems: 'center',
-                position: 'absolute',
-                top: 110,
-                left: 290,
-                right: 0,
-                bottom: 0,
-                justifyContent: 'center',
-                backgroundColor: '#C4F601',
-                width: 55,
-                height: 24,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-              }}>
-              <Ionicon
-                name="people-outline"
-                size={15}
+        {room
+          .filter(
+            filter => moment(filter.room_expired) >= moment().startOf('day'),
+          )
+          .map((item, index) => (
+            <TouchableOpacity
+              style={styles.View}
+              onPress={() => navigate('DetailMeetupPage', {id: item.id})}>
+              <Image
+                source={{
+                  uri: item?.facility?.banner_img
+                    ? item?.facility?.banner_img
+                    : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                }}
                 style={{
-                  fontWeight: 'bold',
-                  color: '#000000',
-                  paddingRight: 2,
+                  width: '100%',
+                  height: 148,
+                  borderRadius: 10,
                 }}
               />
-              <Text
+              <View
                 style={{
-                  fontSize: 12,
-                  color: '#000000',
-                  fontWeight: '400',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  top: 110,
+                  left: 290,
+                  right: 0,
+                  bottom: 0,
+                  justifyContent: 'center',
+                  backgroundColor: '#C4F601',
+                  width: 55,
+                  height: 24,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 8,
                 }}>
-                {item.room_detail?.length} / {item.max_capacity}
-              </Text>
-            </View>
-            <Text
-              style={{
-                fontSize: 16,
-                marginLeft: 15,
-                marginTop: 8,
-                color: '#C4F601',
-                fontWeight: '700',
-                fontFamily: 'OpenSans',
-                marginBottom: 8,
-              }}>
-              {item.room_name}
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                marginLeft: 20,
-                marginVertical: 8,
-                alignItems: 'center',
-              }}>
-              <Ionicon
-                name="location-outline"
-                size={18}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
-              />
+                <Ionicon
+                  name="people-outline"
+                  size={15}
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#000000',
+                    paddingRight: 2,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: '#000000',
+                    fontWeight: '400',
+                  }}>
+                  {item.room_detail?.length} / {item.max_capacity}
+                </Text>
+              </View>
               <Text
                 style={{
-                  marginLeft: 10,
-                  fontSize: 12,
-                  color: '#ffffff',
+                  fontSize: 16,
+                  marginLeft: 15,
+                  marginTop: 8,
+                  color: '#C4F601',
+                  fontWeight: '700',
                   fontFamily: 'OpenSans',
+                  marginBottom: 8,
                 }}>
-                {item.facility?.merchant?.address || '-'}
+                {item.room_name}
               </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                marginLeft: 20,
-                alignItems: 'center',
-                marginBottom: 10,
-              }}>
-              <Ionicon
-                name="time-outline"
-                size={18}
-                style={{fontWeight: 'bold', color: '#ffffff'}}
-              />
-              <Text
+              <View
                 style={{
-                  marginLeft: 10,
-                  fontSize: 12,
-                  fontFamily: 'OpenSans',
-                  color: '#ffffff',
+                  flexDirection: 'row',
+                  marginLeft: 20,
+                  marginVertical: 8,
+                  alignItems: 'center',
                 }}>
-                {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
-                {item.booking?.time
-                  ? `${JSON.parse(item.booking?.time)[0]} - ${
-                      JSON.parse(item.booking?.time)[1]
-                    }`
-                  : ''}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+                <Ionicon
+                  name="location-outline"
+                  size={18}
+                  style={{fontWeight: 'bold', color: '#ffffff'}}
+                />
+                <Text
+                  style={{
+                    marginLeft: 10,
+                    fontSize: 12,
+                    color: '#ffffff',
+                    fontFamily: 'OpenSans',
+                  }}>
+                  {item.facility?.merchant?.address || '-'}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 20,
+                  alignItems: 'center',
+                  marginBottom: 10,
+                }}>
+                <Ionicon
+                  name="time-outline"
+                  size={18}
+                  style={{fontWeight: 'bold', color: '#ffffff'}}
+                />
+                <Text
+                  style={{
+                    marginLeft: 10,
+                    fontSize: 12,
+                    fontFamily: 'OpenSans',
+                    color: '#ffffff',
+                  }}>
+                  {moment(item.booking?.booking_date).format('ddd, D MMM')}{' '}
+                  {item.booking?.time
+                    ? `${JSON.parse(item.booking?.time)[0]} - ${
+                        JSON.parse(item.booking?.time)[1]
+                      }`
+                    : ''}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
       </View>
     </ScrollView>
   );

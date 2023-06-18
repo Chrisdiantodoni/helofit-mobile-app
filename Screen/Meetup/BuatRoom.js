@@ -57,14 +57,15 @@ const BuatRoom = ({route, navigation}) => {
         console.log({err});
       });
   };
+
   const getUser = async userId => {
     console.log(userId);
     try {
       const response = await Axios.get(`/user/${userId}`);
       console.log(response);
       const data = response?.data;
-      if (data?.message === 'OK') {
-        setDataUser(data?.data);
+      if (response?.data?.message === 'OK') {
+        setDataUser(data?.data?.user_info);
         console.log('dataUser', data?.data);
       }
     } catch (error) {

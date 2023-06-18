@@ -28,12 +28,13 @@ function HomeScreen({navigation}) {
   const [dataTask, setDataTask] = useState([]);
   const [facility, setFacility] = useState([]);
   const [promo, setPromo] = useState([]);
-
+  const [dataNotif, setDataNotif] = useState([]);
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser').then(res => {
       const userId = JSON.parse(res)?.id;
       console.log(userId);
       getUser(userId);
+      getNotification(userId);
     });
   };
 
@@ -54,8 +55,8 @@ function HomeScreen({navigation}) {
       const response = await Axios.get(`/user/${userId}`);
       console.log(response);
       const data = response?.data;
-      if (data?.message === 'OK') {
-        setDataUser(data?.data);
+      if (response?.data?.message === 'OK') {
+        setDataUser(data?.data?.user_info);
         console.log('dataUser', data?.data);
       }
     } catch (error) {
@@ -134,9 +135,9 @@ function HomeScreen({navigation}) {
   const displayImages = item => {
     switch (item?.category_name?.toLowerCase()) {
       case 'badminton':
-        return require('./src/Badminton1.png');
+        return require('./src/LogoSVG/Shuttlecock.svg');
       case 'futsal':
-        return require('./src/Football.png');
+        return require('./src/LogoSVG/Football.svg');
       case 'basket':
         return require('./src/Basketball.png');
       case 'yoga':
@@ -154,6 +155,26 @@ function HomeScreen({navigation}) {
       default:
         return null;
         break;
+    }
+  };
+
+  const getNotification = async userId => {
+    if (!userId) {
+      showMessage({
+        message: 'Tidak ada Notifikasi',
+        type: 'danger',
+      });
+    } else {
+      await Axios.get(`/notification/${userId}`)
+        .then(response => {
+          if (response.data?.message === 'OK') {
+            console.log('data notif', response?.data?.data);
+            setDataNotif(response?.data?.data);
+          }
+        })
+        .catch(err => {
+          console.log({err});
+        });
     }
   };
 
@@ -177,6 +198,25 @@ function HomeScreen({navigation}) {
         <View style={{flexDirection: 'row'}}>
           <View style={{width: '25%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
+              {dataNotif.length !== 0 ? (
+                <View style={{position: 'absolute'}}>
+                  <View
+                    style={{
+                      backgroundColor: 'red',
+                      borderRadius: 10,
+                      position: 'absolute',
+                      top: -5,
+                      right: -37,
+                      paddingHorizontal: 5,
+                      zIndex: 1,
+                    }}>
+                    <Text style={{color: 'white', fontSize: 12}}>
+                      {dataNotif.length}
+                    </Text>
+                  </View>
+                </View>
+              ) : null}
+
               <Icon
                 style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
                 name="bell"
@@ -203,7 +243,7 @@ function HomeScreen({navigation}) {
         style={{
           position: 'absolute',
           top: 0,
-          bottom: 1120,
+          bottom: '70%',
           justifyContent: 'center',
           marginLeft: 32,
           width: '40%',

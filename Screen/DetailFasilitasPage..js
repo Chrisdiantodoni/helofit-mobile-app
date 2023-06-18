@@ -19,17 +19,6 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
     kategori: 'badminton',
   });
 
-  const arrayFacility = [
-    {
-      id: 1,
-      kategori: 'badminton',
-    },
-    {
-      id: 2,
-      kategori: 'Futsal',
-    },
-  ];
-
   const getDetailMerchant = async () => {
     try {
       const response = await Axios.get(`/merchant/${id}`);
@@ -96,7 +85,9 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
       <View style={{height: 220}}>
         <Image
           source={{
-            uri: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
+            uri: data?.img_merchant
+              ? data?.img_merchant
+              : 'https://img.freepik.com/free-photo/sports-tools_53876-138077.jpg?w=2000',
           }}
           style={{width: '95%', height: 200}}
         />

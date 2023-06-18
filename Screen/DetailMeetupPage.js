@@ -35,14 +35,15 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
       getUser(userId);
     });
   };
+
   const getUser = async userId => {
     console.log(userId);
     try {
       const response = await Axios.get(`/user/${userId}`);
       console.log(response);
       const data = response?.data;
-      if (data?.message === 'OK') {
-        setDataUser(data?.data);
+      if (response?.data?.message === 'OK') {
+        setDataUser(data?.data?.user_info);
         console.log('dataUser', data?.data);
       }
     } catch (error) {
@@ -173,6 +174,63 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
     navigate('Tabs');
   };
 
+  const validatingBalance = () => {
+    const validate =
+      priceperPerson(data?.booking?.total, data?.max_capacity) *
+        parseInt(totalPlayer) >
+      parseInt(dataUser?.balance);
+    return validate;
+  };
+
+  const TimePlay = () => {
+    const bookingTime = data?.booking?.time;
+
+    let displayTime = '';
+
+    if (bookingTime) {
+      try {
+        const parsedTime = JSON.parse(bookingTime);
+
+        if (Array.isArray(parsedTime) && parsedTime.length === 1) {
+          const time = parsedTime[0];
+          const [startHour, startMinute] = time.split(':');
+
+          if (startHour && startMinute) {
+            displayTime = `${startHour.padStart(2, '0')}:${startMinute.padStart(
+              2,
+              '0',
+            )} - ${startHour.padStart(2, '0')}:59`;
+          }
+        } else if (Array.isArray(parsedTime) && parsedTime.length === 2) {
+          const startTime = parsedTime[0];
+          const endTime = parsedTime[1];
+
+          displayTime = `${startTime} - ${endTime}`;
+        }
+      } catch (error) {
+        console.log('Invalid booking time format');
+      }
+    }
+
+    console.log(displayTime);
+    return displayTime;
+  };
+
+  const displayGender = () => {
+    if (data && typeof data.gender === 'string') {
+      const parsedGender = JSON.parse(data.gender);
+      if (parsedGender[0] === 'male') {
+        return 'Laki - Laki';
+      } else if (parsedGender[0] === 'female') {
+        return 'Perempuan';
+      } else {
+        return 'Laki - Laki & Perempuan';
+      }
+    } else {
+      console.log('Invalid data');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View>
@@ -243,11 +301,13 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                 |
               </Text>
               <Text style={[styles.heading14, {fontWeight: '400'}]}>
-                {data?.gender === 'male'
-                  ? 'Laki - Laki'
-                    ? data?.gender === 'female'
-                    : 'Perempuan'
-                  : 'Laki - Laki & Perempuan'}
+                {data?.gender
+                  ? JSON.parse(data?.gender)[0] == 'male'
+                    ? 'Laki- Laki'
+                    : JSON.parse(data?.gender)[1] == 'female'
+                    ? 'Perempuan'
+                    : 'Laki - Laki & Perempuan'
+                  : data?.gender}
               </Text>
               <Text
                 style={[
@@ -356,13 +416,7 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             <View>
               <Text style={styles.heading14}>
                 {moment(data?.booking?.booking_date).format('ddd, D MMM')}{' '}
-                {data?.booking?.time
-                  ? `${JSON.parse(data?.booking?.time)[0]} - ${
-                      JSON.parse(data?.booking?.time)[1] === undefined
-                        ? JSON.parse(data?.booking?.time)[0]
-                        : '-'
-                    }`
-                  : ''}
+                {TimePlay()}
               </Text>
             </View>
           </View>
@@ -600,7 +654,6 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
               width: '100%',
               justifyContent: 'center',
               alignItems: 'center',
-              flexDirection: 'row',
             }}>
             <TouchableOpacity
               style={{
@@ -612,6 +665,13 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
+              disabled={
+                priceperPerson(data?.booking?.total, data?.max_capacity) *
+                  parseInt(totalPlayer) >
+                parseInt(dataUser?.balance)
+                  ? true
+                  : false
+              }
               onPress={() => handleShowJoinModal()}>
               <Text
                 style={[
@@ -621,6 +681,16 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                 Join Meetup
               </Text>
             </TouchableOpacity>
+            {console.log(validatingBalance())}
+            {validatingBalance() ? (
+              <Text
+                style={[
+                  styles.heading28,
+                  {color: '#F47878', fontSize: 14, fontWeight: '700'},
+                ]}>
+                Dompet anda tidak Cukup
+              </Text>
+            ) : null}
           </View>
         )}
         <Modal
