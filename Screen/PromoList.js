@@ -28,8 +28,8 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
     const response = await Axios.get(`/promo/ownPromo/${userId}`);
     try {
       if (response.data.message === 'OK') {
-        console.log('data', response);
         const data = response?.data?.data;
+        console.log(data);
         setPromo(data);
       }
     } catch (error) {
@@ -47,7 +47,7 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
   const handleShowModal = item => {
     setIsVisible(true);
     setPromoName(item.promo?.promo_name);
-    setModalBanner(item.promo?.promo_img);
+    setModalBanner(item?.promo_img);
     setPoin(item.promo?.point);
     setExpiredIn(item.ExpiredIn);
     setMerchantName(item?.promo?.merchant?.merchant_name);
@@ -106,7 +106,7 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
                 }}
                 onPress={() => handleShowModal(item)}>
                 <Image
-                  source={{uri: item.promo?.promo_img}}
+                  source={{uri: item?.promo_img}}
                   style={{
                     width: '95%',
                     height: 160,

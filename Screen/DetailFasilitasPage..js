@@ -46,7 +46,21 @@ const DetailFasilitasPage = ({route, navigation: {navigate, goBack}}) => {
       ),
     ];
 
-    return newCat;
+    const uniqueCat = [];
+
+    for (let i = 0; i < newCat.length; i++) {
+      const currentItem = newCat[i];
+      const isDuplicate = uniqueCat.some(
+        item =>
+          item.id === currentItem.id || item.kategori === currentItem.kategori,
+      );
+
+      if (!isDuplicate) {
+        uniqueCat.push(currentItem);
+      }
+    }
+
+    return uniqueCat;
   };
 
   useEffect(() => {

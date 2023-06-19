@@ -48,7 +48,7 @@ const DetailTask = ({navigation: {goBack, navigate, addListener}, route}) => {
   return (
     <ScrollView style={styles.container}>
       <Image
-        source={{uri: data?.task?.banner_img}}
+        source={{uri: data?.banner_img}}
         style={{width: '100%', height: 188}}
       />
       <TouchableOpacity onPress={() => goBack()}>

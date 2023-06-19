@@ -135,23 +135,23 @@ function HomeScreen({navigation}) {
   const displayImages = item => {
     switch (item?.category_name?.toLowerCase()) {
       case 'badminton':
-        return require('./src/LogoSVG/Shuttlecock.svg');
+        return require('./src/icon/Badminton.png');
       case 'futsal':
-        return require('./src/LogoSVG/Football.svg');
+        return require('./src/icon/Futsal.png');
       case 'basket':
-        return require('./src/Basketball.png');
+        return require('./src/icon/Basketball.png');
       case 'yoga':
-        return require('./src/Yoga.png');
+        return require('./src/icon/Yoga.png');
       case 'tennis':
-        return require('./src/Tennis.png');
+        return require('./src/icon/Tennis.png');
       case 'boxing':
-        return require('./src/Boxing.png');
+        return require('./src/icon/Boxing.png');
       case 'fitness':
-        return require('./src/Gymming.png');
+        return require('./src/icon/Fitness.png');
       case 'golf':
-        return require('./src/Hockey.png');
+        return require('./src/icon/Golf.png');
       case 'bowling':
-        return require('./src/Bowling.png');
+        return require('./src/icon/Bowling.png');
       default:
         return null;
         break;
@@ -206,7 +206,7 @@ function HomeScreen({navigation}) {
                       borderRadius: 10,
                       position: 'absolute',
                       top: -5,
-                      right: -37,
+                      right: -40,
                       paddingHorizontal: 5,
                       zIndex: 1,
                     }}>
@@ -243,7 +243,7 @@ function HomeScreen({navigation}) {
         style={{
           position: 'absolute',
           top: 0,
-          bottom: '70%',
+          bottom: '75%',
           justifyContent: 'center',
           marginLeft: 32,
           width: '40%',
@@ -608,45 +608,47 @@ function HomeScreen({navigation}) {
                     </View>
                   </View>
                   <View style={{flexDirection: 'row'}}>
-                    {item?.list_task?.map((itemTask, idxTask) => (
-                      <View
-                        key={idxTask}
-                        style={{
-                          backgroundColor: '#C4F601',
-                          borderRadius: 8,
-                          paddingHorizontal: 10,
-                          height: 24,
-                          justifyContent: 'center',
-                          marginTop: 8,
-                          marginHorizontal: 8,
-                          alignItems: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            fontWeight: '400',
-                            color: '#000000',
-                          }}>
-                          {idxTask + 1}. {itemTask?.task_name}
-                        </Text>
-                      </View>
-                    ))}
-                    {/* <View
-                          style={{
-                            backgroundColor: '#C4F601',
-                            borderRadius: 8,
-                            height: 24,
-                            justifyContent: 'center',
-                            marginTop: 8,
-                            paddingHorizontal: 10,
-                            marginHorizontal: 8,
-                            alignItems: 'center',
-                          }}>
-                          <Text
-                            style={{fontSize: 12, fontWeight: '400', color: '#000000'}}>
-                            2. Barbel 15 kg
-                          </Text>
-                        </View> */}
+                    {item?.list_task
+                      ? item?.list_task
+                          ?.slice(0, 2)
+                          .map((itemTask, idxTask) => (
+                            <View
+                              key={idxTask}
+                              style={{
+                                backgroundColor: '#C4F601',
+                                borderRadius: 8,
+                                paddingHorizontal: 10,
+                                height: 24,
+                                justifyContent: 'center',
+                                marginTop: 8,
+                                marginHorizontal: 8,
+                                alignItems: 'center',
+                              }}>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: '400',
+                                  color: '#000000',
+                                }}>
+                                {idxTask + 1}. {itemTask?.task_name}
+                              </Text>
+                            </View>
+                          ))
+                      : null}
+
+                    <View
+                      style={{
+                        backgroundColor: '#C4F601',
+                        borderRadius: 8,
+                        height: 24,
+                        justifyContent: 'center',
+                        marginTop: 8,
+                        paddingHorizontal: 10,
+                        marginHorizontal: 8,
+                        alignItems: 'center',
+                      }}>
+                      <Text style={{fontSize: 12, fontWeight: '400'}}>...</Text>
+                    </View>
                   </View>
                 </TouchableOpacity>
               ))}
