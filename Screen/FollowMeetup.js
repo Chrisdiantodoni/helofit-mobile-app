@@ -86,9 +86,7 @@ const FollowMeetup = ({navigation: {goBack, navigate}}) => {
                   }>
                   <Image
                     source={{
-                      uri:
-                        item.facility?.banner_img ||
-                        require('../src/Badminton.png'),
+                      uri: item.banner_img || require('../src/Badminton.png'),
                     }}
                     style={{
                       width: '100%',

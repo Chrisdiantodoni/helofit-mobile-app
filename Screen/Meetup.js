@@ -111,6 +111,7 @@ function Meetup({navigation: {navigate, goBack}}) {
           )
           .map((item, index) => (
             <TouchableOpacity
+              key={index}
               style={styles.View}
               onPress={() => navigate('DetailMeetupPage', {id: item.id})}>
               <Image

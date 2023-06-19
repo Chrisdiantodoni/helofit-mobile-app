@@ -448,8 +448,8 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
             return (
               <Image
                 source={{
-                  uri: item.user?.profile_img
-                    ? item.user?.profile_img
+                  uri: item.profile_img
+                    ? item.profile_img
                     : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
                 }}
                 style={{
@@ -742,8 +742,8 @@ const DetailMeetupPage = ({route, navigation: {navigate, goBack}}) => {
                             }}>
                             <Image
                               source={{
-                                uri: item.user?.profile_img
-                                  ? item.user?.profile_img
+                                uri: item?.profile_img
+                                  ? item?.profile_img
                                   : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
                               }}
                               style={{

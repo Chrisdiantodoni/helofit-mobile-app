@@ -714,7 +714,7 @@ function HomeScreen({navigation}) {
               right: 30,
             }}>
             {facility.map((item, index) => (
-              <View style={Styles.View2}>
+              <View style={Styles.View2} key={index}>
                 <Image
                   source={displayImages(item.category)}
                   style={{

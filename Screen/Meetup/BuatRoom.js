@@ -152,6 +152,7 @@ const BuatRoom = ({route, navigation}) => {
       price: data?.price,
       booking_date: moment(isSelected).format('YYYY-MM-DD'),
       userId: dataUser?.id,
+      type: 'reserve',
       time: JSON.stringify(selectedBooking.map(item => item.time)),
       payment: type_create_room !== 'room' ? true : false,
     };

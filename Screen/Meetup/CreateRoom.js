@@ -103,6 +103,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
         booking_date: moment(selectedDate).format('YYYY-MM-DD'),
         userId: dataUser?.id,
         time: JSON.stringify(listTime.map(item => item.time)),
+        type: 'meetup',
       };
       const max = Math.max(
         ...listTime
