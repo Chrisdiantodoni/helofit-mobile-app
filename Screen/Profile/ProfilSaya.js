@@ -99,7 +99,6 @@ const ProfilSaya = ({navigation}) => {
     formData.append('age', age);
     formData.append('phone_number', phoneNumber);
     formData.append('bio', bio);
-
     if (photo) {
       const uriParts = photo.split('.');
       const fileType = uriParts[uriParts.length - 1];

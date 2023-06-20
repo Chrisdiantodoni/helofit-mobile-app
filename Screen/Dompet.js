@@ -1,11 +1,20 @@
 import React, {Component, useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {currency, Axios} from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 
 const Dompet = ({navigation: {goBack, navigate, addListener}}) => {
   const [dataUser, setDataUser] = useState({});
+  const [dataHistory, setDataHistory] = useState([]);
 
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser')
@@ -13,6 +22,7 @@ const Dompet = ({navigation: {goBack, navigate, addListener}}) => {
         const userId = JSON.parse(res)?.id;
         console.log(userId);
         getUser(userId);
+        getHistory(userId);
       })
       .catch(err => {
         console.log(err);
@@ -35,6 +45,20 @@ const Dompet = ({navigation: {goBack, navigate, addListener}}) => {
       if (response?.data?.message === 'OK') {
         setDataUser(data?.data?.user_info);
         console.log('dataUser', data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getHistory = async userId => {
+    try {
+      const response = await Axios.get(`/history/${userId}`);
+      console.log(response);
+      const data = response?.data;
+      if (response?.data?.message === 'OK') {
+        setDataHistory(data?.data);
+        console.log('dataDompet', data?.data);
       }
     } catch (error) {
       console.log(error);
@@ -130,68 +154,55 @@ const Dompet = ({navigation: {goBack, navigate, addListener}}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{marginTop: 8}}>
-        <View
-          style={{
-            backgroundColor: '#000000',
-            marginBottom: 2,
-            paddingBottom: 27,
-            borderRadius: 16,
-          }}>
+      <ScrollView style={{marginTop: 8}}>
+        {dataHistory.map((item, index) => (
           <View
             style={{
-              flexDirection: 'row',
-              marginTop: 24,
+              backgroundColor: '#000000',
+              marginBottom: 2,
+              paddingBottom: 27,
+              borderRadius: 16,
             }}>
-            <View style={{width: '15%', alignItems: 'center'}}>
-              <Image
-                source={require('../src/Group.png')}
-                style={{width: 24, height: 24}}
-              />
-            </View>
-            <View style={{width: '65%'}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 24,
+              }}>
+              <View style={{width: '15%', alignItems: 'center'}}>
+                {item.type === 'meetup' ? (
+                  <Image
+                    source={require('../src/Group.png')}
+                    style={{width: 24, height: 24}}
+                  />
+                ) : item.type === 'reserve' ? (
+                  <Image
+                    source={require('../src/Fasilitas2.png')}
+                    style={{width: 24, height: 18, resizeMode: 'stretch'}}
+                  />
+                ) : (
+                  <Image
+                    source={require('../src/Dompet.png')}
+                    style={{width: 20, height: 17, resizeMode: 'stretch'}}
+                  />
+                )}
+              </View>
+              <View style={{width: '65%'}}>
+                <Text
+                  style={[styles.heading28, {color: '#FFFFFF', fontSize: 14}]}>
+                  {item.description}
+                </Text>
+                <Text style={styles.small12}>
+                  {moment(item.createdAt).format('DD MMM YYYY')}
+                </Text>
+              </View>
               <Text
                 style={[styles.heading28, {color: '#FFFFFF', fontSize: 14}]}>
-                Gak perlu jago yang perlu...
+                {currency(item.nominal)}
               </Text>
-              <Text style={styles.small12}>20 Jan, 04:48 AM</Text>
             </View>
-            <Text style={[styles.heading28, {color: '#FFFFFF', fontSize: 14}]}>
-              -20.000
-            </Text>
           </View>
-        </View>
-        <View
-          style={{
-            backgroundColor: '#000000',
-            marginBottom: 2,
-            paddingBottom: 27,
-            borderRadius: 16,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 24,
-            }}>
-            <View style={{width: '15%', alignItems: 'center'}}>
-              <Image
-                source={require('../src/Group.png')}
-                style={{width: 24, height: 24}}
-              />
-            </View>
-            <View style={{width: '65%'}}>
-              <Text
-                style={[styles.heading28, {color: '#FFFFFF', fontSize: 14}]}>
-                Gak perlu jago yang perlu...
-              </Text>
-              <Text style={styles.small12}>20 Jan, 04:48 AM</Text>
-            </View>
-            <Text style={[styles.heading28, {color: '#FFFFFF', fontSize: 14}]}>
-              -20.000
-            </Text>
-          </View>
-        </View>
-      </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
