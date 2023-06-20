@@ -47,7 +47,7 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
   const handleShowModal = item => {
     setIsVisible(true);
     setPromoName(item.promo?.promo_name);
-    setModalBanner(item?.promo_img);
+    setModalBanner(item?.promo.promo_img);
     setPoin(item.promo?.point);
     setExpiredIn(item.ExpiredIn);
     setMerchantName(item?.promo?.merchant?.merchant_name);
@@ -106,7 +106,7 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
                 }}
                 onPress={() => handleShowModal(item)}>
                 <Image
-                  source={{uri: item?.promo_img}}
+                  source={{uri: item?.promo?.promo_img}}
                   style={{
                     width: '95%',
                     height: 160,
