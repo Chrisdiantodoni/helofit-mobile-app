@@ -7,10 +7,12 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Axios} from '../../utils';
+import {RadioButton} from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker';
 import * as ImagePicker from 'react-native-image-picker';
 // create a component
@@ -25,7 +27,7 @@ const ProfilSaya = ({navigation}) => {
   const [bio, setBio] = useState('');
   const [imageBlob, setImageBlob] = useState(null);
   const [photo, setPhoto] = useState(null);
-
+  const [checked, setChecked] = useState('first');
   const dataUserAsync = async () => {
     try {
       const res = await AsyncStorage.getItem('dataUser');
@@ -153,134 +155,175 @@ const ProfilSaya = ({navigation}) => {
           Profil Saya
         </Text>
       </View>
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'row',
-        }}>
-        <TouchableOpacity disabled={!isEdit} onPress={handleChoosePhoto}>
-          <Image
-            source={{
-              uri: photo
-                ? photo
-                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-            }}
-            style={{
-              height: 72,
-              width: 72,
-              marginTop: 32,
-              borderRadius: 72 / 2,
-              resizeMode: 'cover',
-            }}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
+      <ScrollView style={{flex: 1}}>
+        <View
           style={{
-            position: 'absolute',
-            top: 32,
-            right: 16,
-            flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
-          }}
-          onPress={() => setIsEdit(isEdit => !isEdit)}>
-          <Image
-            source={require('../../src/Pencil.png')}
-            style={{width: 20, height: 20}}
-          />
-          <Text
-            style={[
-              styles.Heading28,
-              {paddingHorizontal: 0, color: '#C4F601', fontSize: 16},
-            ]}>
-            Ubah
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{paddingHorizontal: 23}}>
-        <Text style={[styles.heading14, {marginTop: 57, fontWeight: '400'}]}>
-          Username
-        </Text>
-        <TextInput
-          editable={isEdit}
-          value={username}
-          style={[
-            styles.Heading28,
-            {backgroundColor: isEdit ? '#161616' : '#000'},
-          ]}
-          onChangeText={text => setUsername(text)}
-        />
-        <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
-          Jenis Kelamin
-        </Text>
-        <TextInput
-          editable={isEdit}
-          value={gender}
-          style={[
-            styles.Heading28,
-            {backgroundColor: isEdit ? '#161616' : '#000'},
-          ]}
-          onChangeText={text => setGender(text)}
-        />
-        <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
-          Umur
-        </Text>
-        <TextInput
-          editable={isEdit}
-          value={age}
-          style={[
-            styles.Heading28,
-            {backgroundColor: isEdit ? '#161616' : '#000'},
-          ]}
-          onChangeText={setAge}
-        />
-        <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
-          Nomor Handphone
-        </Text>
-        <TextInput
-          editable={isEdit}
-          value={phoneNumber}
-          style={[
-            styles.Heading28,
-            {backgroundColor: isEdit ? '#161616' : '#000'},
-          ]}
-          onChangeText={text => setPhoneNumber(text)}
-        />
-        <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
-          Bio Singkat
-        </Text>
-        <TextInput
-          editable={isEdit}
-          value={bio}
-          style={[
-            styles.Heading28,
-            {backgroundColor: isEdit ? '#161616' : '#000'},
-          ]}
-          onChangeText={text => setBio(text)}
-        />
-        {isEdit && (
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity disabled={!isEdit} onPress={handleChoosePhoto}>
+            <Image
+              source={{
+                uri: photo
+                  ? photo
+                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+              }}
+              style={{
+                height: 72,
+                width: 72,
+                marginTop: 32,
+                borderRadius: 72 / 2,
+                resizeMode: 'cover',
+              }}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={{
-              width: '100%',
-              height: 38,
-              backgroundColor: '#C4F601',
-              borderRadius: 8,
+              position: 'absolute',
+              top: 32,
+              right: 16,
+              flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: 30,
             }}
-            onPress={() => handleEdit()}>
+            onPress={() => setIsEdit(isEdit => !isEdit)}>
+            <Image
+              source={require('../../src/Pencil.png')}
+              style={{width: 20, height: 20}}
+            />
             <Text
               style={[
-                styles.heading14,
-                {fontWeight: '700', fontSize: 14, color: '#000000'},
+                styles.Heading28,
+                {paddingHorizontal: 0, color: '#C4F601', fontSize: 16},
               ]}>
-              Simpan
+              Ubah
             </Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+        <View style={{paddingHorizontal: 23}}>
+          <Text style={[styles.heading14, {marginTop: 57, fontWeight: '400'}]}>
+            Username
+          </Text>
+          <TextInput
+            editable={isEdit}
+            value={username}
+            style={[
+              styles.Heading28,
+              {backgroundColor: isEdit ? '#161616' : '#000'},
+            ]}
+            onChangeText={text => setUsername(text)}
+          />
+          <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
+            Jenis Kelamin
+          </Text>
+          {!isEdit ? (
+            <TextInput
+              editable={isEdit}
+              value={
+                gender == 'male'
+                  ? 'Laki - Laki'
+                  : gender == 'female'
+                  ? 'Perempuan'
+                  : ''
+              }
+              style={[
+                styles.Heading28,
+                {backgroundColor: isEdit ? '#161616' : '#000'},
+              ]}
+              onChangeText={setAge}
+            />
+          ) : (
+            <RadioButton.Group
+              style={[
+                styles.Heading28,
+                {backgroundColor: isEdit ? '#161616' : '#000'},
+              ]}
+              onValueChange={newValue => setGender(newValue)}
+              value={gender}>
+              <RadioButton.Item
+                style={[
+                  styles.Heading28,
+                  {backgroundColor: isEdit ? '#161616' : '#000'},
+                ]}
+                value="male"
+                labelStyle={styles.Heading28}
+                label="Laki - Laki"
+                color="white"
+              />
+              <RadioButton.Item
+                style={[
+                  styles.Heading28,
+                  {backgroundColor: isEdit ? '#161616' : '#000'},
+                ]}
+                value="female"
+                labelStyle={styles.Heading28}
+                label="Perempuan"
+                color="white"
+              />
+            </RadioButton.Group>
+          )}
+
+          <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
+            Umur
+          </Text>
+          <TextInput
+            editable={isEdit}
+            value={age}
+            style={[
+              styles.Heading28,
+              {backgroundColor: isEdit ? '#161616' : '#000'},
+            ]}
+            onChangeText={setAge}
+          />
+          <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
+            Nomor Handphone
+          </Text>
+          <TextInput
+            editable={isEdit}
+            value={phoneNumber}
+            style={[
+              styles.Heading28,
+              {backgroundColor: isEdit ? '#161616' : '#000'},
+            ]}
+            onChangeText={text => setPhoneNumber(text)}
+          />
+          <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
+            Bio Singkat
+          </Text>
+          <TextInput
+            editable={isEdit}
+            value={bio}
+            style={[
+              styles.Heading28,
+              {backgroundColor: isEdit ? '#161616' : '#000'},
+            ]}
+            onChangeText={text => setBio(text)}
+          />
+          {isEdit && (
+            <TouchableOpacity
+              style={{
+                width: '100%',
+                height: 38,
+                backgroundColor: '#C4F601',
+                borderRadius: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 30,
+                marginBottom: 30,
+              }}
+              onPress={() => handleEdit()}>
+              <Text
+                style={[
+                  styles.heading14,
+                  {fontWeight: '700', fontSize: 14, color: '#000000'},
+                ]}>
+                Simpan
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 };

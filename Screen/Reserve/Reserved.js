@@ -16,7 +16,7 @@ import moment from 'moment';
 const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
   const [dataUser, setDataUser] = useState({});
   const [dataReserve, setReserveData] = useState([]);
-
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const dataUserAsync = async () => {
     await AsyncStorage.getItem('dataUser')
       .then(res => {
@@ -55,6 +55,14 @@ const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
   useEffect(() => {
     dataUserAsync();
   }, []);
+
+  const handleConfirmPayment = item => {
+    const body = {
+      item,
+    };
+
+    console.log({body});
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -143,6 +151,18 @@ const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
                     Rp.{currency(item.total)}
                   </Text>
                 </View>
+                {/* <TouchableOpacity
+                  onPress={() => handleConfirmPayment(item)}
+                  disabled={
+                    moment(item.updatedAt) >= moment().startOf('second')
+                      ? true
+                      : false
+                  }
+                  style={[styles.button, {borderColor: '#C4F601'}]}>
+                  <Text style={[styles.Heading28, {color: '#C4F601'}]}>
+                    Pasti Main
+                  </Text>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => handleCancelReserve(item.userId, item.id)}>

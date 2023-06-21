@@ -211,7 +211,15 @@ function HomeScreen({navigation}) {
                       zIndex: 1,
                     }}>
                     <Text style={{color: 'white', fontSize: 12}}>
-                      {dataNotif.length}
+                      {dataNotif.filter(
+                        item => item?.list_user?.userId === dataUser?.id,
+                      ).length === 0
+                        ? dataNotif.filter(
+                            item =>
+                              item?.status_notif === 'request' &&
+                              item?.list_user?.status === 'request',
+                          ).length
+                        : 0}
                     </Text>
                   </View>
                 </View>

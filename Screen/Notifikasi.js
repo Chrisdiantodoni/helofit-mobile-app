@@ -200,7 +200,7 @@ const ApproveRequest = ({item}) => {
         }}>
         <View style={{width: '20%'}}>
           <Image
-            source={require('../src/Doni.png')}
+            source={{uri: item?.room?.user?.profile_img}}
             style={{width: 48, height: 48}}
           />
         </View>

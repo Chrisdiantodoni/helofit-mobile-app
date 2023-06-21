@@ -117,7 +117,11 @@ function Profile({
             </TouchableOpacity>
           </View>
           <Text style={styles.heading14}>
-            {dataUser?.gender ? dataUser.gender : '-'}
+            {dataUser?.gender === 'male'
+              ? 'Laki - Laki'
+              : dataUser?.gender === 'female'
+              ? 'Perempuan'
+              : '-'}
           </Text>
           <Text style={[styles.heading14, {fontSize: 14}]}>
             {dataUser?.phone_number}
