@@ -100,10 +100,20 @@ const DetailEachTask = ({navigation: {goBack, navigate}, route}) => {
               alignItems: 'center',
               marginTop: 11,
             }}>
-            <View style={{width: '105%', flexDirection: 'row'}}>
+            <View
+              style={{
+                width: '105%',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
               <Image
-                source={require('../../src/Fitness-Icon.png')}
-                style={{height: 24, width: 24, marginRight: 8}}
+                source={require('../../src/Merchant.png')}
+                style={{
+                  width: 24,
+                  height: 24,
+                  marginRight: 11,
+                  resizeMode: 'stretch',
+                }}
               />
               <Text style={styles.heading14}>
                 {data?.task_info?.merchant?.merchant_name}

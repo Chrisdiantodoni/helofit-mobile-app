@@ -298,8 +298,13 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
               marginTop: 24,
             }}>
             <Image
-              source={require('../src/Basketball1.png')}
-              style={{width: 20, height: 20, marginRight: 11}}
+              source={require('../src/Merchant.png')}
+              style={{
+                width: 20,
+                height: 20,
+                marginRight: 11,
+                resizeMode: 'stretch',
+              }}
             />
             <Text
               style={[
@@ -333,11 +338,21 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
                 fontSize: 16,
                 alignSelf: 'center',
               }}>
-              {parseInt(poin) > parseInt(dataUser?.point)
-                ? 'Poin anda belum mencukupi..'
-                : 'Tukarkan Poin'}
+              Tukarkan Poin
             </Text>
           </TouchableOpacity>
+          {parseInt(poin) > parseInt(dataUser?.point) ? (
+            <Text
+              style={{
+                color: '#DC3545',
+                fontWeight: '700',
+                fontSize: 16,
+                alignSelf: 'center',
+                marginTop: 10,
+              }}>
+              Poin anda tidak cukup
+            </Text>
+          ) : null}
         </View>
       </Modal>
     </ScrollView>

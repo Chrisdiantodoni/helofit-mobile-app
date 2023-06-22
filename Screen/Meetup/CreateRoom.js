@@ -194,6 +194,18 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
     });
   };
 
+  const handleMinimumAge = text => {
+    const age = text.replace(/[^0-9]/g, '');
+
+    if (age !== '') {
+      const numericAge = parseInt(age);
+      if (numericAge < 0 || numericAge > 99) {
+        return;
+      }
+    }
+    setToAge(age);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View
@@ -334,6 +346,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
               <TextInput
                 style={[styles.TextInput, {marginTop: 0}]}
                 value={fromAge}
+                maxLength={2}
                 onChangeText={e => setFromAge(e)}
                 keyboardType="number-pad"
               />
@@ -364,8 +377,9 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
               <TextInput
                 style={[styles.TextInput, {marginTop: 0}]}
                 value={toAge}
+                maxLength={2}
                 keyboardType="number-pad"
-                onChangeText={e => setToAge(e)}
+                onChangeText={handleMinimumAge}
               />
 
               {/* <Dropdown dropdownPosition={true} data={age} /> */}

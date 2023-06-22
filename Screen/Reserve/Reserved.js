@@ -56,12 +56,22 @@ const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
     dataUserAsync();
   }, []);
 
-  const handleConfirmPayment = item => {
+  const handleConfirmPayment = async item => {
+    console.log(item);
     const body = {
-      item,
+      total: parseInt(item.total),
+      merchantId: item.facility?.merchant?.id,
     };
-
-    console.log({body});
+    const bookingId = item.id;
+    await Axios.put(`/booking/confirm/${bookingId}`, body)
+      .then(res => {
+        const data = res.data;
+        console.log(res);
+        if (data.message === 'OK') {
+          navigate('Tabs');
+        }
+      })
+      .catch(err => console.log(err));
   };
 
   return (
@@ -151,23 +161,29 @@ const Reserved = ({navigation: {navigate, goBack, addListener}}) => {
                     Rp.{currency(item.total)}
                   </Text>
                 </View>
-                {/* <TouchableOpacity
-                  onPress={() => handleConfirmPayment(item)}
-                  disabled={
-                    moment(item.updatedAt) >= moment().startOf('second')
-                      ? true
-                      : false
-                  }
-                  style={[styles.button, {borderColor: '#C4F601'}]}>
-                  <Text style={[styles.Heading28, {color: '#C4F601'}]}>
-                    Pasti Main
-                  </Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => handleCancelReserve(item.userId, item.id)}>
-                  <Text style={styles.Heading28}>Batalkan Reservasi</Text>
-                </TouchableOpacity>
+                {!item.status_payment ? (
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => handleConfirmPayment(item)}
+                      disabled={item.status_payment ? true : false}
+                      style={[
+                        styles.button,
+                        {borderColor: '#C4F601', backgroundColor: '#C4f601'},
+                      ]}>
+                      <Text style={[styles.Heading28, {color: '#000000'}]}>
+                        Konfirmasi Pasti Main
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, {borderColor: '#C4F601'}]}
+                      disabled={item.status_payment ? true : false}
+                      onPress={() => handleCancelReserve(item.userId, item.id)}>
+                      <Text style={[styles.Heading28, {color: '#C4F601'}]}>
+                        Batalkan Reservasi
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
               </View>
             ))}
         </View>

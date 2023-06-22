@@ -172,8 +172,13 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
                     alignItems: 'center',
                   }}>
                   <Image
-                    source={require('../src/Fitness-Icon.png')}
-                    style={{width: 21, height: 21, tintColor: 'white'}}
+                    source={require('../src/Merchant.png')}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      marginRight: 11,
+                      resizeMode: 'stretch',
+                    }}
                   />
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <View style={{width: '80%'}}>
@@ -270,8 +275,13 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
                     alignItems: 'center',
                   }}>
                   <Image
-                    source={require('../src/Fitness-Icon.png')}
-                    style={{width: 21, height: 21, tintColor: 'white'}}
+                    source={require('../src/Merchant.png')}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      marginRight: 11,
+                      resizeMode: 'stretch',
+                    }}
                   />
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <View
