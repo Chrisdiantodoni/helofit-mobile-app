@@ -120,110 +120,118 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
             bottom: 0,
             right: 30,
           }}>
-          {data
-            ?.filter(filter => filter.expiredInDays >= 0)
-            .map((item, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={styles.View}
-                onPress={() =>
-                  navigate('DetailTask', {
-                    taskId: item?.taskId,
-                    userId: item?.userId,
-                  })
-                }>
-                <Image
-                  source={{
-                    uri: item?.task.banner_img
-                      ? item?.task.banner_img
-                      : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                  }}
-                  style={{width: '100%', height: 148, borderRadius: 10}}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginLeft: 15,
-                    marginTop: 8,
-                    color: '#C4F601',
-                    fontWeight: '700',
-                    fontFamily: 'OpenSans',
-                  }}>
-                  {item.task?.task_name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    marginLeft: 15,
-                    marginTop: 4,
-                    fontWeight: '400',
-                    fontFamily: 'OpenSans',
-                    marginBottom: 24,
-                    color: '#FFFFFF',
-                  }}>
-                  {item?.expiredInDays == 0
-                    ? 'Berakhir Hari Ini'
-                    : `Berakhir dalam ${item?.expiredInDays} hari lagi`}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 20,
-                    alignItems: 'center',
-                  }}>
+          {data?.filter(filter => filter.expiredInDays >= 0).length > 0 ? (
+            data
+              ?.filter(filter => filter.expiredInDays >= 0)
+              .map((item, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={styles.View}
+                  onPress={() =>
+                    navigate('DetailTask', {
+                      taskId: item?.taskId,
+                      userId: item?.userId,
+                    })
+                  }>
                   <Image
-                    source={require('../src/Merchant.png')}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      marginRight: 11,
-                      resizeMode: 'stretch',
+                    source={{
+                      uri: item?.task.banner_img
+                        ? item?.task.banner_img
+                        : 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
                     }}
+                    style={{width: '100%', height: 148, borderRadius: 10}}
                   />
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View style={{width: '80%'}}>
-                      <Text
-                        style={{
-                          marginLeft: 10,
-                          fontSize: 12,
-                          color: '#ffffff',
-                          fontFamily: 'OpenSans',
-                        }}>
-                        {item.task?.merchant?.merchant_name}
-                      </Text>
-                    </View>
-                    <View
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginLeft: 15,
+                      marginTop: 8,
+                      color: '#C4F601',
+                      fontWeight: '700',
+                      fontFamily: 'OpenSans',
+                    }}>
+                    {item.task?.task_name}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      marginLeft: 15,
+                      marginTop: 4,
+                      fontWeight: '400',
+                      fontFamily: 'OpenSans',
+                      marginBottom: 24,
+                      color: '#FFFFFF',
+                    }}>
+                    {item?.expiredInDays == 0
+                      ? 'Berakhir Hari Ini'
+                      : `Berakhir dalam ${item?.expiredInDays} hari lagi`}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginLeft: 20,
+                      alignItems: 'center',
+                    }}>
+                    <Image
+                      source={require('../src/Merchant.png')}
                       style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <View>
+                        width: 20,
+                        height: 20,
+                        marginRight: 11,
+                        resizeMode: 'stretch',
+                      }}
+                    />
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <View style={{width: '80%'}}>
                         <Text
                           style={{
-                            color: '#C4F601',
-                            fontSize: 20,
-                            fontWeight: '700',
+                            marginLeft: 10,
+                            fontSize: 12,
+                            color: '#ffffff',
                             fontFamily: 'OpenSans',
                           }}>
-                          {currency(item?.task?.poin)}
+                          {item.task?.merchant?.merchant_name}
                         </Text>
                       </View>
-                      <View>
-                        <Text
-                          style={{
-                            color: '#C4F601',
-                            fontSize: 12,
-                            fontWeight: '700',
-                            fontFamily: 'OpenSans',
-                          }}>
-                          POIN
-                        </Text>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                        <View>
+                          <Text
+                            style={{
+                              color: '#C4F601',
+                              fontSize: 20,
+                              fontWeight: '700',
+                              fontFamily: 'OpenSans',
+                            }}>
+                            {currency(item?.task?.poin)}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text
+                            style={{
+                              color: '#C4F601',
+                              fontSize: 12,
+                              fontWeight: '700',
+                              fontFamily: 'OpenSans',
+                            }}>
+                            POIN
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                Tidak terdapat task yang sedang berjalan
+              </Text>
+            </View>
+          )}
         </ScrollView>
       </View>
       <View
@@ -379,6 +387,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     paddingHorizontal: 16,
     borderRadius: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'gray',
   },
   header: {
     fontSize: 20,

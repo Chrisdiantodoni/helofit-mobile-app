@@ -197,6 +197,29 @@ function Signin({navigation}) {
             Masuk
           </Text>
         </TouchableOpacity>
+        <View style={{flexDirection: 'row', marginTop: 8}}>
+          <Text
+            style={{
+              color: '#FFFFFF',
+              fontWeight: '400',
+              fontSize: 14,
+            }}>
+            Belum punya akun?
+          </Text>
+          <TouchableOpacity>
+            <Text
+              style={{
+                alignSelf: 'flex-end',
+                color: '#C4F601',
+                marginRight: 5,
+                fontSize: 14,
+                fontWeight: '400',
+              }}>
+              {' '}
+              daftar
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAwareScrollView>
   );

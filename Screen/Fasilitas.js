@@ -30,10 +30,19 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
       title: 'Buka Sekarang',
     },
   ];
+
+  const [filteredFacility, setFilteredFacility] = useState([]);
+
   const handleSelectedFilter = item => {
     setSelected(item);
+    if (item.title === 'Harga Terendah') {
+      const sortedFacility = [...facility].sort((a, b) => a.price - b.price);
+      setFilteredFacility(sortedFacility);
+    } else if (item.title === 'Buka Sekarang') {
+      const openFacility = facility.filter(item => item.time.length !== 0);
+      setFilteredFacility(openFacility);
+    }
   };
-
   const getFacility = async () => {
     try {
       const response = await Axios.get(
@@ -41,6 +50,7 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
       );
       const data = response?.data?.data?.result;
       setFacility(data || []);
+      setFilteredFacility(data || []);
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -103,10 +113,10 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
                 marginRight: 8,
               }}
               onPress={() => handleSelectedFilter(item)}>
-              <Image
+              {/* <Image
                 source={item.image}
                 style={{width: 20, height: 20, marginRight: 11}}
-              />
+              /> */}
               <Text
                 style={{
                   fontFamily: 'OpenSans',
@@ -122,7 +132,7 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
       </View>
       <View style={{marginTop: 24, marginHorizontal: 16}}>
         <FlatList
-          data={facility}
+          data={filteredFacility}
           renderItem={({item, index}) => (
             <TouchableOpacity
               key={index}
@@ -164,6 +174,11 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
               </Text>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Tidak ada fasilitas</Text>
+            </View>
+          )}
         />
       </View>
     </ScrollView>
@@ -182,6 +197,17 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000000',
     flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'gray',
   },
   badge: {
     backgroundColor: '#161616',

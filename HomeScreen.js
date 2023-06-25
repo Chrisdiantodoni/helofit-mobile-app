@@ -169,6 +169,7 @@ function HomeScreen({navigation}) {
         .then(response => {
           if (response.data?.message === 'OK') {
             console.log('data notif', response?.data?.data);
+
             setDataNotif(response?.data?.data);
           }
         })
@@ -211,15 +212,11 @@ function HomeScreen({navigation}) {
                       zIndex: 1,
                     }}>
                     <Text style={{color: 'white', fontSize: 12}}>
-                      {dataNotif.filter(
-                        item => item?.list_user?.userId === dataUser?.id,
-                      ).length === 0
-                        ? dataNotif.filter(
-                            item =>
-                              item?.status_notif === 'request' &&
-                              item?.list_user?.status === 'request',
-                          ).length
-                        : 0}
+                      {
+                        dataNotif.filter(
+                          filter => filter.userId === dataUser?.id,
+                        ).length
+                      }
                     </Text>
                   </View>
                 </View>
