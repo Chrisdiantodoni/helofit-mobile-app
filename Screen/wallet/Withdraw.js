@@ -53,16 +53,20 @@ const Withdraw = ({navigation: {goBack, navigate, addListener}}) => {
     const body = {
       nominal: parseInt(nominal),
     };
-    await Axios.put(`/wallet/withdraw/${userId}`, body)
-      .then(res => {
-        if (res) {
-          Alert.alert('Selamat Dana anda berhasil di tarik dari dompet kamu');
-          replace('Tabs');
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    if (parseInt(nominal) >= 300000) {
+      await Axios.put(`/wallet/withdraw/${userId}`, body)
+        .then(res => {
+          if (res) {
+            Alert.alert('Selamat Dana anda berhasil di tarik dari dompet kamu');
+            replace('Tabs');
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    } else {
+      Alert.alert('Penarikan tidak sesuai ketentuan');
+    }
 
     console.log({body});
   };

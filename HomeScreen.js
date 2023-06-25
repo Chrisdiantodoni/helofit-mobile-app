@@ -669,7 +669,11 @@ function HomeScreen({navigation}) {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Onboarding data={promo} />
+          <Onboarding
+            data={promo?.filter(
+              filter => moment(filter.ExpiredIn) >= moment().startOf('day'),
+            )}
+          />
         </View>
         {/* <View
           style={{

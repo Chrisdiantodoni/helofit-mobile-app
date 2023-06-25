@@ -127,18 +127,20 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
           />
         </TouchableOpacity>
         <Text style={[styles.header, {color: '#000000', fontSize: 20}]}>
-          List Task
+          List Promo
         </Text>
       </View>
       <View>
-        <View
-          style={{
-            backgroundColor: '#000000',
-            paddingHorizontal: 16,
-            borderRadius: 16,
-            paddingVertical: 25,
-          }}>
-          <TouchableOpacity style={styles.badge}>
+        <TouchableOpacity
+          style={styles.badge}
+          onPress={() => navigate('Tabs', {screen: 'Task'})}>
+          <View
+            style={{
+              backgroundColor: '#000000',
+              paddingHorizontal: 16,
+              borderRadius: 16,
+              paddingVertical: 25,
+            }}>
             <View style={{flexDirection: 'row'}}>
               <Image
                 source={require('../src/Reward.png')}
@@ -179,8 +181,8 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
                 }}
               />
             </View>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView>
