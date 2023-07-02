@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '93%',
     resizeMode: 'contain',
-    height: 160,
+    height: 136,
     marginTop: 32,
   },
 });

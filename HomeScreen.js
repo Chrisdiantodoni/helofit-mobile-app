@@ -190,14 +190,14 @@ function HomeScreen({navigation}) {
           flexDirection: 'row',
           marginLeft: 16,
         }}>
-        <View style={{width: '65%'}}>
+        <View style={{width: '75%'}}>
           <Image
             source={require('./src/LogoHomescreen.png')}
             style={{width: 195, height: 56, resizeMode: 'stretch'}}
           />
         </View>
         <View style={{flexDirection: 'row'}}>
-          <View style={{width: '25%'}}>
+          <View style={{width: '22%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
               {dataNotif.length !== 0 ? (
                 <View style={{position: 'absolute'}}>
@@ -206,31 +206,30 @@ function HomeScreen({navigation}) {
                       backgroundColor: 'red',
                       borderRadius: 10,
                       position: 'absolute',
-                      top: -5,
-                      right: -40,
+                      top: -2,
+                      right: -35,
                       paddingHorizontal: 5,
                       zIndex: 1,
                     }}>
                     <Text style={{color: 'white', fontSize: 12}}>
-                      {
-                        dataNotif.filter(
-                          filter => filter.userId === dataUser?.id,
-                        ).length
-                      }
+                      {dataNotif.length}
                     </Text>
                   </View>
                 </View>
               ) : null}
 
-              <Icon
-                style={{color: 'black', fontSize: 20, paddingHorizontal: 15}}
-                name="bell"
+              <Image
+                source={require('./src/Notification.png')}
+                style={{width: 35, height: 35, resizeMode: 'cover'}}
               />
             </TouchableOpacity>
           </View>
           <View style={{width: '25%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-              <Icon1 style={{color: 'black', fontSize: 25}} name="user" />
+              <Image
+                source={require('./src/Profile.png')}
+                style={{width: 35, height: 35, resizeMode: 'cover'}}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -635,7 +634,9 @@ function HomeScreen({navigation}) {
                                   fontWeight: '400',
                                   color: '#000000',
                                 }}>
-                                {idxTask + 1}. {itemTask?.task_name}
+                                {idxTask + 1}.{' '}
+                                {itemTask?.task_name?.slice(0, 10)}
+                                {'...'}
                               </Text>
                             </View>
                           ))

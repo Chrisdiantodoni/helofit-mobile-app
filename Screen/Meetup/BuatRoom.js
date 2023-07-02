@@ -161,7 +161,7 @@ const BuatRoom = ({route, navigation}) => {
         console.log(res);
         const data = res.data;
         if (data.message === 'OK') {
-          navigation.navigate('Tabs');
+          navigation.replace('Reserved');
         }
       })
       .catch(err => {
@@ -303,7 +303,6 @@ const BuatRoom = ({route, navigation}) => {
       {type_create_room === 'room' ? (
         <View
           style={{
-            position: 'absolute',
             bottom: 0,
             backgroundColor: '#000',
             height: 70,
@@ -344,7 +343,6 @@ const BuatRoom = ({route, navigation}) => {
       ) : (
         <View
           style={{
-            position: 'absolute',
             bottom: 0,
             backgroundColor: '#000',
             height: 70,

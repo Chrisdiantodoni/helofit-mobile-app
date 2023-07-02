@@ -25,6 +25,9 @@ const SyaratKetentuan = ({navigation: {goBack}}) => {
             }}
           />
         </TouchableOpacity>
+        <Text style={[styles.header, {color: '#000000', fontSize: 20}]}>
+          Syarat dan Ketentuan
+        </Text>
       </View>
       <View style={{paddingHorizontal: 16}}>
         <Text style={[styles.heading14, {fontSize: 20, fontWeight: '700'}]}>

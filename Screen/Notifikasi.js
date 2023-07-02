@@ -201,7 +201,7 @@ const ApproveRequest = ({item}) => {
         <View style={{width: '20%'}}>
           <Image
             source={{uri: item?.room?.user?.profile_img}}
-            style={{width: 48, height: 48}}
+            style={{width: 48, height: 48, borderRadius: 48 / 2}}
           />
         </View>
         <View style={{marginBottom: 30}}>
@@ -241,8 +241,8 @@ const SendingRequest = ({item}) => {
         }}>
         <View style={{width: '20%'}}>
           <Image
-            source={require('../src/Doni.png')}
-            style={{width: 48, height: 48}}
+            source={{uri: item?.room?.user?.profile_img}}
+            style={{width: 48, height: 48, borderRadius: 48 / 2}}
           />
         </View>
         <View style={{marginBottom: 30}}>
@@ -272,6 +272,7 @@ const CardRequest = ({
   handleApproved,
   handleUnapproved,
 }) => {
+  console.log({itemUser});
   console.log({dataUser});
   return (
     <View>
@@ -286,8 +287,8 @@ const CardRequest = ({
         }}>
         <View style={{width: '20%'}}>
           <Image
-            source={require('../src/Doni.png')}
-            style={{width: 48, height: 48}}
+            source={{uri: itemUser?.user?.profile_img}}
+            style={{width: 48, height: 48, borderRadius: 48 / 2}}
           />
         </View>
         <View style={{marginBottom: 30}}>

@@ -582,7 +582,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
                     <Text
                       style={[
                         styles.heading28,
-                        {color: '#C4f601', fontSize: 16},
+                        {color: '#C4f601', fontSize: 14},
                       ]}>
                       Rp. {currency(dataUser?.balance)}
                     </Text>

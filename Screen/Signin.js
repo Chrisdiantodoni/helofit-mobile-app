@@ -214,7 +214,8 @@ function Signin({navigation}) {
                 marginRight: 5,
                 fontSize: 14,
                 fontWeight: '400',
-              }}>
+              }}
+              onPress={() => navigation.navigate('Signup')}>
               {' '}
               daftar
             </Text>

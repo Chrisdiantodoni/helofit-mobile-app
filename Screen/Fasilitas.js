@@ -42,6 +42,19 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
       const openFacility = facility.filter(item => item.time.length !== 0);
       setFilteredFacility(openFacility);
     }
+
+    // Filter out facilities with the same name
+    const uniqueFacilities = [];
+    filteredFacility.forEach(facility => {
+      if (
+        !uniqueFacilities.some(
+          f => f.merchant?.merchant_name === facility.merchant?.merchant_name,
+        )
+      ) {
+        uniqueFacilities.push(facility);
+      }
+    });
+    setFilteredFacility(uniqueFacilities);
   };
   const getFacility = async () => {
     try {
@@ -49,9 +62,20 @@ function Fasilitas({route, navigation: {navigate, goBack}}) {
         `/facility?column_name=["category.id"]&query=[${id}]&order_field=price&order=ASC`,
       );
       const data = response?.data?.data?.result;
-      setFacility(data || []);
-      setFilteredFacility(data || []);
-      console.log(data);
+      const uniqueFacilities = [];
+      data.forEach(facility => {
+        if (
+          !uniqueFacilities.some(
+            f => f.merchant?.merchant_name === facility.merchant?.merchant_name,
+          )
+        ) {
+          uniqueFacilities.push(facility);
+        }
+      });
+
+      setFacility(uniqueFacilities || []);
+      setFilteredFacility(uniqueFacilities || []);
+      console.log(uniqueFacilities);
     } catch (error) {
       console.log(error);
     }

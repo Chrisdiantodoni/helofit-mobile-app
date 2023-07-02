@@ -354,7 +354,9 @@ function Task({navigation: {navigate, goBack, addListener}, route}) {
                             alignItems: 'center',
                           }}>
                           <Text style={{fontSize: 12, fontWeight: '400'}}>
-                            {idxTask + 1} {'.'} {itemTask.task_name}
+                            {idxTask + 1} {'.'}{' '}
+                            {itemTask.task_name.slice(0, 10)}
+                            {'...'}
                           </Text>
                         </View>
                       ))

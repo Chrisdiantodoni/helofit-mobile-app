@@ -88,6 +88,7 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
         style={{
           paddingTop: 32,
           marginHorizontal: 16,
+          justifyContent: 'center',
         }}>
         <Text style={styles.Heading28}>Daftar Promo Kamu</Text>
         <Text style={[styles.heading14, {paddingTop: 8}]}>
@@ -108,9 +109,10 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
                 <Image
                   source={{uri: item?.promo?.promo_img}}
                   style={{
-                    width: '95%',
-                    height: 160,
+                    width: '100%',
+                    height: 136,
                     borderRadius: 16,
+                    resizeMode: 'cover',
                   }}
                 />
               </TouchableOpacity>
@@ -205,8 +207,13 @@ const PromoList = ({navigation: {navigate, goBack, addListener}}) => {
               marginTop: 24,
             }}>
             <Image
-              source={require('../src/Basketball1.png')}
-              style={{width: 20, height: 20, marginRight: 11}}
+              source={require('../src/Merchant.png')}
+              style={{
+                width: 20,
+                height: 20,
+                marginRight: 11,
+                resizeMode: 'stretch',
+              }}
             />
             <Text
               style={[

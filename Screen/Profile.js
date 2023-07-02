@@ -94,11 +94,17 @@ function Profile({
         <View style={{justifyContent: 'center'}}>
           <Image
             source={{
-              uri: dataUser?.profile_img
-                ? dataUser?.profile_img
-                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+              uri:
+                dataUser?.profile_img !== null
+                  ? dataUser?.profile_img
+                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
             }}
-            style={{width: 48, height: 48, borderRadius: 48 / 2}}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 48 / 2,
+              backgroundColor: '#7c7c7c',
+            }}
           />
         </View>
         <View style={{justifyContent: 'center', marginLeft: 16}}>

@@ -31,6 +31,7 @@ function Signin({navigation}) {
   const [username, setusername] = useState('');
   const [nohp, setNohp] = useState('');
   const [secureText, setSecureText] = useState(true);
+  const [securePin, setSecurePin] = useState(true);
   const [pin, setPin] = useState('');
   const [message, setMessage] = useState('');
 
@@ -209,25 +210,43 @@ function Signin({navigation}) {
               </TouchableOpacity>
             </View>
 
-            <TextInput
-              placeholder="Masukkan Pin"
-              keyboardType="number-pad"
-              value={pin}
-              maxLength={6}
-              secureTextEntry={true}
-              placeholderTextColor={'#FFFFFF'}
+            <View
               style={{
                 backgroundColor: '#7c7c7c',
                 borderRadius: 16,
                 width: 355,
                 height: 60,
                 color: '#FFFFFF',
+                paddingLeft: 22,
                 fontSize: 14,
-                textAlign: 'center',
+                marginBottom: 16,
                 fontFamily: 'openSans',
-              }}
-              onChangeText={text => setPin(text)}
-            />
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <View style={{width: '85%'}}>
+                <TextInput
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                  }}
+                  autoCapitalize="none"
+                  placeholder="Masukkan Pin"
+                  secureTextEntry={securePin}
+                  placeholderTextColor={'#FFFFFF'}
+                  value={pin}
+                  onChangeText={text => setPin(text)}
+                  maxLength={6}
+                />
+              </View>
+              <TouchableOpacity onPress={() => setSecurePin(prev => !prev)}>
+                <Icon
+                  name={securePin ? 'eye-slash' : 'eye'}
+                  size={24}
+                  color="#FFFFFF"
+                />
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={{

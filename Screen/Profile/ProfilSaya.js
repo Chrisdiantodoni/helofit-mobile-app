@@ -175,6 +175,7 @@ const ProfilSaya = ({navigation}) => {
                 marginTop: 32,
                 borderRadius: 72 / 2,
                 resizeMode: 'cover',
+                backgroundColor: '#7c7c7c',
               }}
             />
           </TouchableOpacity>

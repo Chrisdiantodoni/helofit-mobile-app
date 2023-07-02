@@ -26,8 +26,6 @@ function ForgetPassword(props, {navigation}) {
     } catch (error) {
       console.log(error);
     }
-
-    console.log({body});
   };
 
   return (
@@ -84,6 +82,11 @@ function ForgetPassword(props, {navigation}) {
         }}>
         <View style={{width: '85%'}}>
           <TextInput
+            style={{
+              color: '#FFFFFF',
+              fontSize: 16,
+              fontFamily: 'OpenSans',
+            }}
             placeholder="Masukkan Password"
             secureTextEntry={isSecureEntry}
             placeholderTextColor={'#FFFFFF'}
