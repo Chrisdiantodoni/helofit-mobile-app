@@ -6,6 +6,7 @@ import {
   Button,
   TouchableOpacity,
   Touchable,
+  Pressable,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -49,7 +50,7 @@ import ConfirmTopUp from './Screen/wallet/ConfirmTopUp';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
+function MyTabs({navigation}) {
   const {dispatch} = useContext(Context);
   return (
     <Tab.Navigator
@@ -72,12 +73,14 @@ function MyTabs() {
           tabBarLabel: 'Home',
           headerShown: false,
           tabBarIcon: ({color, size}) => (
-            <View style={{alignSelf: 'center'}}>
-              <Image
-                source={require('./src/Home.png')}
-                style={{width: 21, height: 21, tintColor: color}}
-              />
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  source={require('./src/Home.png')}
+                  style={{width: 21, height: 21, tintColor: color}}
+                />
+              </View>
+            </TouchableOpacity>
           ),
         }}
       />
@@ -94,12 +97,15 @@ function MyTabs() {
           headerShown: false,
           tabBarLabel: 'Meetup',
           tabBarIcon: ({color, size}) => (
-            <View style={{alignSelf: 'center'}}>
-              <Image
-                source={require('./src/Group.png')}
-                style={{width: 32, height: 32, tintColor: color}}
-              />
-            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('List Meetup')}>
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  source={require('./src/Group.png')}
+                  style={{width: 32, height: 32, tintColor: color}}
+                />
+              </View>
+            </TouchableOpacity>
           ),
         }}
       />
@@ -110,12 +116,14 @@ function MyTabs() {
           headerShown: false,
           tabBarLabel: 'Task',
           tabBarIcon: ({color, size}) => (
-            <View style={{alignSelf: 'center'}}>
-              <Image
-                source={require('./src/Task.png')}
-                style={{width: 32, height: 32, tintColor: color}}
-              />
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('Task')}>
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  source={require('./src/Task.png')}
+                  style={{width: 32, height: 32, tintColor: color}}
+                />
+              </View>
+            </TouchableOpacity>
           ),
         }}
       />
@@ -126,12 +134,14 @@ function MyTabs() {
           headerShown: false,
           tabBarLabel: 'Promo',
           tabBarIcon: ({color, size}) => (
-            <View style={{alignSelf: 'center'}}>
-              <Image
-                source={require('./src/Promo.png')}
-                style={{width: 24, height: 20, tintColor: color}}
-              />
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('Promo')}>
+              <View style={{alignSelf: 'center'}}>
+                <Image
+                  source={require('./src/Promo.png')}
+                  style={{width: 24, height: 20, tintColor: color}}
+                />
+              </View>
+            </TouchableOpacity>
           ),
         }}
       />

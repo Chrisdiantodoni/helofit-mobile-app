@@ -126,7 +126,7 @@ const CreateRoom = ({route, navigation: {goBack, navigate}}) => {
           const response = res.data?.data;
           const id = response.id;
           if (res.data.message === 'OK') {
-            handleCreateRoom(id, new Date(newBookingDate));
+            handleCreateRoom(id, newBookingDate);
           }
         })
         .catch(err => {

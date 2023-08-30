@@ -199,7 +199,7 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
                     style={{
                       width: '100%',
                       height: 138,
-                      resizeMode: 'cover',
+                      resizeMode: 'contain',
                       borderRadius: 10,
                     }}
                   />
@@ -234,7 +234,7 @@ function Promo({navigation: {goBack, navigate, addListener}}) {
           <Image
             source={{uri: modalBanner}}
             style={{
-              resizeMode: 'cover',
+              resizeMode: 'contain',
               width: '100%',
               height: 160,
               borderRadius: 10,

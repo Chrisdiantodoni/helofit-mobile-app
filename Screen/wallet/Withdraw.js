@@ -53,7 +53,7 @@ const Withdraw = ({navigation: {goBack, navigate, addListener}}) => {
     const body = {
       nominal: parseInt(nominal),
     };
-    if (parseInt(nominal) >= 300000) {
+    if (parseInt(nominal) >= 100000) {
       await Axios.put(`/wallet/withdraw/${userId}`, body)
         .then(res => {
           if (res) {
@@ -114,7 +114,7 @@ const Withdraw = ({navigation: {goBack, navigate, addListener}}) => {
           </Text>
         </View>
         <Text style={[styles.heading28, {marginTop: 18}]}>
-          Masukkan Nonimal Penarikan
+          Masukkan Nominal Penarikan
         </Text>
         <View
           style={{
@@ -193,7 +193,7 @@ const Withdraw = ({navigation: {goBack, navigate, addListener}}) => {
             setItems={setItems}
           />
           <Text style={[styles.heading28, {fontSize: 16, marginVertical: 8}]}>
-            Bank Tujuan
+            Nomor Rekening
           </Text>
           <TextInput
             style={{
@@ -209,6 +209,22 @@ const Withdraw = ({navigation: {goBack, navigate, addListener}}) => {
             disabled
             keyboardType="number-pad"
             onChangeText={text => setNominal(text)}
+          />
+          <Text style={[styles.heading28, {fontSize: 16, marginVertical: 8}]}>
+            Atas Nama
+          </Text>
+          <TextInput
+            style={{
+              backgroundColor: '#7C7c7c',
+              borderRadius: 16,
+              height: 60,
+              color: '#FFFFFF',
+              width: '100%',
+              paddingLeft: 20,
+              fontSize: 16,
+            }}
+            value={'Doni Chrisdianto K'}
+            disabled
           />
         </View>
 

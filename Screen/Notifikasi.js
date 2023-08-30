@@ -228,6 +228,7 @@ const ApproveRequest = ({item}) => {
   );
 };
 const SendingRequest = ({item}) => {
+  console.log(item);
   return (
     <View>
       <View

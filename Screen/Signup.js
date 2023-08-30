@@ -231,6 +231,7 @@ function Signin({navigation}) {
                     fontSize: 14,
                   }}
                   autoCapitalize="none"
+                  keyboardType="number-pad"
                   placeholder="Masukkan Pin"
                   secureTextEntry={securePin}
                   placeholderTextColor={'#FFFFFF'}

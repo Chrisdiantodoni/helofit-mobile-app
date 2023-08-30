@@ -271,11 +271,12 @@ const ProfilSaya = ({navigation}) => {
           <TextInput
             editable={isEdit}
             value={age}
+            keyboardType="number-pad"
             style={[
               styles.Heading28,
               {backgroundColor: isEdit ? '#161616' : '#000'},
             ]}
-            onChangeText={setAge}
+            onChangeText={text => setAge(text)}
           />
           <Text style={[styles.heading14, {fontWeight: '400', marginTop: 24}]}>
             Nomor Handphone
@@ -283,6 +284,7 @@ const ProfilSaya = ({navigation}) => {
           <TextInput
             editable={isEdit}
             value={phoneNumber}
+            keyboardType="phone-pad"
             style={[
               styles.Heading28,
               {backgroundColor: isEdit ? '#161616' : '#000'},
